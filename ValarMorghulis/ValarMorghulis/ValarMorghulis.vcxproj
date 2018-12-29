@@ -20,7 +20,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{DA7405C8-C479-4AAB-B64B-605339B4AD35}</ProjectGuid>
+    <ProjectGuid>{93FFF8BB-3E0A-4691-9EFA-CAA286CA6C29}</ProjectGuid>
     <RootNamespace>ValarMorghulis</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
