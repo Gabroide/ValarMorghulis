@@ -7,8 +7,8 @@
 #include "Globals.h"
 
 #include "imgui\imgui.h"
-#include "imgui\examples\imgui_impl_sdl.h"
-#include "imgui\examples\imgui_impl_opengl3.h"
+#include "imgui\imgui_impl_sdl.h"
+#include "imgui\imgui_impl_opengl3.h"
 
 class ModuleEditor : public Module
 {
@@ -23,7 +23,12 @@ class ModuleEditor : public Module
 		update_status		Update()	override;
 
 public:
+	bool	showAboutMenu		= false;
+	bool	showHardwareMenu	= false;
+	bool	requestedExit		= false;
+
 	ImGuiIO io;
+
 
 };
 

@@ -11,6 +11,7 @@ class ModuleTextures;
 class ModuleEditor;
 class ModuleInput;
 class ModuleRenderExercise;
+class ModuleShader;
 
 class Application
 {
@@ -18,10 +19,10 @@ public:
 	Application();
 	~Application();
 
-	bool Init();
-	bool CleanUp();
+	bool			Init();
+	bool			CleanUp();
 
-	update_status Update();
+	update_status	Update();
 
 public:
 	ModuleRender* renderer = nullptr;
@@ -30,6 +31,7 @@ public:
 	ModuleTextures* textures = nullptr;
 	ModuleEditor* editor = nullptr;
 	ModuleRenderExercise* exercise = nullptr;
+	ModuleShader* shader = nullptr;
 
 private:
 	std::list<Module*>	modules;

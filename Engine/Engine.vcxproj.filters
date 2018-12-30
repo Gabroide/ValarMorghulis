@@ -1,6 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <ClCompile Include="log.cpp" />
+    <ClCompile Include="ModuleInput.cpp" />
+    <ClCompile Include="ModulePrograms.cpp" />
+    <ClCompile Include="ModuleRender.cpp" />
+    <ClCompile Include="ModuleTextures.cpp" />
+    <ClCompile Include="ModuleWindow.cpp" />
     <ClCompile Include="MathGeoLib\include\Geometry\AABB.cpp">
       <Filter>MathGeoLib\Geometry</Filter>
     </ClCompile>
@@ -97,11 +103,9 @@
     <ClCompile Include="MathGeoLib\include\Time\Clock.cpp">
       <Filter>MathGeoLib\Time</Filter>
     </ClCompile>
+    <ClCompile Include="ModuleModelLoader.cpp" />
     <ClCompile Include="Application.cpp">
       <Filter>Main</Filter>
-    </ClCompile>
-    <ClCompile Include="log.cpp">
-      <Filter>Utils</Filter>
     </ClCompile>
     <ClCompile Include="Main.cpp">
       <Filter>Main</Filter>
@@ -109,29 +113,20 @@
     <ClCompile Include="ModuleEditor.cpp">
       <Filter>Modules\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ModuleInput.cpp">
-      <Filter>Modules\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ModuleModelLoader.cpp">
-      <Filter>Modules\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ModulePrograms.cpp">
-      <Filter>Modules\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ModuleRender.cpp">
-      <Filter>Modules\Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ModuleRenderExercise.cpp">
       <Filter>Modules\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ModuleTextures.cpp">
-      <Filter>Modules\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ModuleWindow.cpp">
+    <ClCompile Include="ModuleShader.cpp">
       <Filter>Modules\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Module.h" />
+    <ClInclude Include="ModuleInput.h" />
+    <ClInclude Include="ModulePrograms.h" />
+    <ClInclude Include="ModuleRender.h" />
+    <ClInclude Include="ModuleTextures.h" />
+    <ClInclude Include="ModuleWindow.h" />
     <ClInclude Include="MathGeoLib\include\Geometry\AABB.h">
       <Filter>MathGeoLib\Geometry</Filter>
     </ClInclude>
@@ -312,38 +307,21 @@
     <ClInclude Include="MathGeoLib\include\MathGeoLibFwd.h">
       <Filter>MathGeoLib</Filter>
     </ClInclude>
+    <ClInclude Include="modulemodelloader.h" />
     <ClInclude Include="Application.h">
       <Filter>Main</Filter>
     </ClInclude>
     <ClInclude Include="Globals.h">
       <Filter>Main</Filter>
     </ClInclude>
-    <ClInclude Include="ModuleTextures.h">
-      <Filter>Modules\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ModuleWindow.h">
-      <Filter>Modules\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ModuleRenderExercise.h">
-      <Filter>Modules\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ModuleRender.h">
-      <Filter>Modules\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ModulePrograms.h">
-      <Filter>Modules\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="modulemodelloader.h">
-      <Filter>Modules\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ModuleInput.h">
-      <Filter>Modules\Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ModuleEditor.h">
       <Filter>Modules\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Module.h">
-      <Filter>Modules\Header Files</Filter>
+    <ClInclude Include="ModuleRenderExercise.h">
+      <Filter>Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="ModuleShader.h">
+      <Filter>Modules</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -363,19 +341,16 @@
       <UniqueIdentifier>{ac47e9fb-136d-4979-9b5d-96b211105faa}</UniqueIdentifier>
     </Filter>
     <Filter Include="Main">
-      <UniqueIdentifier>{27f4fe06-32fb-410a-8271-74006f84ab42}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Utils">
-      <UniqueIdentifier>{d97435c2-3853-49c2-a63c-ba3b22726051}</UniqueIdentifier>
+      <UniqueIdentifier>{1b40e2ba-87da-4088-b2a0-e45de04c4257}</UniqueIdentifier>
     </Filter>
     <Filter Include="Modules">
-      <UniqueIdentifier>{90001bad-3548-4119-b3a9-0e4806f2f90d}</UniqueIdentifier>
+      <UniqueIdentifier>{300cdf61-45ce-4a43-8f03-749c0d49a583}</UniqueIdentifier>
     </Filter>
     <Filter Include="Modules\Header Files">
-      <UniqueIdentifier>{f4e29c71-3e2b-461f-95a4-0f3e592a30b3}</UniqueIdentifier>
+      <UniqueIdentifier>{8526a3d6-ad8f-446a-aa9d-7dee5a041332}</UniqueIdentifier>
     </Filter>
     <Filter Include="Modules\Source Files">
-      <UniqueIdentifier>{0667ce93-30c9-41b7-bb28-c6876ffd546c}</UniqueIdentifier>
+      <UniqueIdentifier>{7a1a161f-fa86-4503-a6e8-f0522df53753}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
