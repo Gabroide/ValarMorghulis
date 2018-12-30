@@ -3,10 +3,6 @@
 #include "ModuleWindow.h"
 #include "ModuleShader.h"
 
-//#include "SDL\include\SDL.h"
-
-//#include "glew-2.1.0\include\GL\glew.h"
-
 ModuleRenderExercise::ModuleRenderExercise()
 {
 
@@ -39,31 +35,9 @@ bool ModuleRenderExercise::Init()
 		0.0f, 1.0f, 0.0f
 	};
 
-	// Camera position
-	math::float3 target(0.0f, 0.0f, 0.0f);
-	math::float3 eye(0.0f, 0.0f, 4.0f);
-	math::float3 up(0.0f, 1.0f, 0.0f);
-
-	math::float4x4 transform = ModuleRenderExercise::ProjectionMatrix() *	ModuleRenderExercise::LookAt(target, eye, up);
-
-	// New vertex position
-	math::float4 vertexA(vboData[0], vboData[1], vboData[2], 1);
-	math::float4 vertexB(vboData[3], vboData[4], vboData[5], 1);
-	math::float4 vertexC(vboData[6], vboData[7], vboData[8], 1);
-
-	math::float4 vertATrans = transform * vertexA;
-	math::float4 vertBTrans = transform * vertexB;
-	math::float4 vertCTrans = transform * vertexC;
-
-	float vboTrans[] = {
-		vertATrans.x / vertATrans.w, vertATrans.y / vertATrans.w, vertATrans.z / vertATrans.w,
-		vertBTrans.x / vertBTrans.w, vertBTrans.y / vertBTrans.w, vertBTrans.z / vertBTrans.w,
-		vertCTrans.x / vertCTrans.w, vertCTrans.y / vertCTrans.w, vertCTrans.z / vertCTrans.w,
-	};
-
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vboTrans), vboTrans, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vboData), vboData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	return vbo;
@@ -82,10 +56,13 @@ update_status ModuleRenderExercise::Update()
 		(void*)0			// aarray buffer offset
 	);
 
+	// Use shaders loaders
 	glUseProgram(program);
 
-	int vertexColorLocation = glGetUniformLocation(program, "ourColor");
-	glUniform4f(vertexColorLocation, 1.0f, 1.0f, 1.0f, 1.0f);
+	// Fragments
+	int fragUnifLocation = glGetUniformLocation(program, "newColor");
+	float color[4] = { 0.5f, 1.0f,0.0f, 1.0f };
+	glUniform4fv(fragUnifLocation, 1, color);
 
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 
@@ -98,8 +75,19 @@ update_status ModuleRenderExercise::Update()
 math::float4x4 ModuleRenderExercise::ProjectionMatrix()
 {
 	math::float4x4 projectMatrix;
+	projectMatrix = frustum.ProjectionMatrix();
 
 	return projectMatrix;
+}
+
+bool ModuleRenderExercise::CleanUp()
+{
+	if (vbo != 0)
+	{
+		glDeleteBuffers(1, &vbo);
+	}
+
+	return true;
 }
 
 math::float4x4 ModuleRenderExercise::LookAt(math::float3 & target, math::float3& eye, math::float3& up)

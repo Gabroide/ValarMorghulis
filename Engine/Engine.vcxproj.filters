@@ -352,5 +352,16 @@
     <Filter Include="Modules\Source Files">
       <UniqueIdentifier>{7a1a161f-fa86-4503-a6e8-f0522df53753}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{046673ba-3190-4d6d-823e-a258f12dcec9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Game\Shaders\default.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Game\Shaders\default.vs">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

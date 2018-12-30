@@ -201,6 +201,10 @@
     <ClCompile Include="ModuleTextures.cpp" />
     <ClCompile Include="ModuleWindow.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Game\Shaders\default.fs" />
+    <None Include="Game\Shaders\default.vs" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
