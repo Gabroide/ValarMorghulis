@@ -11,7 +11,7 @@ public:
 	ModuleShader();
 	~ModuleShader();
 
-	void	CheckCompiletionErrors(GLuint shader);
+	void	CheckCompilationErrors(GLuint shader);
 	GLuint	LoadShaders(const char* vertShaderPath, const char* fragShaderPath);
 
 public:

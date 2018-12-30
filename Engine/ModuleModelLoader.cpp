@@ -60,7 +60,7 @@ bool ModuleModelLoader::CleanUp()
 	{
 		if (materials[i].texture0 != 0)
 		{
-			App->textures->Unload(materials[i].texture0);
+			//App->textures->Unload(materials[i].texture0);
 		}
 	}
 	return true;

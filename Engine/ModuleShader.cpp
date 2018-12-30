@@ -12,7 +12,7 @@ ModuleShader::~ModuleShader()
 
 }
 
-GLuint ModuleShader::LoadShader(const char* vertShaderPath, const char* fragShaderPath)
+GLuint ModuleShader::LoadShaders(const char* vertShaderPath, const char* fragShaderPath)
 {
 	GLuint vertShader = glCreateShader(GL_VERTEX_SHADER);
 	GLuint fragShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -30,9 +30,9 @@ GLuint ModuleShader::LoadShader(const char* vertShaderPath, const char* fragShad
 		return GL_FALSE;
 	}
 
-	glShaderSource(vertShader, 1, vertShader, 1, &vertShaderStr, NULL);
+	glShaderSource(vertShader, 1, &vertShaderStr, NULL);
 	glCompileShader(vertShader);
-	glGetShader(vertShader, GL_COMPILE_STATUS, &compileStatus);
+	glGetShaderiv(vertShader, GL_COMPILE_STATUS, &compileStatus);
 
 	if (!compileStatus)
 	{
@@ -42,11 +42,11 @@ GLuint ModuleShader::LoadShader(const char* vertShaderPath, const char* fragShad
 		return GL_FALSE;
 	}
 
-	glShaderSource(fragSader, 1, &fragShaderStr, NULL);
-	gloCompileShader(fragShader);
+	glShaderSource(fragShader, 1, &fragShaderStr, NULL);
+	glCompileShader(fragShader);
 	glGetShaderiv(fragShader, GL_COMPILE_STATUS, &compileStatus);
 
-	if (!comileStatus)
+	if (!compileStatus)
 	{
 		LOG("Error: Failed compiling fragment shader");
 		CheckCompilationErrors(fragShader);
@@ -55,11 +55,11 @@ GLuint ModuleShader::LoadShader(const char* vertShaderPath, const char* fragShad
 	}
 
 	// Compile program
-	GLuint program = glCreaeProgram();
+	GLuint program = glCreateProgram();
 	glAttachShader(program, vertShader);
 	glAttachShader(program, fragShader);
 	glLinkProgram(program);
-	glGetProgramiv(program, LINK_STATUS, &compileStatus);
+	glGetProgramiv(program, GL_LINK_STATUS, &compileStatus);
 
 	// Removing shaders
 	glDeleteShader(vertShader);
@@ -71,7 +71,7 @@ GLuint ModuleShader::LoadShader(const char* vertShaderPath, const char* fragShad
 char* ModuleShader::ReadShaderFile(const char* shaderPath)
 {
 	FILE* file;
-	errno_t_err = fopen_s(&file, shaderPath, "rb");
+	errno_t err = fopen_s(&file, shaderPath, "rb");
 
 	if (file)
 	{
@@ -81,24 +81,24 @@ char* ModuleShader::ReadShaderFile(const char* shaderPath)
 		char* shaderData = (char*)malloc(size + 1);
 		fread(shaderData, 1, size, file);
 		shaderData[size] = 0;
-		close(file);
+		fclose(file);
 
-		returnshaderData;
+		return shaderData;
 	}
 
 	return nullptr;
 }
 
-void ModuleShader::CheckCompilationErrors(Guint shader)
+void ModuleShader::CheckCompilationErrors(GLuint shader)
 {
 	GLint infoLogLength;
 	glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLogLength);
 	GLchar* strInfoLog = new GLchar[infoLogLength + 1];
 	glGetShaderInfoLog(shader, infoLogLength, NULL, strInfoLog);
 
-	LOG(strInfLog);
+	LOG(strInfoLog);
 
 	delete[] strInfoLog;
-	infoLogLegth = NULL;
+	infoLogLength = NULL;
 	glDeleteShader(shader);
 }
