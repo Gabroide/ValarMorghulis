@@ -3,37 +3,44 @@
 #include "ModuleRender.h"
 #include "ModuleWindow.h"
 #include "ModuleEditor.h"
+#include "ModuleCamera.h"
 
-#include "SDL\include\SDL.h"
+#include "SDL\include\SDL.h" // TODO: search the SDL
 
 static void ShowMenuBar();
 static void ShowAbout();
 static void ShowHardware();
+static void ShowSceneConfig();
 
-ModuleEditor::ModuleEditor() 
+// Costructor
+ModuleEditor::ModuleEditor()
 {
 
 }
 
-ModuleEditor::~ModuleEditor() 
-{ 
+// Destructor
+ModuleEditor::~ModuleEditor()
+{
 
 }
 
-bool ModuleEditor::Init() 
-{
-	const char* glsl_version = "#version 130"; 
+bool ModuleEditor::Init() {
+	const char* glsl_version = "#version 130";
 
+	// Setup Dear ImGui binding
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
-	io = ImGui::GetIO(); 
-	(void)io;
+	io = ImGui::GetIO(); (void)io;
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
-	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;			// Enable Multi-Viewport
+	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
+	//io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
+	//io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
 
 	ImGui_ImplSDL2_InitForOpenGL(App->window->window, App->renderer->context);
 	ImGui_ImplOpenGL3_Init(glsl_version);
+
+	// Setup style
 	ImGui::StyleColorsDark();
 
 	return true;
@@ -48,18 +55,24 @@ update_status ModuleEditor::PreUpdate()
 	return UPDATE_CONTINUE;
 }
 
-update_status ModuleEditor::Update() 
+update_status ModuleEditor::Update()
 {
+
+	ImGui::ShowDemoWindow();
 	ShowMenuBar();
 
-	if (showAboutMenu)
-	{
+	if (showAboutMenu) {
 		ShowAbout();
 	}
 
-	if (showHardwareMenu)
+	if (showHardwareMenu) 
 	{
 		ShowHardware();
+	}
+
+	if (showSceneConfig) 
+	{
+		ShowSceneConfig();
 	}
 
 	if (requestedExit)
@@ -70,15 +83,25 @@ update_status ModuleEditor::Update()
 	return UPDATE_CONTINUE;
 }
 
-static void ShowMenuBar()
+static void ShowMenuBar() 
 {
-	if (ImGui::BeginMainMenuBar())
+	if (ImGui::BeginMainMenuBar()) 
 	{
-		if (ImGui::BeginMenu("File"))
+		if (ImGui::BeginMenu("File")) 
 		{
-			if (ImGui::MenuItem("Exit"))
-			{
-				App->editor->requestedExit = true;
+			if (ImGui::MenuItem("Exit")) 
+			{ 
+				App->editor->requestedExit = true; 
+			}
+
+			ImGui::EndMenu();
+		}
+
+		if (ImGui::BeginMenu("Scene")) 
+		{
+			if (ImGui::MenuItem("Configuration")) 
+			{ 
+				App->editor->showSceneConfig = true; 
 			}
 
 			ImGui::EndMenu();
@@ -86,19 +109,19 @@ static void ShowMenuBar()
 
 		if (ImGui::BeginMenu("Tools"))
 		{
-			if (ImGui::MenuItem("Hardware"))
-			{
-				App->editor->showHardwareMenu = true;
+			if (ImGui::MenuItem("Hardware")) 
+			{ 
+				App->editor->showHardwareMenu = true; 
 			}
 
-			ImGui:EndMenu();
+			ImGui::EndMenu();
 		}
 
 		if (ImGui::BeginMenu("Help"))
 		{
-			if (ImGui::MenuItem("About"))
-			{
-				App->editor->showAboutMenu = true;
+			if (ImGui::MenuItem("About")) 
+			{ 
+				App->editor->showAboutMenu = true; 
 			}
 
 			ImGui::EndMenu();
@@ -108,68 +131,110 @@ static void ShowMenuBar()
 	ImGui::EndMainMenuBar();
 }
 
-static void ShowAbout()
+static void ShowAbout() 
 {
-	const char* MITLicence = "Copyroght 2018 - QTEngine";
+	const char* MITLicense = "Copyright 2018 - QTEngine \n\nPermission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the 'Software'), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions";
 
-	ImGui::BeginMenu("About", App->editor->showAboutMenu);
+	ImGui::Begin("About", &App->editor->showAboutMenu);
 
 	ImGui::Text(TITLE);
 	ImGui::Text("C++/C engine for game development");
 	ImGui::Separator();
-	ImGui::Text("Libraries");
-
-	if (ImGui::MenuItem("SDL v2.0.8"))
-	{
-		ShellExecute(0, 0, "https://www.libsdl.org/index.php", 0, 0, SW_SHOW);
-	}
-
-	if (ImGui::MenuItem("Glew v2.1.0"))
-	{
-		ShellExecute(0, 0, "https://www.glew.sourceforge.net", 0, 0, SW_SHOW);
-	}
-
-	if (ImGui::MenuItem("ImGui v1.66"))
-	{
-		ShellExecute(0, 0, "https://www.github.com/ocornut/imgui/tree/docking", 0, 0, SW_SHOW);
-	}
-
-	ImGui::Separator();
-	ImGui::Text("Author");
-
-	if (ImGui::MenuItem("Gabriel Cambronero"))
-	{
-		ShellExecute(0, 0, "https://www.github.com/Gabroide/", 0, 0, SW_SHOW);
-	}
-
-	ImGui::Separator();
-	ImGui::TextWrapped(MITLicence);
+	ImGui::Text("Libraries:");
 	
-	ImGui::EndMenu();
+	if (ImGui::MenuItem("SDL v2.0.8")) 
+	{ 
+		ShellExecute(0, 0, "https://www.libsdl.org/index.php", 0, 0, SW_SHOW); 
+	}
+	
+	if (ImGui::MenuItem("Glew v2.1.0")) 
+	{ 
+		ShellExecute(0, 0, "http://glew.sourceforge.net/", 0, 0, SW_SHOW); 
+	}
+	
+	if (ImGui::MenuItem("ImGui v1.66")) 
+	{ 
+		ShellExecute(0, 0, "https://github.com/ocornut/imgui/tree/docking", 0, 0, SW_SHOW); 
+	}
+
+	ImGui::Separator();
+	ImGui::Text("Authors:");
+	
+	if (ImGui::MenuItem("Gabriel Cambronero")) 
+	{ 
+		ShellExecute(0, 0, "https://github.com/Gabroide/", 0, 0, SW_SHOW); 
+	}
+
+	ImGui::Separator();
+	ImGui::TextWrapped(MITLicense);
+	ImGui::End();
 }
 
-static void ShowHardware()
+static void ShowHardware() 
 {
-	ImGui::Begin("Hadware specifications", &App->editor->showHardwareMenu);
-	ImGui::Text("CPU Count: ");
+	ImGui::Begin("Hardware specs", &App->editor->showHardwareMenu);
+	
+	ImGui::Text("CPU Count: "); 
+	ImGui::SameLine(); 
 	ImGui::TextColored(ImVec4(0.8f, 0.5f, 1.0f, 1.0f), "%d", SDL_GetCPUCount());
-	ImGui::Text("System RAM: ");
-	ImGui::SameLine();
+
+	ImGui::Text("System RAM: "); 
+	ImGui::SameLine(); 
 	ImGui::TextColored(ImVec4(0.8f, 0.5f, 1.0f, 1.0f), "%d", SDL_GetSystemRAM());
+
+	ImGui::End();
+}
+
+static void ShowSceneConfig() 
+{
+	ImGui::Begin("Camera", &App->editor->showSceneConfig);
+
+	float forward[3] = { 
+		App->camera->forw.x, 
+		App->camera->forw.y, 
+		App->camera->forw.z 
+	};
+
+	ImGui::InputFloat3("Front", forward, "%.3f");
+	float up[3] = { 
+		App->camera->upw.x, 
+		App->camera->upw.y, 
+		App->camera->upw.z 
+	};
+
+	ImGui::InputFloat3("Up", up, "%.3f");
+	float eye[3] = { 
+		App->camera->eye.x, 
+		App->camera->eye.y, 
+		App->camera->eye.z 
+	};
+
+	ImGui::InputFloat3("Position", eye, "%.3f");
+	ImGui::SliderFloat("Mov Speed", &App->camera->cameraSpeed, 0.25f, 3.0f);
+	ImGui::SliderFloat("Rot Speed", &App->camera->rotationSpeed, 0.25f, 2.0f);
+	ImGui::Separator();
+	ImGui::SliderFloat("Near Plane", &App->camera->frustum.nearPlaneDistance, 0.1f, App->camera->frustum.farPlaneDistance);
+	ImGui::SliderFloat("Far Plane", &App->camera->frustum.farPlaneDistance, 0.1f, 1000.0f);
+	
+	ImGui::SliderFloat("Hotizontal FOV", &App->camera->frustum.horizontalFov, 0.01f, 1.0f);
+	ImGui::SliderFloat("Vertical FOV", &App->camera->frustum.verticalFov, 0.01f, 1.0f);
+	ImGui::InputFloat("AspectRatio", &App->camera->screenRatio, 0, 0, "%.3f");
+	ImGui::Separator();
+	ImGui::SliderFloat3("Background color", App->renderer->bgColor, 0.0f, 1.0f);
 	
 	ImGui::End();
 }
 
-void ModuleEditor::HandleInput(SDL_Event& event)
-{
+void ModuleEditor::HandleInputs(SDL_Event& event) {
 	ImGui_ImplSDL2_ProcessEvent(&event);
 }
 
-bool ModuleEditor::CleanUp() 
+// Called before quitting
+bool ModuleEditor::CleanUp()
 {
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplSDL2_Shutdown();
 	ImGui::DestroyContext();
-
+	
 	return true;
 }

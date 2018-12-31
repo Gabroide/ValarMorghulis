@@ -9,7 +9,7 @@ ModuleCamera::ModuleCamera()
 	target = math::float3(0.0f, 0.0f, 0.0f);
 	eye = math::float3(2.0f, 2.0f, 2.0f);
 	up = math::float3(0.0f, 1.0f, 0.0f);
-	pitch = 0.0f;
+	pitch = -45.0f;
 	yaw = 0.0f;
 }
 
@@ -81,7 +81,12 @@ update_status ModuleCamera::PreUpdate()
 		cameraSpeed /= 2;
 	}
 	
-	if(App->input->GetMouseButtonDown(SDL_BUTTON_LEFT) == KEY_DOWN) 
+	if (App->input->GetKey(SDL_SCANCODE_LALT) == KEY_DOWN)
+	{
+		MouseUpdate(App->input->GetMousePosition().x, App->input->GetMousePosition().y);
+
+	}
+	if(App->input->GetMouseButtonDown(SDL_BUTTON_LEFT) == KEY_REPEAT) 
 	{
 		LOG("Moving camera");
 		SDL_ShowCursor(SDL_DISABLE);
@@ -91,8 +96,7 @@ update_status ModuleCamera::PreUpdate()
 		LOG("Stoping camera movement");
 		SDL_ShowCursor(SDL_ENABLE);
 	}
-
-	if (App->input->GetMouseButtonDown(SDL_BUTTON_RIGHT) == KEY_DOWN)
+	else if (App->input->GetMouseButtonDown(SDL_BUTTON_RIGHT) == KEY_REPEAT)
 	{
 		LOG("Spining camera");
 		SDL_ShowCursor(SDL_DISABLE);
@@ -135,14 +139,6 @@ math::float4x4 ModuleCamera::ProjectionMatrix()
 	return projectMatrix;
 }
 
-/*
-tienes que sumar a la posicion de la camara el vector forward * (cantidad de momvimento) para ir para alante
-con el up para arriba y con el right o side para los lados
-
-cuando calculas, segun lo de carlos, hay un
-f...ese es el forward, el u es el up y el s el right
-*/
-
 void ModuleCamera::MoveCamera(CameraMovement cameraSide) {
 	switch (cameraSide) {
 	case Upwards:
@@ -177,9 +173,15 @@ void ModuleCamera::RotateCamera(CameraRotation cameraRotation) {
 	math::float3 direction;
 
 	if (pitch > 89.0f)
+	{
 		pitch = 89.0f;
+	}
 	if (pitch < -89.0f)
+	{
 		pitch = -89.0f;
+	}
+
+	LOG("%f", pich);
 
 	switch (cameraRotation) {
 	case PositivePitch:
@@ -190,14 +192,16 @@ void ModuleCamera::RotateCamera(CameraRotation cameraRotation) {
 		forw.Normalize();
 		target += forw * cameraSpeed;
 		break;
+
 	case NegativePitch:
-		pitch -= cameraSpeed * 2;
+		pitch -= rotationSpeed * 2;
 		forw.y = SDL_sin(degreesToRadians(pitch));
 		forw.x = SDL_cos(degreesToRadians(pitch));
 		forw.z = SDL_cos(degreesToRadians(pitch));
 		forw.Normalize();
 		target -= forw * cameraSpeed;
 		break;
+
 	case PositiveYaw:
 		yaw += cameraSpeed;
 		forw.y = SDL_cos(degreesToRadians(pitch)) * SDL_cos(degreesToRadians(yaw));
@@ -207,6 +211,7 @@ void ModuleCamera::RotateCamera(CameraRotation cameraRotation) {
 		target += forw * cameraSpeed;
 		eye += forw * cameraSpeed;
 		break;
+
 	case NegativeYaw:
 		LOG("%f", yaw);
 		yaw -= cameraSpeed;
@@ -237,34 +242,36 @@ math::float4x4 ModuleCamera::LookAt(math::float3& target, math::float3& eye, mat
 	return matrix;
 }
 
-void ModuleCamera::InitFrustum() {
+void ModuleCamera::InitFrustum() 
+{
 	frustum.type = FrustumType::PerspectiveFrustum;
 	frustum.pos = float3::zero;
 	frustum.front = -float3::unitZ;
 	frustum.up = float3::unitY;
 	frustum.nearPlaneDistance = 0.1f;
 	frustum.farPlaneDistance = 100.0f;
-	frustum.verticalFov = math::pi / 4.0f;								// TODO: Change this to -1 * instead /
+	frustum.verticalFov = math::pi / 4.0f;								
 	frustum.horizontalFov = 2.f * atanf(tanf(frustum.verticalFov * 0.5f) * (SCREEN_WIDTH / SCREEN_HEIGHT));
 }
 
-void ModuleCamera::SetFOV() {
+void ModuleCamera::SetFOV() 
+{
 
 }
 
-void ModuleCamera::MouseUpdate(math::float2& mouseNewPosition)
+void ModuleCamera::MouseUpdate(int mouseXPos, int mouseYPos)
 {
 	if (firstMouse)
 	{
-		lastX = mouseNewPosition.x;
-		lastY = mouseNewPosition.y;
+		lastX = mouseXPos;
+		lastY = mouseYPos;
 		firstMouse = false;
 	}
 
-	float xoffset = mouseNewPosition.x - lastX;
-	float yoffset = lastY - mouseNewPosition.y;
-	lastX = mouseNewPosition.x;
-	lastY = mouseNewPosition.y;
+	float xoffset = mouseXPos - lastX;
+	float yoffset = lastY - mouseYPos;
+	lastX = mouseXPos;
+	lastY = mouseYPos;
 
 	float sensitivity = 0.05;
 	xoffset *= sensitivity;

@@ -10,6 +10,9 @@
 
 #include "Math\float2.h"
 #include "Math\float3.h"
+#include "Math\float4x4.h"
+#include "Math\MathConstants.h"
+#include "Math\MathFunc.h"
 #include "Geometry\Frustum.h"
 
 class ModuleCamera : public Module
@@ -42,10 +45,10 @@ public:
 	update_status	Update()	override;
 	
 	void			InitFrustum();
-	void			MouseUpdate(math::float2& mouseNewPosition);
+	void			MouseUpdate(int mouseXPos, int mouseYPos);
 	void			SetFOV();
 	void			MoveCamera(CameraMovement cameraSide);
-	void			RotateCamera(CameraRotation cameraSide);
+	void			RotateCamera(CameraRotation cameraRotation);
 
 	math::float4x4	LookAt(math::float3& target, math::float3& eye, math::float3& up);
 	math::float4x4	ProjectionMatrix();
@@ -53,15 +56,16 @@ public:
 public:
 	bool			firstMouse	= true;
 	
-	float			cameraSpeed = 0.5f;
+	float			cameraSpeed		= 0.5f;
+	float			rotationSpeed	= 0.8f;
 	float			pitch;
 	float			yaw;
-	float			lastX		= SCREEN_WIDTH / 2;
-	float			lastY		= SCREEN_HEIGHT / 2;
+	float			lastX			= SCREEN_WIDTH / 2;
+	float			lastY			= SCREEN_HEIGHT / 2;
+	float			screenRatio		= SCREEN_WIDTH / SCREEN_HEIGHT;
 
 	Frustum			frustum;
 
-	math::float2	oldMousePos;
 	math::float3&	target		= math::float3(0.0f, 0.0f, 0.0f);
 	math::float3&	eye			= math::float3(0.0f, 0.0f, 0.0f);
 	math::float3&	up			= math::float3(0.0f, 0.0f, 0.0f);
