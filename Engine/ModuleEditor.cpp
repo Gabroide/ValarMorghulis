@@ -26,7 +26,8 @@ bool ModuleEditor::Init()
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	io = ImGui::GetIO(); 
+	(void)io;
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
 	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;			// Enable Multi-Viewport
@@ -143,7 +144,8 @@ static void ShowAbout()
 
 	ImGui::Separator();
 	ImGui::TextWrapped(MITLicence);
-ImGui:EndMenu();
+	
+	ImGui::EndMenu();
 }
 
 static void ShowHardware()
@@ -154,7 +156,13 @@ static void ShowHardware()
 	ImGui::Text("System RAM: ");
 	ImGui::SameLine();
 	ImGui::TextColored(ImVec4(0.8f, 0.5f, 1.0f, 1.0f), "%d", SDL_GetSystemRAM());
+	
 	ImGui::End();
+}
+
+void ModuleEditor::HandleInput(SDL_Event& event)
+{
+	ImGui_ImplSDL2_ProcessEvent(&event);
 }
 
 bool ModuleEditor::CleanUp() 

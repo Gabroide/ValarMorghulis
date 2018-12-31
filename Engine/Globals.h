@@ -15,10 +15,33 @@ enum update_status
 	UPDATE_ERROR
 };
 
+// Deleting a buffer
+#define RELEASE(x)\
+	{\
+		if(x != nullptr)
+		{\
+				delete x;\
+				x = nullpr;\
+		}\
+	}
+
+#define RELEASE_ARRAY(x)\
+	{\
+		if(x != nullptr)
+		{
+			\
+				delete[] x; \
+				x = nullpr; \
+		}\
+}
+
+#define degreesToRadians(x) x*(3.141592f/180.0f)
+
 // Configuration -----------
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
 #define FULLSCREEN false
+#define RESIZABLE false
 #define VSYNC true
 #define TITLE "Valar Morghulis Game"
 

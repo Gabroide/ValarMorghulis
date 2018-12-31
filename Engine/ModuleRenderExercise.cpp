@@ -59,10 +59,18 @@ update_status ModuleRenderExercise::Update()
 	// Use shaders loaders
 	glUseProgram(program);
 
+	// Editor references
+	DrawReferenceGround();
+	DrawReferenceAis();
+
 	// Fragments
 	int fragUnifLocation = glGetUniformLocation(program, "newColor");
-	float color[4] = { 0.5f, 1.0f,0.0f, 1.0f };
+	float color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	glUniform4fv(fragUnifLocation, 1, color);
+
+	glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_TRUE, &Model[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_TRUE, &App->camera->LookAt(App->camera->target, App->camera->eye, App->camera->up)[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_TRUE, &App->camera->ProjectionMatrix()[0][0]);
 
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 
@@ -72,53 +80,76 @@ update_status ModuleRenderExercise::Update()
 	return UPDATE_CONTINUE;
 }
 
-math::float4x4 ModuleRenderExercise::ProjectionMatrix()
+math::float4x4 ModuleRenderExercise::DrawReferenceGround()
 {
-	math::float4x4 projectMatrix;
-	projectMatrix = frustum.ProjectionMatrix();
+	glLineWidth(1.0f);
+	float d = 200.0f;
+	glBegin(GL_LINES);
 
-	return projectMatrix;
-}
-
-bool ModuleRenderExercise::CleanUp()
-{
-	if (vbo != 0)
+	for (float i = -d; i <= d; ++i)
 	{
-		glDeleteBuffers(1, &vbo);
+		glVertex3f(i, 0.0f, -d);
+		glVertex3f(i, 0.0f, d);
+		glVertex3f(-d, 0.0f, i);
+		glVertex3f(d, 0.0f, i);
 	}
 
-	return true;
+	glEnd();
 }
 
-math::float4x4 ModuleRenderExercise::LookAt(math::float3 & target, math::float3& eye, math::float3& up)
+void ModuleRenderExercise:: DrawReferenceAxis()
 {
-	math::float4x4 matrix;
+	glLineWidth(2.0f);
 
-	math::float3 f(target - eye);
-	f.Normalize();
-	math::float3 s(f.Cross(up));
-	s.Normalize();
-	math::float3 u(s.Cross(f));
+	// red x
+	int xAxis = glGetUniformLocation(program, "newColor");
+	float red[4] = { 1.0f, 0.0f, 0.0f, 1.0f };
+	glUniform4fv(xAxis, 1, red);
 
-	matrix[0][0] = s.x;			matrix[0][1] = s.y;			matrix[0][2] = s.z;
-	matrix[1][0] = u.x;			matrix[1][1] = u.y;			matrix[1][2] = u.z;
-	matrix[2][0] = -f.x;		matrix[2][1] = -f.y;		matrix[2][2] = -f.z;
-	matrix[0][3] = -s.Dot(eye);	matrix[1][3] = -u.Dot(eye);	matrix[2][3] = -f.Dot(eye);
-	matrix[3][0] = 0.0f;		matrix[3][1] = 0.0f;		matrix[3][2] = 0.0f;		matrix[3][3] = 1.0f;
+	glBegin(GL_LINES);
+	glVertex3f(0.0f, 0.0f, 0.0f);
+	glVertex3f(1.0f, 0.0f, 0.0f);
+	glVertex3f(1.0f, 0.1f, 0.0f);
+	glVertex3f(1.1f, -0.1f, 0.0f);
+	glVertex3f(1.1f, 0.1f, 0.0f);
+	glVertex3f(1.0f, -0.1f, 0.0f);
+	glEnd();
 
-	return matrix;
-}
+	// green y
+	int yAxis = glGetUniformLocation(program, "newColor");
+	float green[4] = { 0.0f, 1.0f, 0.0f, 1.0f };
+	glUniform4fv(yAxis, 1, green);
 
-void ModuleRenderExercise::InitFrustum()
-{
-	frustum.type = FrustumType::PerspectiveFrustum;
-	frustum.pos = float3::zero;
-	frustum.front = -float3::unitZ;
-	frustum.up = float3::unitY;
-	frustum.nearPlaneDistance = 0.1f;
-	frustum.farPlaneDistance = 100.0f;
-	frustum.verticalFov = math::pi / 4.0f;
-	frustum.horizontalFov = 2.0f * atanf(tanf(frustum.verticalFov * 0.5f) * (SCREEN_WIDTH / SCREEN_HEIGHT));
+	glBegin(GL_LINES);
+	glVertex4f(0.0f, 1.0f, 0.0f, 1.0f);
+	glVertex3f(0.0f, 0.0f, 0.0f);
+	glVertex3f(0.0f, 1.0f, 0.0f);
+	glVertex3f(-0.05f, 1.25f, 0.0f);
+	glVertex3f(0.0f, 1.15f, 0.0f);
+	glVertex3f(0.05f, 1.25f, 0.0f);
+	glVertex3f(0.0f, 1.15f, 0.0f);
+	glVertex3f(0.0f, 1.15f, 0.0f);
+	glVertex3f(0.0f, 1.05f, 0.0f);
+	glEnd();
+
+	// blue z
+	int zAxis = glGetUniformLocation(program, "newColor");
+	float green[4] = { 0.0f, 0.0f, 1.0f, 1.0f };
+	glUniform4fv(zAxis, 1, blue);
+
+	glBegin(GL_LINES);
+	glVertex4f(0.0f, 0.0f, 1.0f, 1.0f);
+	glVertex3f(0.0f, 0.0f, 0.0f);
+	glVertex3f(0.0f, 0.0f, 1.0f);
+	glVertex3f(-0.05f, 0.1f, 1.05f);
+	glVertex3f(0.05f, 0.1f, 1.05f);
+	glVertex3f(0.05f, 0.1f, 1.05f);
+	glVertex3f(-0.05f, -0.1f, 1.05f);
+	glVertex3f(-0.05f, -0.1f, 1.05f);
+	glVertex3f(0.05f, -0.1f, 1.05f);
+	glEnd();
+
+	glLineWidth(1.0f);
 }
 
 bool ModuleRenderExercise::CleanUp()

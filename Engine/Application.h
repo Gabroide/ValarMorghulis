@@ -2,6 +2,7 @@
 #define __Application_h__
 
 #include <list>
+
 #include "Globals.h"
 #include "Module.h"
 
@@ -9,6 +10,7 @@ class ModuleRender;
 class ModuleWindow;
 class ModuleTextures;
 class ModuleEditor;
+class ModuleCamera;
 class ModuleInput;
 class ModuleRenderExercise;
 class ModuleShader;
@@ -30,6 +32,7 @@ public:
 	ModuleInput* input = nullptr;
 	ModuleTextures* textures = nullptr;
 	ModuleEditor* editor = nullptr;
+	ModuleCamera* camera = nullptr;
 	ModuleRenderExercise* exercise = nullptr;
 	ModuleShader* shader = nullptr;
 

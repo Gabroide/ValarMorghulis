@@ -22,13 +22,14 @@ class ModuleEditor : public Module
 		update_status		PreUpdate()	override;
 		update_status		Update()	override;
 
+		void				HandleInputs(SDL_Event& event);
+
 public:
 	bool	showAboutMenu		= false;
 	bool	showHardwareMenu	= false;
 	bool	requestedExit		= false;
 
 	ImGuiIO io;
-
 
 };
 

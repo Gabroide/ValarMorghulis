@@ -23,21 +23,12 @@ public:
 	bool			Init()		override;
 	bool			CleanUp()	override;
 
-	void			InitFrustum();
+	void			DrawReferenceGround();
+	void			DrawReferenceAxis();
 
 	update_status	Update()	override;
 
-	math::float4x4	LookAt(math::float3 & target, math::float3& eye, math::float3& up);
-	math::float4x4	ProjectionMatrix();
-
 public:
-	char* LoadShader(const char* shaderName);
-
-public:
-	float			cameraSpeed = 0.5f;
-
-	Frustum			frustum;
-
 	math::float3	target;
 	math::float3	eye;
 	math::float3	up;
