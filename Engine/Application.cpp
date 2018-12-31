@@ -49,7 +49,7 @@ bool Application::Init()
 
 update_status Application::Update()
 {
-	update_status ret = UPDATE_CONTINUE;
+	update_statupdate_status ret = UPDATE_CONTINUE;
 
 	Tick();
 
@@ -82,7 +82,7 @@ void Application::Tick()
 	float ticksNow = SDL_GetTicks();
 	deltaTime = (ticksNow - lastTickTime) / 1000;
 	lastTickTime = ticksNow;
-	FPS = 60 * (-1 * deltaTime);
+	FPS = deltaTime * 60;
 }
 
 #endif // __Application_cpp__
