@@ -1,8 +1,7 @@
 #ifndef __Application_h__
 #define __Application_h__
 
-#include <list>
-
+#include<list>
 #include "Globals.h"
 #include "Module.h"
 
@@ -25,19 +24,27 @@ public:
 	bool			CleanUp();
 
 	update_status	Update();
+	
+	void			Tick();
 
 public:
-	ModuleRender* renderer = nullptr;
-	ModuleWindow* window = nullptr;
-	ModuleInput* input = nullptr;
-	ModuleTextures* textures = nullptr;
-	ModuleEditor* editor = nullptr;
-	ModuleCamera* camera = nullptr;
-	ModuleRenderExercise* exercise = nullptr;
-	ModuleShader* shader = nullptr;
+	ModuleRender*			renderer	= nullptr;
+	ModuleWindow*			window		= nullptr;
+	ModuleTextures*			textures	= nullptr;
+	ModuleEditor*			editor		= nullptr;
+	ModuleCamera*			camera		= nullptr;
+	ModuleInput*			input		= nullptr;
+	ModuleRenderExercise*	exercise	= nullptr;
+	ModuleShader*			shader		= nullptr;
+
+public:
+	float	lastTickTime	= 0;
+	float	deltaTime		= 0;
+
+	int		FPS				= 60 * deltaTime;
 
 private:
-	std::list<Module*>	modules;
+	std::list<Module*> modules;
 
 };
 
