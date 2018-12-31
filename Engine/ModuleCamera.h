@@ -18,7 +18,7 @@
 class ModuleCamera : public Module
 {
 
-	enum CameraMovement {
+	enum CameraMovement { // TODO: pass to class
 		Upwards = 0,
 		Downwards,
 		Left,
@@ -27,11 +27,9 @@ class ModuleCamera : public Module
 		Backwards
 	};
 
-	enum CameraRotation {
-		PositivePitch = 0,
-		NegativePitch,
-		PositiveYaw,
-		NegativeYaw
+	enum CameraRotation { // TODO: pass to class
+		Pitch = 0,
+		Yaw
 	};
 
 public:
@@ -45,33 +43,33 @@ public:
 	update_status	Update()	override;
 	
 	void			InitFrustum();
-	void			MouseUpdate(int mouseXPos, int mouseYPos);
+	void			MouseUpdate(int mouseXpos, int mouseYpos);
 	void			SetFOV();
 	void			MoveCamera(CameraMovement cameraSide);
-	void			RotateCamera(CameraRotation cameraRotation);
+	void			RotateCamera();
 
-	math::float4x4	LookAt(math::float3& target, math::float3& eye, math::float3& up);
 	math::float4x4	ProjectionMatrix();
-	
+	math::float4x4	LookAt(math::float3& cameraPos, math::float3& cameraFront, math::float3& cameraUp);
+
 public:
-	bool			firstMouse	= true;
+	bool		firstMouse = true;
 	
-	float			cameraSpeed		= 0.5f;
-	float			rotationSpeed	= 0.8f;
-	float			pitch;
-	float			yaw;
-	float			lastX			= SCREEN_WIDTH / 2;
-	float			lastY			= SCREEN_HEIGHT / 2;
-	float			screenRatio		= SCREEN_WIDTH / SCREEN_HEIGHT;
+	int			lastX		= SCREEN_WIDTH / 2;
+	int			lastY		= SCREEN_HEIGHT / 2;
 
-	Frustum			frustum;
+	float		cameraSpeed;
+	float		rotationSpeed;
+	float		mouseSensitivity;
+	float		fov;
+	float		screenRatio	= SCREEN_WIDTH / SCREEN_HEIGHT;
+	float		pitch;
+	float		yaw;
 
-	math::float3&	target		= math::float3(0.0f, 0.0f, 0.0f);
-	math::float3&	eye			= math::float3(0.0f, 0.0f, 0.0f);
-	math::float3&	up			= math::float3(0.0f, 0.0f, 0.0f);
-	math::float3	forw;
-	math::float3	sidew;
-	math::float3	upw;
+	Frustum		frustum;
+	
+	math::float3 cameraPos;
+	math::float3 cameraFront;
+	math::float3 cameraUp;
 
 };
 
