@@ -5,11 +5,13 @@
 #include "ModuleRenderExercise.h"
 #include "ModuleWindow.h"
 
+// Constructor
 ModuleRenderExercise::ModuleRenderExercise()
 {
 
 }
 
+// Destructor
 ModuleRenderExercise::~ModuleRenderExercise()
 {
 
@@ -18,9 +20,10 @@ ModuleRenderExercise::~ModuleRenderExercise()
 bool ModuleRenderExercise::Init()
 {
 	// Handle texture loader
-	texture0 = App->textures->Load("Lenna.png");
+	texture0 = App->textures->Load("./textures/Lenna.png");
 
-	if (texture0 == -1) {
+	if (texture0 == -1) 
+	{
 		LOG("Error: Texture cannot be loaded");
 		return false;
 	}
@@ -28,7 +31,8 @@ bool ModuleRenderExercise::Init()
 	// Generate program with vertex and fragment shaders and load it to GL
 	progDefault = App->shader->LoadShaders("../default.vs", "../default.fs");
 
-	if (!progDefault) {
+	if (!progDefault) 
+	{
 		LOG("Error: Program cannot be compiled");
 		return false;
 	}
@@ -36,11 +40,12 @@ bool ModuleRenderExercise::Init()
 	// Generate program with vertex and fragment shaders and load it to GL
 	progTexture = App->shader->LoadShaders("../texture.vs", "../texture.fs");
 
-	if (!progTexture) {
+	if (!progTexture) 
+	{
 		LOG("Error: Program cannot be compiled");
+
 		return false;
 	}
-
 
 	// Triangle exercise
 	float vboData[] = {
@@ -70,8 +75,6 @@ bool ModuleRenderExercise::Init()
 
 update_status ModuleRenderExercise::Update()
 {
-
-	// This is what kind of info GL is going to read and where do it needs to read from
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glVertexAttribPointer(
@@ -86,16 +89,12 @@ update_status ModuleRenderExercise::Update()
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)(sizeof(float) * 3 * 6));
 
-	//Printing Colors with default shader
-
 	glUseProgram(progDefault);
 
 	// Editor References
 	DrawReferenceGround();
 	DrawReferenceAxis();
-
-	//Uniforms - This could be inside a ImgUI to edit manually
-
+	
 	// Fragment shader coloring
 	int fragUnifLocation = glGetUniformLocation(progDefault, "newColor");
 	float color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -105,7 +104,6 @@ update_status ModuleRenderExercise::Update()
 	math::float4x4 Model(math::float4x4::identity); // Not moving anything
 
 	glUniformMatrix4fv(glGetUniformLocation(progDefault, "proj"), 1, GL_TRUE, &App->camera->ProjectionMatrix()[0][0]);
-	// We are using the vector front pointing to our target instead of target - cameraPos so we can manage easily with vectors
 	glUniformMatrix4fv(glGetUniformLocation(progDefault, "view"), 1, GL_TRUE, &App->camera->LookAt(App->camera->cameraPos, App->camera->cameraFront, App->camera->cameraUp)[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(progDefault, "model"), 1, GL_TRUE, &Model[0][0]);
 
@@ -120,7 +118,7 @@ update_status ModuleRenderExercise::Update()
 	glUniformMatrix4fv(glGetUniformLocation(progTexture, "view"), 1, GL_TRUE, &App->camera->LookAt(App->camera->cameraPos, App->camera->cameraFront, App->camera->cameraUp)[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(progTexture, "model"), 1, GL_TRUE, &Model[0][0]);
 
-
+	// Draw every GL_TRIANGLE that starts at vec[0] and you can find 6 of them
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
 	// Cleaning for next frame
@@ -132,9 +130,14 @@ update_status ModuleRenderExercise::Update()
 
 bool ModuleRenderExercise::CleanUp()
 {
-	if (vbo != 0)
+	if (vbo != 0) 
 	{
 		glDeleteBuffers(1, &vbo);
+	}
+
+	if (texture0 != 0) 
+	{
+		glDeleteTextures(1, &texture0);
 	}
 
 	return true;
@@ -143,8 +146,10 @@ bool ModuleRenderExercise::CleanUp()
 void ModuleRenderExercise::DrawReferenceGround() 
 {
 	glLineWidth(1.0f);
+
 	float d = 200.0f;
 	glBegin(GL_LINES);
+
 	for (float i = -d; i <= d; i += 1.0f)
 	{
 		glVertex3f(i, 0.0f, -d);
@@ -152,6 +157,7 @@ void ModuleRenderExercise::DrawReferenceGround()
 		glVertex3f(-d, 0.0f, i);
 		glVertex3f(d, 0.0f, i);
 	}
+
 	glEnd();
 }
 

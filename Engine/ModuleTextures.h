@@ -6,7 +6,8 @@
 #include "Module.h"
 #include "Globals.h"
 
-#include "SDL\include\SDL.h" // TODO: Try to reduce SDL.h
+#include "SDL\include\SDL.h" // TODO: Try to reduce SDL.
+#include "SDL_image\include\SDL_image.h"
 
 #include "glew-2.1.0\include\GL\glew.h"
 
@@ -25,13 +26,27 @@ public:
 	bool			Init()		override;
 	bool			CleanUp()	override;
 
+	void			ReloadTexture(const char* newPath, GLuint& texture);
+	void			SetNewParameter(const char* newPath, GLuint& texture, GLuint newTextFilter, GLuint newResizeMethod, GLuint newWrapMethod, GLuint newClampMethod);
+	void			SwitchMipMaps(const char* newPath, GLuint& texture, bool state);
+
 	GLuint const	Load(const char* path);
 
 public:
-	SDL_Texture* const	Load(const char* path);
+	bool	generateMipMaps = false;
 
-private:
-	std::list<SDL_Texture*> textures;
+	int		imgWidth;
+	int		imgHeight;
+	int		imgPixelDepth;
+	
+	GLuint	textFilter		= 0;
+	GLuint	resizeMethod	= 0;
+	GLuint	wrapMethod		= 0;
+	GLuint	clampMethod		= 0;
+
+public:
+	const char* currentPathLoaded;
+	char*		imgFormat;
 
 };
 

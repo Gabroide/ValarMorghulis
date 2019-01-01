@@ -28,6 +28,8 @@ public:
 	bool	showAboutMenu		= false;
 	bool	showHardwareMenu	= false;
 	bool	requestedExit		= false;
+	bool	showSceneConfig		= false;
+	bool	showTextureConfig	= false;
 
 	ImGuiIO io;
 

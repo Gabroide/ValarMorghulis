@@ -29,6 +29,8 @@ public:
 	update_status	Update()	override;
 
 public:
+	GLuint			texture0 = 0;
+
 	math::float3	target;
 	math::float3	eye;
 	math::float3	up;
@@ -38,7 +40,6 @@ private:
 
 	GLuint			progDefault = GL_FALSE;
 	GLuint			progTexture = GL_FALSE;
-	GLuint			texture0 = 0;
 
 };
 
