@@ -21,6 +21,7 @@ static void ShowZoomMagnifier();
 static void PrintTextureParams(const char* currentTexture);
 static void PrintMipMapOption(const char* currentTexture);
 
+// Constructor
 ModuleEditor::ModuleEditor()
 {
 	fps_log.resize(100);
@@ -139,7 +140,7 @@ static void ShowMenuBar()
 			{ 
 				App->editor->requestedExit = true; 
 			}
-
+		
 			ImGui::EndMenu();
 		}
 
@@ -190,6 +191,7 @@ static void ShowMenuBar()
 // About
 static void ShowAbout() 
 {
+
 	const char* MITLicense = "Copyright 2018 - Chimera Engine \n\nPermission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the 'Software'), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions";
 
 	ImGui::Begin("About", &App->editor->showAboutMenu);
@@ -200,13 +202,17 @@ static void ShowAbout()
 	ImGui::Text("Libraries:");
 	
 	if (ImGui::MenuItem("SDL v2.0.8")) 
-	{
+	{ 
 		ShellExecute(0, 0, "https://www.libsdl.org/index.php", 0, 0, SW_SHOW); 
 	}
 	
-	if (ImGui::MenuItem("Glew v2.1.0")) { ShellExecute(0, 0, "http://glew.sourceforge.net/", 0, 0, SW_SHOW); }
+	if (ImGui::MenuItem("Glew v2.1.0")) 
+	{ 
+		ShellExecute(0, 0, "http://glew.sourceforge.net/", 0, 0, SW_SHOW); 
+	}
+	
 	if (ImGui::MenuItem("ImGui v1.66")) 
-	{
+	{ 
 		ShellExecute(0, 0, "https://github.com/ocornut/imgui/tree/docking", 0, 0, SW_SHOW); 
 	}
 	
@@ -217,14 +223,10 @@ static void ShowAbout()
 
 	ImGui::Separator();
 	ImGui::Text("Author's Repository:");
-	
-	if (ImGui::MenuItem("Gabriel Cambronero")) 
-	{ 
-		ShellExecute(0, 0, "https://github.com/Gabroide/", 0, 0, SW_SHOW); 
-	}
-	
+	if (ImGui::MenuItem("Gabriel Cambronero")) { ShellExecute(0, 0, "https://github.com/Gabroide/", 0, 0, SW_SHOW); }
 	ImGui::Separator();
 	ImGui::TextWrapped(MITLicense);
+
 	ImGui::End();
 }
 
@@ -257,12 +259,13 @@ static void ShowSceneConfig(std::vector<float> fps, std::vector<float> ms)
 	{
 		float forward[3] = { App->camera->cameraFront.x, App->camera->cameraFront.y, App->camera->cameraFront.z };
 		ImGui::InputFloat3("Front", forward, "%.3f");
-		
 		float up[3] = { App->camera->cameraUp.x, App->camera->cameraUp.y, App->camera->cameraUp.z };
 		ImGui::InputFloat3("Up", up, "%.3f");
-	
 		float eye[3] = { App->camera->cameraPos.x, App->camera->cameraPos.y, App->camera->cameraPos.z };
 		ImGui::InputFloat3("Position", eye, "%.3f");
+		ImGui::Separator();
+		ImGui::InputFloat("Pitch", &App->camera->pitch, 0, 0, 0);
+		ImGui::InputFloat("Yaw", &App->camera->yaw, 0, 0, 0);
 	}
 	
 	if (ImGui::CollapsingHeader("Camera config")) 
@@ -388,16 +391,16 @@ static void PrintTextureParams(const char* currentTexture)
 				currentResize = resizeMethods[rs];
 				App->textures->SetNewParameter(currentTexture, App->exercise->texture0, App->textures->textFilter, resizeMethodsValues[rs], App->textures->wrapMethod, App->textures->clampMethod);
 			}
-		
+			
 			if (resizeSelected)
 			{
 				ImGui::SetItemDefaultFocus();
 			}
 		}
-
+	
 		ImGui::EndCombo();
 	}
-	
+
 	// Clamp methods
 	const char* clampMethods[] = { "GL_CLAMP", "GL_CLAMP_TO_BORDER", "GL_REPEAT", "GL_MIRRORED_REPEAT" };
 	const int clampMethodsValues[] = { GL_CLAMP, GL_CLAMP_TO_BORDER, GL_REPEAT, GL_MIRRORED_REPEAT };
@@ -440,7 +443,7 @@ static void PrintTextureParams(const char* currentTexture)
 				currentFilter = filterMethods[fl];
 				App->textures->SetNewParameter(currentTexture, App->exercise->texture0, filterMethodsValues[fl], App->textures->resizeMethod, App->textures->wrapMethod, App->textures->clampMethod);
 			}
-			
+		
 			if (filterSelected)
 			{
 				ImGui::SetItemDefaultFocus();
@@ -456,7 +459,7 @@ static void PrintMipMapOption(const char* currentTexture)
 	const char* mipMapState[] = { "Disabled", "Enabled" };
 	bool valueMipMapValue[] = { false, true };
 	static const char* currentMMState = mipMapState[0];
-	
+
 	if (ImGui::BeginCombo("MipMap", currentMMState, ImGuiComboFlags_NoArrowButton))
 	{
 		for (int mm = 0; mm < IM_ARRAYSIZE(mipMapState); mm++)
@@ -468,6 +471,7 @@ static void PrintMipMapOption(const char* currentTexture)
 				currentMMState = mipMapState[mm];
 				App->textures->SwitchMipMaps(currentTexture, App->exercise->texture0, valueMipMapValue[mm]);
 			}
+		
 			if (is_selected)
 			{
 				ImGui::SetItemDefaultFocus();
@@ -478,8 +482,9 @@ static void PrintMipMapOption(const char* currentTexture)
 	}
 }
 
-static void ShowConsole() {
-	// CONSOLE("Console", &App->editor->showConsole);
+static void ShowConsole() 
+{
+
 }
 
 static void ShowZoomMagnifier() 

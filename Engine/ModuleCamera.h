@@ -17,7 +17,6 @@
 
 class ModuleCamera : public Module
 {
-
 	enum CameraMovement { // TODO: pass to class
 		Upwards = 0,
 		Downwards,
@@ -39,9 +38,10 @@ public:
 	bool			Init()		override;
 	bool			CleanUp()	override;
 
+
 	update_status	PreUpdate()	override;
 	update_status	Update()	override;
-	
+
 	void			InitFrustum();
 	void			MouseUpdate(int mouseXpos, int mouseYpos);
 	void			SetScreenNewScreenSize(float newWidth, float newHeight);
@@ -50,26 +50,27 @@ public:
 	void			SetHorizontalFOV(float& fovXDegrees);
 	void			SetVerticalFOV(float& fovYDegrees);
 	void			Zooming(bool positive);
+	void			FocusObject(math::float3 objectCenterPos);
 
 	math::float4x4	ProjectionMatrix();
 	math::float4x4	LookAt(math::float3& cameraPos, math::float3& cameraFront, math::float3& cameraUp);
-
+	
 public:
-	bool			firstMouse			= true;
+	bool			firstMouse		= true;
 
-	int				lastX				= 0;
-	int				lastY				= 0;
+	int				lastX			= 0;
+	int				lastY			= 0;
 
 	float			cameraSpeed;
 	float			rotationSpeed;
 	float			mouseSensitivity;
 	float			fov;
-	float			screenWidth			= SCREEN_WIDTH;
-	float			screenHeight		= SCREEN_HEIGHT;
-	float			screenRatio			= screenWidth / screenHeight;
-	float			fovY				= 45.0f;
-	float			fovX				= 45.0f;
-	float			zoomValue			= 0.0f;
+	float			screenWidth		= SCREEN_WIDTH;
+	float			screenHeight	= SCREEN_HEIGHT;
+	float			screenRatio		= screenWidth / screenHeight;
+	float			fovY			= 45.0f;
+	float			fovX			= 45.0f;
+	float			zoomValue		= 0.0f;
 	float			pitch;
 	float			yaw;
 
@@ -78,6 +79,7 @@ public:
 	math::float3	cameraPos;
 	math::float3	cameraFront;
 	math::float3	cameraUp;
+	math::float3	sceneCenter = math::float3(0.0f, 0.0f, 0.0f);
 
 };
 

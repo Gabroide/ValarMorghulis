@@ -38,7 +38,6 @@ bool ModuleCamera::Init()
 // Called every draw update
 update_status ModuleCamera::PreUpdate()
 {
-	// This will have the target point as reference, we need to handle absolute values from the camera instead of the plane
 	if (App->input->GetKey(SDL_SCANCODE_Q) == KEY_REPEAT) 
 	{
 		MoveCamera(Upwards);
@@ -95,11 +94,20 @@ update_status ModuleCamera::PreUpdate()
 		rotationSpeed = rotationSpeed / 3;
 	}
 
-	// Bibliography: https://github.com/ocornut/imgui/issues/52
+	if (App->input->GetKey(SDL_SCANCODE_F) == KEY_DOWN) 
+	{
+		FocusObject(sceneCenter);
+	}
+
+	// Bibliography https://github.com/ocornut/imgui/issues/52
 	if (App->input->GetMouseButtonDown(SDL_BUTTON_LEFT) == KEY_REPEAT) 
 	{
-		SDL_ShowCursor(SDL_DISABLE);
-		MouseUpdate(App->input->GetMousePosition().x, App->input->GetMousePosition().y);
+		iPoint mousePos = App->input->GetMousePosition();
+	
+		if (lastX != mousePos.x || lastY != mousePos.y)
+		{
+			MouseUpdate(mousePos.x, mousePos.y);
+		}
 	}
 	else if (App->input->GetMouseButtonDown(SDL_BUTTON_LEFT) == KEY_UP) 
 	{
@@ -107,7 +115,7 @@ update_status ModuleCamera::PreUpdate()
 	}
 	else if (App->input->GetMouseButtonDown(SDL_BUTTON_RIGHT) == KEY_DOWN) 
 	{
-
+	
 	}
 	else if (App->input->GetMouseWheelUsed() == KEY_UP) 
 	{
@@ -146,11 +154,11 @@ void ModuleCamera::MoveCamera(CameraMovement cameraSide)
 	switch (cameraSide) 
 	{
 	case Upwards:
-		cameraPos += cameraUp * normCameraSpeed;
+		cameraPos += cameraUp.Normalized() * normCameraSpeed;
 		break;
 
 	case Downwards:
-		cameraPos -= cameraUp * normCameraSpeed;
+		cameraPos -= cameraUp.Normalized() * normCameraSpeed;
 		break;
 
 	case Left:
@@ -162,11 +170,11 @@ void ModuleCamera::MoveCamera(CameraMovement cameraSide)
 		break;
 
 	case Forward:
-		cameraPos += normCameraSpeed * cameraFront;
+		cameraPos += normCameraSpeed * cameraFront.Normalized();
 		break;
 
 	case Backwards:
-		cameraPos -= normCameraSpeed * cameraFront;
+		cameraPos -= normCameraSpeed * cameraFront.Normalized();
 		break;
 	}
 }
@@ -177,7 +185,7 @@ void ModuleCamera::RotateCamera()
 	{
 		pitch = 89.0f;
 	}
-
+	
 	if (pitch < -89.0f)
 	{
 		pitch = -89.0f;
@@ -188,7 +196,6 @@ void ModuleCamera::RotateCamera()
 	rotation.y = SDL_sinf(math::DegToRad(pitch));
 	rotation.z = SDL_sinf(math::DegToRad(yaw)) * SDL_cosf(math::DegToRad(pitch));
 	cameraFront = rotation.Normalized();
-
 }
 
 math::float4x4 ModuleCamera::LookAt(math::float3& cameraPos, math::float3& cameraFront, math::float3& cameraUp) 
@@ -250,6 +257,7 @@ void ModuleCamera::SetScreenNewScreenSize(float newWidth, float newHeight)
 
 void ModuleCamera::MouseUpdate(int mouseXpos, int mouseYpos)
 {
+	LOG("%d %d", mouseXpos, mouseYpos);
 	if (firstMouse)
 	{
 		lastX = mouseXpos;
@@ -262,6 +270,7 @@ void ModuleCamera::MouseUpdate(int mouseXpos, int mouseYpos)
 	lastX = mouseXpos;
 	lastY = mouseYpos;
 
+
 	xoffset *= mouseSensitivity;
 	yoffset *= mouseSensitivity;
 
@@ -272,7 +281,7 @@ void ModuleCamera::MouseUpdate(int mouseXpos, int mouseYpos)
 	{
 		pitch = 89.0f;
 	}
-
+	
 	if (pitch < -89.0f)
 	{
 		pitch = -89.0f;
@@ -295,8 +304,7 @@ void ModuleCamera::Zooming(bool positive)
 		fovX -= 10.0;
 	}
 
-	if (fovX > 100.0f) 
-	{
+	if (fovX > 100.0f) {
 		fovX = 100.0f;
 	}
 	else if (fovX < 0.0f) 
@@ -316,4 +324,12 @@ void ModuleCamera::Zooming(bool positive)
 	{
 		App->editor->showZoomMagnifier = false;
 	}
+}
+
+void ModuleCamera::FocusObject(math::float3 objectCenterPos) 
+{
+	cameraFront = objectCenterPos - cameraPos;
+	
+	pitch = math::RadToDeg(SDL_tanf(cameraFront.y / cameraFront.x));
+	yaw = math::RadToDeg(SDL_tanf(cameraFront.z / cameraFront.x)) - 90;
 }
