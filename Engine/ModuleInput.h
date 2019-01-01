@@ -31,47 +31,38 @@ public:
 	ModuleInput();
 	virtual ~ModuleInput();
 
-	bool			Init()								override;
-	bool			Start()								override;
 	bool			CleanUp()							override;
 	bool			GetWindowEvent(EventWindow code)	const;
 
-	update_status	PreUpdate()	override;
+	update_status	PreUpdate()							override;
 
 	const iPoint&	GetMouseMotion()					const;
 	const iPoint&	GetMousePosition()					const;
 
 public:
+	// Check key states from keyboard
 	KeyState GetKey(int id) const
 	{
-
 		return keyboard[id];
 	}
 
+	// Check mouse key states
 	KeyState GetMouseButtonDown(int id) const
 	{
-
 		return mouse_buttons[id - 1];
 	}
 
-	KeyState GetMouseWheelUsed() const
-	{
+private:
+	bool			windowEvents[WE_COUNT];
 
-		return mouse_wheel;
-	}
+	KeyState		mouse_buttons[NUM_MOUSE_BUTTONS];
+	
+	iPoint			mouse_motion;
+	iPoint			mouse;
 
 private:
-	bool		windowEvents[WE_COUNT];
-
-	KeyState	mouse_buttons[NUM_MOUSE_BUTTONS];
-	KeyState	mouse_wheel;
-
-	iPoint		mouse_motion;
-	iPoint		mouse;
-
-private:
-	KeyState*	keyboard;
-
+	KeyState*		keyboard;
+	
 };
 
 #endif // __ModuleInpu_h__

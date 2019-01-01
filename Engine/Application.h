@@ -2,6 +2,7 @@
 #define __Application_h__
 
 #include<list>
+
 #include "Globals.h"
 #include "Module.h"
 
@@ -24,9 +25,9 @@ public:
 	bool			Init();
 	bool			CleanUp();
 
-	void			Tick();
-
 	update_status	Update();
+	
+	void			Tick();
 
 public:
 	ModuleRender*			renderer	= nullptr;
@@ -39,13 +40,13 @@ public:
 	ModuleShader*			shader		= nullptr;
 
 public:
-	float	lastTickTime	= 0;
-	float	deltaTime		= 0;
-	float	auxTimer		= 0;
-
-	int		FPS				= 0;
-	int		frameCounter	= 0;
+	float					lastTickTime	= 0.0f;
+	float					deltaTime		= 0.0f;
+	float					auxTimer		= 0.0f;
 	
+	int						frameCounter	= 0;
+	int						FPS				= 0;
+
 private:
 	std::list<Module*> modules;
 

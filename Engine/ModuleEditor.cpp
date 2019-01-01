@@ -34,8 +34,7 @@ ModuleEditor::~ModuleEditor()
 
 }
 
-bool ModuleEditor::Init() 
-{
+bool ModuleEditor::Init() {
 	const char* glsl_version = "#version 130";
 
 	// Setup Dear ImGui binding
@@ -45,8 +44,8 @@ bool ModuleEditor::Init()
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
 	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
-	//io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
-	//io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
+																//io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
+																//io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
 
 	ImGui_ImplSDL2_InitForOpenGL(App->window->window, App->renderer->context);
 	ImGui_ImplOpenGL3_Init(glsl_version);
@@ -57,8 +56,8 @@ bool ModuleEditor::Init()
 	return true;
 }
 
-update_status ModuleEditor::PreUpdate() 
-{
+update_status ModuleEditor::PreUpdate() {
+
 	fps_log.erase(fps_log.begin());
 	fps_log.push_back(App->FPS);
 	ms_log.erase(ms_log.begin());
@@ -73,7 +72,6 @@ update_status ModuleEditor::PreUpdate()
 
 update_status ModuleEditor::Update()
 {
-
 	ShowMenuBar();
 
 	if (showAboutMenu) 
@@ -108,6 +106,7 @@ update_status ModuleEditor::Update()
 
 	if (requestedExit)
 	{
+	
 		return UPDATE_STOP;
 	}
 
@@ -155,7 +154,7 @@ static void ShowMenuBar()
 			{ 
 				App->editor->showTextureConfig = true; 
 			}
-		
+			
 			ImGui::EndMenu();
 		}
 
@@ -170,7 +169,7 @@ static void ShowMenuBar()
 			{ 
 				App->editor->showHardwareMenu = true; 
 			}
-
+		
 			ImGui::EndMenu();
 		}
 
@@ -191,7 +190,6 @@ static void ShowMenuBar()
 // About
 static void ShowAbout() 
 {
-
 	const char* MITLicense = "Copyright 2018 - Chimera Engine \n\nPermission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the 'Software'), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions";
 
 	ImGui::Begin("About", &App->editor->showAboutMenu);
@@ -215,7 +213,7 @@ static void ShowAbout()
 	{ 
 		ShellExecute(0, 0, "https://github.com/ocornut/imgui/tree/docking", 0, 0, SW_SHOW); 
 	}
-	
+
 	if (ImGui::MenuItem("Devil v1.8.0")) 
 	{ 
 		ShellExecute(0, 0, "http://openil.sourceforge.net/", 0, 0, SW_SHOW); 
@@ -223,7 +221,12 @@ static void ShowAbout()
 
 	ImGui::Separator();
 	ImGui::Text("Author's Repository:");
-	if (ImGui::MenuItem("Gabriel Cambronero")) { ShellExecute(0, 0, "https://github.com/Gabroide/", 0, 0, SW_SHOW); }
+	
+	if (ImGui::MenuItem("Gabriel Cambronero")) 
+	{ 
+		ShellExecute(0, 0, "https://github.com/Gabroide/", 0, 0, SW_SHOW); 
+	}
+
 	ImGui::Separator();
 	ImGui::TextWrapped(MITLicense);
 
@@ -267,9 +270,8 @@ static void ShowSceneConfig(std::vector<float> fps, std::vector<float> ms)
 		ImGui::InputFloat("Pitch", &App->camera->pitch, 0, 0, 0);
 		ImGui::InputFloat("Yaw", &App->camera->yaw, 0, 0, 0);
 	}
-	
-	if (ImGui::CollapsingHeader("Camera config")) 
-	{
+
+	if (ImGui::CollapsingHeader("Camera config")) {
 		ImGui::SliderFloat("Mov Speed", &App->camera->cameraSpeed, 0.0f, 100.0f);
 		ImGui::SliderFloat("Rot Speed", &App->camera->rotationSpeed, 0.0f, 100.0f);
 		ImGui::SliderFloat("Mouse Sens", &App->camera->mouseSensitivity, 0.0f, 1.0f);
@@ -283,24 +285,23 @@ static void ShowSceneConfig(std::vector<float> fps, std::vector<float> ms)
 		
 		fovYEdited = ImGui::SliderFloat("Vertical. Fov", &App->camera->fovY, 1.0f, 45.0f, "%.00f", 1.0f);
 		
-		if (ImGui::IsItemEdited()) 
-		{
-			App->camera->SetVerticalFOV(App->camera->fovY);
+		if (ImGui::IsItemEdited()) {
+			{	App->camera->SetVerticalFOV(App->camera->fovY);
+			}
 		}
-
+	
 		ImGui::InputFloat("AspectRatio", &App->camera->screenRatio, 0, 0, "%.3f");
 		ImGui::SliderFloat("Near Plane", &App->camera->frustum.nearPlaneDistance, 0.1f, App->camera->frustum.farPlaneDistance);
 		ImGui::SliderFloat("Far Plane", &App->camera->frustum.farPlaneDistance, 0.1f, 500.0f);
 		ImGui::Separator();
 		ImGui::SliderFloat3("Background color", App->renderer->bgColor, 0.0f, 1.0f);
 	}
-
+	
 	ImGui::End();
 }
 
 //Texture config
-static void ShowTextureConfig() 
-{
+static void ShowTextureConfig() {
 	ImGui::Begin("Textures", &App->editor->showTextureConfig, ImGuiWindowFlags_AlwaysAutoResize);
 	const char* items[] = { "./textures/Lenna.png", "./textures/Lennin.dds", "./textures/Lolnope.jpg", "./textures/Lolyes.gif" };
 	static const char* current_item = items[0];
@@ -322,7 +323,6 @@ static void ShowTextureConfig()
 				ImGui::SetItemDefaultFocus();
 			}
 		}
-	
 		ImGui::EndCombo();
 	}
 	
@@ -371,7 +371,7 @@ static void PrintTextureParams(const char* currentTexture)
 				ImGui::SetItemDefaultFocus();
 			}
 		}
-	
+
 		ImGui::EndCombo();
 	}
 	
@@ -391,7 +391,7 @@ static void PrintTextureParams(const char* currentTexture)
 				currentResize = resizeMethods[rs];
 				App->textures->SetNewParameter(currentTexture, App->exercise->texture0, App->textures->textFilter, resizeMethodsValues[rs], App->textures->wrapMethod, App->textures->clampMethod);
 			}
-			
+		
 			if (resizeSelected)
 			{
 				ImGui::SetItemDefaultFocus();
@@ -400,7 +400,7 @@ static void PrintTextureParams(const char* currentTexture)
 	
 		ImGui::EndCombo();
 	}
-
+	
 	// Clamp methods
 	const char* clampMethods[] = { "GL_CLAMP", "GL_CLAMP_TO_BORDER", "GL_REPEAT", "GL_MIRRORED_REPEAT" };
 	const int clampMethodsValues[] = { GL_CLAMP, GL_CLAMP_TO_BORDER, GL_REPEAT, GL_MIRRORED_REPEAT };
@@ -459,7 +459,7 @@ static void PrintMipMapOption(const char* currentTexture)
 	const char* mipMapState[] = { "Disabled", "Enabled" };
 	bool valueMipMapValue[] = { false, true };
 	static const char* currentMMState = mipMapState[0];
-
+	
 	if (ImGui::BeginCombo("MipMap", currentMMState, ImGuiComboFlags_NoArrowButton))
 	{
 		for (int mm = 0; mm < IM_ARRAYSIZE(mipMapState); mm++)
@@ -492,6 +492,5 @@ static void ShowZoomMagnifier()
 	ImGuiWindowFlags zommingFlags = ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoDocking;
 	ImGui::Begin("Zooming", &App->editor->showHardwareMenu, zommingFlags);
 	ImGui::InputFloat("Zoom value", &App->camera->zoomValue, 0, 0, 2);
-
 	ImGui::End();
 }

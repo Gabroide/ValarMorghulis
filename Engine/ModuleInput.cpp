@@ -1,9 +1,8 @@
 #include "Globals.h"
 #include "Application.h"
-#include "ModuleWindow.h"
-#include "ModuleRender.h"
 #include "ModuleEditor.h"
 #include "ModuleInput.h"
+#include "ModuleRender.h"
 
 #include "SDL\include\SDL.h"
 
@@ -23,30 +22,7 @@ ModuleInput::~ModuleInput()
 	RELEASE_ARRAY(keyboard);
 }
 
-// Called before render is available
-bool ModuleInput::Init()
-{
-	LOG("Init SDL input event system");
-	bool ret = true;
-	SDL_Init(0);
-
-	if (SDL_InitSubSystem(SDL_INIT_EVENTS) < 0)
-	{
-		LOG("SDL_EVENTS could not initialize! SDL_Error: %s\n", SDL_GetError());
-		ret = false;
-	}
-
-	return ret;
-}
-
-// Called before the first frame
-bool ModuleInput::Start()
-{
-
-	return true;
-}
-
-// Called every draw update
+// Called each loop iteration
 update_status ModuleInput::PreUpdate()
 {
 	static SDL_Event event;
@@ -95,19 +71,14 @@ update_status ModuleInput::PreUpdate()
 		}
 	}
 
-	mouse_wheel = KEY_IDLE;
-
-	/* Loop until there are no events left on the queue */
 	while (SDL_PollEvent(&event) != 0)
 	{
-		App->editor->HandleInputs(event);
-		
 		switch (event.type)
 		{
 		case SDL_QUIT:
 			windowEvents[WE_QUIT] = true;
 			break;
-
+		
 		case SDL_WINDOWEVENT:
 			switch (event.window.event)
 			{
@@ -125,8 +96,13 @@ update_status ModuleInput::PreUpdate()
 			case SDL_WINDOWEVENT_RESTORED:
 				windowEvents[WE_SHOW] = true;
 				break;
+
+			case SDL_WINDOWEVENT_RESIZED:
+			case SDL_WINDOWEVENT_SIZE_CHANGED:
+				App->renderer->WindowResized(event.window.data1, event.window.data2);
+				break;
 			}
-		
+			
 			break;
 
 		case SDL_MOUSEBUTTONDOWN:
@@ -143,32 +119,24 @@ update_status ModuleInput::PreUpdate()
 			mouse.x = event.motion.x / SCREEN_SIZE;
 			mouse.y = event.motion.y / SCREEN_SIZE;
 			break;
-		
+
 		case SDL_MOUSEWHEEL:
-			if (event.wheel.y > 0) 
-			{
-				mouse_wheel = KEY_UP;
+			if (event.wheel.y > 0) {
+				mouse_buttons[4 - 1] = KEY_DOWN;
 			}
-			else if (event.wheel.y < 0) 
-			{
-				mouse_wheel = KEY_DOWN;
+			else {
+				mouse_buttons[5 - 1] = KEY_DOWN;
 			}
-	
+
 			break;
 		}
 	}
 
-	if (GetWindowEvent(EventWindow::WE_QUIT) == true || GetKey(SDL_SCANCODE_ESCAPE) == KEY_DOWN) 
+	if (GetWindowEvent(EventWindow::WE_QUIT) == true || GetKey(SDL_SCANCODE_ESCAPE) == KEY_DOWN)
 	{
-		if (!CleanUp()) 
-		{
-		
-			return UPDATE_ERROR;
-		}
-
+	
 		return UPDATE_STOP;
 	}
-
 	return UPDATE_CONTINUE;
 }
 
