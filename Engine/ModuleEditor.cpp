@@ -16,10 +16,11 @@ static void ShowAbout();
 static void ShowHardware();
 static void ShowSceneConfig(std::vector<float> fps, std::vector<float> ms);
 static void ShowTextureConfig();
+static void ShowConsole();
+static void ShowZoomMagnifier();
 static void PrintTextureParams(const char* currentTexture);
 static void PrintMipMapOption(const char* currentTexture);
 
-// Constructor
 ModuleEditor::ModuleEditor()
 {
 	fps_log.resize(100);
@@ -39,14 +40,13 @@ bool ModuleEditor::Init()
 	// Setup Dear ImGui binding
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
-	
 	io = ImGui::GetIO(); (void)io;
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
 	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
 	//io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
 	//io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
-	
+
 	ImGui_ImplSDL2_InitForOpenGL(App->window->window, App->renderer->context);
 	ImGui_ImplOpenGL3_Init(glsl_version);
 
@@ -72,6 +72,7 @@ update_status ModuleEditor::PreUpdate()
 
 update_status ModuleEditor::Update()
 {
+
 	ShowMenuBar();
 
 	if (showAboutMenu) 
@@ -92,6 +93,16 @@ update_status ModuleEditor::Update()
 	if (showTextureConfig) 
 	{
 		ShowTextureConfig();
+	}
+
+	if (showConsole) 
+	{
+		ShowConsole();
+	}
+
+	if (showZoomMagnifier) 
+	{
+		ShowZoomMagnifier();
 	}
 
 	if (requestedExit)
@@ -118,11 +129,11 @@ bool ModuleEditor::CleanUp()
 }
 
 // General menu options
-static void ShowMenuBar()
+static void ShowMenuBar() 
 {
 	if (ImGui::BeginMainMenuBar()) 
 	{
-		if (ImGui::BeginMenu("File"))
+		if (ImGui::BeginMenu("File")) 
 		{
 			if (ImGui::MenuItem("Exit")) 
 			{ 
@@ -147,20 +158,25 @@ static void ShowMenuBar()
 			ImGui::EndMenu();
 		}
 
-		if (ImGui::BeginMenu("Tools"))
+		if (ImGui::BeginMenu("Tools")) 
 		{
+			if (ImGui::MenuItem("Console")) 
+			{ 
+				App->editor->showConsole = true; 
+			}
+			
 			if (ImGui::MenuItem("Hardware")) 
 			{ 
 				App->editor->showHardwareMenu = true; 
 			}
-		
+
 			ImGui::EndMenu();
 		}
 
-		if (ImGui::BeginMenu("Help"))
+		if (ImGui::BeginMenu("Help")) 
 		{
 			if (ImGui::MenuItem("About")) 
-			{
+			{ 
 				App->editor->showAboutMenu = true; 
 			}
 
@@ -174,7 +190,7 @@ static void ShowMenuBar()
 // About
 static void ShowAbout() 
 {
-	const char* MITLicense = "Copyright 2018 - QTEngine \n\nPermission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the 'Software'), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions";
+	const char* MITLicense = "Copyright 2018 - Chimera Engine \n\nPermission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the 'Software'), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions";
 
 	ImGui::Begin("About", &App->editor->showAboutMenu);
 
@@ -184,26 +200,29 @@ static void ShowAbout()
 	ImGui::Text("Libraries:");
 	
 	if (ImGui::MenuItem("SDL v2.0.8")) 
-	{ 
+	{
 		ShellExecute(0, 0, "https://www.libsdl.org/index.php", 0, 0, SW_SHOW); 
 	}
 	
-	if (ImGui::MenuItem("Glew v2.1.0")) 
+	if (ImGui::MenuItem("Glew v2.1.0")) { ShellExecute(0, 0, "http://glew.sourceforge.net/", 0, 0, SW_SHOW); }
+	if (ImGui::MenuItem("ImGui v1.66")) 
 	{
-		ShellExecute(0, 0, "http://glew.sourceforge.net/", 0, 0, SW_SHOW); 
+		ShellExecute(0, 0, "https://github.com/ocornut/imgui/tree/docking", 0, 0, SW_SHOW); 
 	}
 	
-	if (ImGui::MenuItem("ImGui v1.66")) 
+	if (ImGui::MenuItem("Devil v1.8.0")) 
 	{ 
-		ShellExecute(0, 0, "https://github.com/ocornut/imgui/tree/docking", 0, 0, SW_SHOW); 
+		ShellExecute(0, 0, "http://openil.sourceforge.net/", 0, 0, SW_SHOW); 
 	}
 
 	ImGui::Separator();
 	ImGui::Text("Author's Repository:");
-	if (ImGui::MenuItem("Alfonso Mestres")) 
+	
+	if (ImGui::MenuItem("Gabriel Cambronero")) 
 	{ 
 		ShellExecute(0, 0, "https://github.com/Gabroide/", 0, 0, SW_SHOW); 
 	}
+	
 	ImGui::Separator();
 	ImGui::TextWrapped(MITLicense);
 	ImGui::End();
@@ -212,9 +231,10 @@ static void ShowAbout()
 // Hardware
 static void ShowHardware() 
 {
-	ImGui::Begin("Hardware specs", &App->editor->showHardwareMenu);
+	ImGui::Begin("Hardware specs", &App->editor->showHardwareMenu, ImGuiWindowFlags_AlwaysAutoResize);
 	ImGui::Text("CPU Count: "); ImGui::SameLine(); ImGui::TextColored(ImVec4(0.8f, 0.5f, 1.0f, 1.0f), "%d", SDL_GetCPUCount());
 	ImGui::Text("System RAM: "); ImGui::SameLine(); ImGui::TextColored(ImVec4(0.8f, 0.5f, 1.0f, 1.0f), "%d", SDL_GetSystemRAM());
+
 	ImGui::End();
 }
 
@@ -258,7 +278,7 @@ static void ShowSceneConfig(std::vector<float> fps, std::vector<float> ms)
 			App->camera->SetHorizontalFOV(App->camera->fovX);
 		}
 		
-		fovYEdited = ImGui::SliderFloat("Vertical. Fov", &App->camera->fovX, 1.0f, 45.0f, "%.00f", 1.0f);
+		fovYEdited = ImGui::SliderFloat("Vertical. Fov", &App->camera->fovY, 1.0f, 45.0f, "%.00f", 1.0f);
 		
 		if (ImGui::IsItemEdited()) 
 		{
@@ -299,7 +319,7 @@ static void ShowTextureConfig()
 				ImGui::SetItemDefaultFocus();
 			}
 		}
-
+	
 		ImGui::EndCombo();
 	}
 	
@@ -342,7 +362,7 @@ static void PrintTextureParams(const char* currentTexture)
 				currentWrap = wrapMethods[wr];
 				App->textures->SetNewParameter(currentTexture, App->exercise->texture0, App->textures->textFilter, App->textures->resizeMethod, wrapMethodsValues[wr], App->textures->clampMethod);
 			}
-
+		
 			if (wrapSelected)
 			{
 				ImGui::SetItemDefaultFocus();
@@ -351,7 +371,7 @@ static void PrintTextureParams(const char* currentTexture)
 	
 		ImGui::EndCombo();
 	}
-
+	
 	// Resize methods
 	const char* resizeMethods[] = { "Linear", "Nearest" };
 	const int resizeMethodsValues[] = { GL_LINEAR, GL_NEAREST };
@@ -377,7 +397,7 @@ static void PrintTextureParams(const char* currentTexture)
 
 		ImGui::EndCombo();
 	}
-
+	
 	// Clamp methods
 	const char* clampMethods[] = { "GL_CLAMP", "GL_CLAMP_TO_BORDER", "GL_REPEAT", "GL_MIRRORED_REPEAT" };
 	const int clampMethodsValues[] = { GL_CLAMP, GL_CLAMP_TO_BORDER, GL_REPEAT, GL_MIRRORED_REPEAT };
@@ -403,7 +423,7 @@ static void PrintTextureParams(const char* currentTexture)
 	
 		ImGui::EndCombo();
 	}
-
+	
 	// Texture filter methods
 	const char* filterMethods[] = { "GL_TEXTURE_MIN_FILTER", "GL_TEXTURE_MAG_FILTER" };
 	const int filterMethodsValues[] = { GL_TEXTURE_MIN_FILTER, GL_TEXTURE_MAG_FILTER };
@@ -420,7 +440,7 @@ static void PrintTextureParams(const char* currentTexture)
 				currentFilter = filterMethods[fl];
 				App->textures->SetNewParameter(currentTexture, App->exercise->texture0, filterMethodsValues[fl], App->textures->resizeMethod, App->textures->wrapMethod, App->textures->clampMethod);
 			}
-		
+			
 			if (filterSelected)
 			{
 				ImGui::SetItemDefaultFocus();
@@ -448,7 +468,6 @@ static void PrintMipMapOption(const char* currentTexture)
 				currentMMState = mipMapState[mm];
 				App->textures->SwitchMipMaps(currentTexture, App->exercise->texture0, valueMipMapValue[mm]);
 			}
-
 			if (is_selected)
 			{
 				ImGui::SetItemDefaultFocus();
@@ -457,4 +476,17 @@ static void PrintMipMapOption(const char* currentTexture)
 
 		ImGui::EndCombo();
 	}
+}
+
+static void ShowConsole() {
+	// CONSOLE("Console", &App->editor->showConsole);
+}
+
+static void ShowZoomMagnifier() 
+{
+	ImGuiWindowFlags zommingFlags = ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoDocking;
+	ImGui::Begin("Zooming", &App->editor->showHardwareMenu, zommingFlags);
+	ImGui::InputFloat("Zoom value", &App->camera->zoomValue, 0, 0, 2);
+
+	ImGui::End();
 }

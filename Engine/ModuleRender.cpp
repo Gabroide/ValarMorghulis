@@ -1,9 +1,9 @@
 #include "Globals.h"
 #include "Application.h"
 #include "ModuleRender.h"
-#include "ModuleWindow.h"
-#include "ModuleRender.h"
 #include "ModuleEditor.h"
+#include "ModuleCamera.h"
+#include "ModuleWindow.h"
 
 #include "SDL\include\SDL.h"
 
@@ -12,6 +12,7 @@
 #include "imgui\imgui.h"
 #include "imgui\examples\imgui_impl_sdl.h"
 
+// Constructor
 ModuleRender::ModuleRender()
 {
 
@@ -27,13 +28,13 @@ ModuleRender::~ModuleRender()
 bool ModuleRender::Init()
 {
 	LOG("Creating Renderer context");
-	
+
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
 	context = SDL_GL_CreateContext(App->window->window);
 
@@ -47,7 +48,6 @@ bool ModuleRender::Init()
 	glEnable(GL_TEXTURE_2D);
 
 	glClearDepth(1.0f);
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 	int width, height;
 	SDL_GetWindowSize(App->window->window, &width, &height);
@@ -58,6 +58,7 @@ bool ModuleRender::Init()
 
 update_status ModuleRender::PreUpdate()
 {
+	glClearColor(bgColor[0], bgColor[1], bgColor[2], bgColor[3]);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	return UPDATE_CONTINUE;
@@ -66,6 +67,7 @@ update_status ModuleRender::PreUpdate()
 // Called every draw update
 update_status ModuleRender::Update()
 {
+
 	return UPDATE_CONTINUE;
 }
 
@@ -74,6 +76,7 @@ update_status ModuleRender::PostUpdate()
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
+	// Update and Render additional Platform Windows
 	if (App->editor->io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 	{
 		ImGui::UpdatePlatformWindows();
@@ -90,5 +93,13 @@ bool ModuleRender::CleanUp()
 {
 	LOG("Destroying renderer");
 
+	//Destroy window
+
 	return true;
+}
+
+void ModuleRender::WindowResized(unsigned width, unsigned height)
+{
+	glViewport(0, 0, width, height);
+	App->camera->SetScreenNewScreenSize(width, height);
 }

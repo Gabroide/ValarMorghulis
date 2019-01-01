@@ -2,7 +2,6 @@
 #define __ModuleInput_h__
 
 #include "Module.h"
-#include "Globals.h"
 #include "Point.h"
 
 #include "SDL\include\SDL_scancode.h"
@@ -28,47 +27,51 @@ enum KeyState
 class ModuleInput : public Module
 {
 public:
-	
+
 	ModuleInput();
 	virtual ~ModuleInput();
 
 	bool			Init()								override;
+	bool			Start()								override;
 	bool			CleanUp()							override;
-	bool			Start();
 	bool			GetWindowEvent(EventWindow code)	const;
 
 	update_status	PreUpdate()	override;
-	
-	// Check key states from keyboard
-	KeyState GetKey(int id) const 
+
+	const iPoint&	GetMouseMotion()					const;
+	const iPoint&	GetMousePosition()					const;
+
+public:
+	KeyState GetKey(int id) const
 	{
 
 		return keyboard[id];
 	}
 
-	// Check mouse key states
-	KeyState GetMouseButtonDown(int id) const 
+	KeyState GetMouseButtonDown(int id) const
 	{
 
 		return mouse_buttons[id - 1];
 	}
 
-	// Get mouse / axis position
-	const iPoint&	GetMouseMotion() const;
-	const iPoint&	GetMousePosition() const;
+	KeyState GetMouseWheelUsed() const
+	{
+
+		return mouse_wheel;
+	}
 
 private:
-	bool		windowsEvent[WE_COUNT];
-	
+	bool		windowEvents[WE_COUNT];
+
 	KeyState	mouse_buttons[NUM_MOUSE_BUTTONS];
+	KeyState	mouse_wheel;
 
 	iPoint		mouse_motion;
 	iPoint		mouse;
 
 private:
-	const Uint8*	keyboard = NULL;
+	KeyState*	keyboard;
 
-	KeyState*		keyboard = nullptr;
 };
 
 #endif // __ModuleInpu_h__

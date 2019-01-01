@@ -16,13 +16,13 @@ class ModuleEditor : public Module
 		ModuleEditor();
 		~ModuleEditor();
 
-		bool				Init()		override;
-		bool				CleanUp()	override;
-
-		update_status		PreUpdate()	override;
-		update_status		Update()	override;
-
-		void				HandleInputs(SDL_Event& event);
+		bool			Init()		override;
+		bool			CleanUp()	override;
+		
+		update_status	PreUpdate()	override;
+		update_status	Update()	override;
+		
+		void			HandleInputs(SDL_Event& event);
 
 public:
 	bool				showAboutMenu		= false;
@@ -30,9 +30,11 @@ public:
 	bool				requestedExit		= false;
 	bool				showSceneConfig		= false;
 	bool				showTextureConfig	= false;
-	
+	bool				showConsole			= false;
+	bool				showZoomMagnifier	= false;
+
 	ImGuiIO				io;
-	
+
 	std::vector<float>	fps_log;
 	std::vector<float>	ms_log;
 
