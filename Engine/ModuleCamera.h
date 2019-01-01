@@ -44,7 +44,8 @@ public:
 	
 	void			InitFrustum();
 	void			MouseUpdate(int mouseXpos, int mouseYpos);
-	void			SetFOV();
+	void			SetHorizontalFOV(bool increasing);
+	void			SetVerticalFOV(bool increasing);
 	void			MoveCamera(CameraMovement cameraSide);
 	void			RotateCamera();
 
@@ -54,14 +55,15 @@ public:
 public:
 	bool		firstMouse = true;
 	
-	int			lastX		= SCREEN_WIDTH / 2;
-	int			lastY		= SCREEN_HEIGHT / 2;
+	int			lastX			= 0;
+	int			lastY			= 0;
+	int			screenWidth		= SCREEN_WIDTH;
+	int			screenHeight	= SCREEN_HEIGHT;
 
 	float		cameraSpeed;
 	float		rotationSpeed;
 	float		mouseSensitivity;
 	float		fov;
-	float		screenRatio	= SCREEN_WIDTH / SCREEN_HEIGHT;
 	float		pitch;
 	float		yaw;
 

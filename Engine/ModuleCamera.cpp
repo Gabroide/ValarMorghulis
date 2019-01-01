@@ -1,6 +1,7 @@
 #include "Globals.h"
 #include "Application.h"
 #include "ModuleInput.h"
+#include "ModuleWindow.h"
 #include "ModuleCamera.h"
 
 // Constructor
@@ -20,10 +21,7 @@ ModuleCamera::ModuleCamera()
 }
 
 // Destructor
-ModuleCamera::~ModuleCamera() 
-{
-
-}
+ModuleCamera::~ModuleCamera() {}
 
 // Called before render is available
 bool ModuleCamera::Init()
@@ -36,7 +34,6 @@ bool ModuleCamera::Init()
 // Called every draw update
 update_status ModuleCamera::PreUpdate()
 {
-	// This will have the target point as reference, we need to handle absolute values from the camera instead of the plane
 	if (App->input->GetKey(SDL_SCANCODE_Q) == KEY_REPEAT) 
 	{
 		MoveCamera(Upwards);
@@ -95,27 +92,28 @@ update_status ModuleCamera::PreUpdate()
 
 	if (App->input->GetMouseButtonDown(SDL_BUTTON_LEFT) == KEY_REPEAT) 
 	{
+		SDL_ShowCursor(SDL_DISABLE);
 		MouseUpdate(App->input->GetMousePosition().x, App->input->GetMousePosition().y);
 	}
 	else if (App->input->GetMouseButtonDown(SDL_BUTTON_LEFT) == KEY_UP) 
 	{
-		
+	
 	}
 	else if (App->input->GetMouseButtonDown(SDL_BUTTON_RIGHT) == KEY_DOWN) 
 	{
-		
+	
 	}
 	else if (App->input->GetMouseButtonDown(SDL_BUTTON_RIGHT) == KEY_UP) 
 	{
-		
+
 	}
 	else if (App->input->GetMouseButtonDown(SDL_BUTTON_MIDDLE) == KEY_DOWN) 
 	{
-		
+	
 	}
 	else if (App->input->GetMouseButtonDown(SDL_BUTTON_MIDDLE) == KEY_UP) 
 	{
-		
+	
 	}
 
 	return UPDATE_CONTINUE;
@@ -131,12 +129,12 @@ update_status ModuleCamera::Update()
 // Called before quitting
 bool ModuleCamera::CleanUp()
 {
-
 	return true;
 }
 
 void ModuleCamera::MoveCamera(CameraMovement cameraSide) 
 {
+
 	float normCameraSpeed = cameraSpeed * App->deltaTime;
 
 	switch (cameraSide) 
@@ -169,6 +167,7 @@ void ModuleCamera::MoveCamera(CameraMovement cameraSide)
 
 void ModuleCamera::RotateCamera() 
 {
+
 	if (pitch > 89.0f)
 	{
 		pitch = 89.0f;
@@ -216,13 +215,55 @@ void ModuleCamera::InitFrustum()
 	frustum.up = float3::unitY;
 	frustum.nearPlaneDistance = 0.1f;
 	frustum.farPlaneDistance = 100.0f;
-	frustum.verticalFov = math::pi / 4.0f;					   // TODO: Change this to -1 * instead
-	frustum.horizontalFov = 2.f * atanf(tanf(frustum.verticalFov * 0.5f) * screenRatio);
+	frustum.verticalFov = degreesToRadians(fovY);					   // TODO: Change this to -1 * instead
+	frustum.horizontalFov = 2.f * atanf(tanf(frustum.verticalFov * 0.5f) * (screenWidth / screenHeight));
 }
 
-void ModuleCamera::SetFOV() 
+void ModuleCamera::SetHorizontalFOV(bool increasing) 
 {
-	
+	if (increasing)
+	{
+		++fovX;
+	}
+	else
+	{
+		--fovX;
+	}
+
+	if (fovX >= 45) 
+	{
+		fovX = 45.0f;
+	}
+	else if (fovX <= 0.0f) 
+	{
+		fovX = 0.0f;
+	}
+
+	frustum.horizontalFov = degreesToRadians(fovX);
+	frustum.verticalFov = frustum.horizontalFov / (screenWidth / screenHeight);
+}
+
+void ModuleCamera::SetVerticalFOV(bool increasing) 
+{
+	if (increasing)
+	{
+		++fovY;
+	}
+	else
+	{
+		--fovY;
+	}
+
+	if (fovY >= 45) 
+	{
+		fovY = 45.0f;
+	}
+	else if (fovY <= 0.0f) {
+		fovY = 0.0f;
+	}
+
+	frustum.verticalFov = degreesToRadians(fovY);
+	frustum.horizontalFov = 2.0f * atanf(tanf(frustum.horizontalFov / (screenWidth / screenHeight) * 2));
 }
 
 void ModuleCamera::MouseUpdate(int mouseXpos, int mouseYpos)
@@ -249,7 +290,7 @@ void ModuleCamera::MouseUpdate(int mouseXpos, int mouseYpos)
 	{
 		pitch = 89.0f;
 	}
-	
+
 	if (pitch < -89.0f)
 	{
 		pitch = -89.0f;
