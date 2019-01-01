@@ -21,7 +21,10 @@ ModuleCamera::ModuleCamera()
 }
 
 // Destructor
-ModuleCamera::~ModuleCamera() {}
+ModuleCamera::~ModuleCamera() 
+{
+
+}
 
 // Called before render is available
 bool ModuleCamera::Init()
@@ -34,6 +37,7 @@ bool ModuleCamera::Init()
 // Called every draw update
 update_status ModuleCamera::PreUpdate()
 {
+	// This will have the target point as reference, we need to handle absolute values from the camera instead of the plane
 	if (App->input->GetKey(SDL_SCANCODE_Q) == KEY_REPEAT) 
 	{
 		MoveCamera(Upwards);
@@ -105,7 +109,7 @@ update_status ModuleCamera::PreUpdate()
 	}
 	else if (App->input->GetMouseButtonDown(SDL_BUTTON_RIGHT) == KEY_UP) 
 	{
-
+	
 	}
 	else if (App->input->GetMouseButtonDown(SDL_BUTTON_MIDDLE) == KEY_DOWN) 
 	{
@@ -129,12 +133,12 @@ update_status ModuleCamera::Update()
 // Called before quitting
 bool ModuleCamera::CleanUp()
 {
+
 	return true;
 }
 
 void ModuleCamera::MoveCamera(CameraMovement cameraSide) 
 {
-
 	float normCameraSpeed = cameraSpeed * App->deltaTime;
 
 	switch (cameraSide) 
@@ -216,54 +220,30 @@ void ModuleCamera::InitFrustum()
 	frustum.nearPlaneDistance = 0.1f;
 	frustum.farPlaneDistance = 100.0f;
 	frustum.verticalFov = degreesToRadians(fovY);					   // TODO: Change this to -1 * instead
-	frustum.horizontalFov = 2.f * atanf(tanf(frustum.verticalFov * 0.5f) * (screenWidth / screenHeight));
+	frustum.horizontalFov = 2.f * atanf(tanf(frustum.verticalFov * 0.5f) * (float)(screenWidth / screenHeight));
 }
 
-void ModuleCamera::SetHorizontalFOV(bool increasing) 
+void ModuleCamera::SetHorizontalFOV(float& fovXDegrees) 
 {
-	if (increasing)
-	{
-		++fovX;
-	}
-	else
-	{
-		--fovX;
-	}
-
-	if (fovX >= 45) 
-	{
-		fovX = 45.0f;
-	}
-	else if (fovX <= 0.0f) 
-	{
-		fovX = 0.0f;
-	}
-
-	frustum.horizontalFov = degreesToRadians(fovX);
+	fovX = fovXDegrees;
+	frustum.horizontalFov = degreesToRadians(fovXDegrees);
 	frustum.verticalFov = frustum.horizontalFov / (screenWidth / screenHeight);
 }
 
-void ModuleCamera::SetVerticalFOV(bool increasing) 
+void ModuleCamera::SetVerticalFOV(float& fovYDegrees) 
 {
-	if (increasing)
-	{
-		++fovY;
-	}
-	else
-	{
-		--fovY;
-	}
-
-	if (fovY >= 45) 
-	{
-		fovY = 45.0f;
-	}
-	else if (fovY <= 0.0f) {
-		fovY = 0.0f;
-	}
-
-	frustum.verticalFov = degreesToRadians(fovY);
+	fovY = fovYDegrees;
+	frustum.verticalFov = degreesToRadians(fovYDegrees);
 	frustum.horizontalFov = 2.0f * atanf(tanf(frustum.horizontalFov / (screenWidth / screenHeight) * 2));
+}
+
+void ModuleCamera::SetScreenNewScreenSize(float& newWidth, float& newHeight) 
+{
+	screenWidth = newWidth;
+	screenHeight = newHeight;
+	screenRatio = (float)(screenWidth / screenHeight);
+	frustum.verticalFov = degreesToRadians(fovY);
+	frustum.horizontalFov = 2.0f * atanf(tanf(frustum.horizontalFov / screenRatio * 2));
 }
 
 void ModuleCamera::MouseUpdate(int mouseXpos, int mouseYpos)
@@ -279,6 +259,7 @@ void ModuleCamera::MouseUpdate(int mouseXpos, int mouseYpos)
 	int yoffset = lastY - mouseYpos;
 	lastX = mouseXpos;
 	lastY = mouseYpos;
+
 
 	xoffset *= mouseSensitivity;
 	yoffset *= mouseSensitivity;

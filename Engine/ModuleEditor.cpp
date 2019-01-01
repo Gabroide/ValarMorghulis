@@ -9,10 +9,12 @@
 
 #include "SDL\include\SDL.h" // TODO: search the SDL
 
+#include "glew-2.1.0\include\GL\glew.h"
+
 static void ShowMenuBar();
 static void ShowAbout();
 static void ShowHardware();
-static void ShowSceneConfig();
+static void ShowSceneConfig(std::vector<float> fps, std::vector<float> ms);
 static void ShowTextureConfig();
 static void PrintTextureParams(const char* currentTexture);
 static void PrintMipMapOption(const char* currentTexture);
@@ -20,7 +22,8 @@ static void PrintMipMapOption(const char* currentTexture);
 // Constructor
 ModuleEditor::ModuleEditor()
 {
-
+	fps_log.resize(100);
+	ms_log.resize(100);
 }
 
 // Destructor
@@ -36,13 +39,14 @@ bool ModuleEditor::Init()
 	// Setup Dear ImGui binding
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
+	
 	io = ImGui::GetIO(); (void)io;
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
 	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
-																//io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
-																//io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
-
+	//io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
+	//io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
+	
 	ImGui_ImplSDL2_InitForOpenGL(App->window->window, App->renderer->context);
 	ImGui_ImplOpenGL3_Init(glsl_version);
 
@@ -54,17 +58,20 @@ bool ModuleEditor::Init()
 
 update_status ModuleEditor::PreUpdate() 
 {
+	fps_log.erase(fps_log.begin());
+	fps_log.push_back(App->FPS);
+	ms_log.erase(ms_log.begin());
+	ms_log.push_back(App->deltaTime * 1000);
+
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplSDL2_NewFrame(App->window->window);
 	ImGui::NewFrame();
-	
+
 	return UPDATE_CONTINUE;
 }
 
 update_status ModuleEditor::Update()
 {
-
-	ImGui::ShowDemoWindow();
 	ShowMenuBar();
 
 	if (showAboutMenu) 
@@ -79,7 +86,7 @@ update_status ModuleEditor::Update()
 
 	if (showSceneConfig) 
 	{
-		ShowSceneConfig();
+		ShowSceneConfig(fps_log, ms_log);
 	}
 
 	if (showTextureConfig) 
@@ -89,7 +96,6 @@ update_status ModuleEditor::Update()
 
 	if (requestedExit)
 	{
-	
 		return UPDATE_STOP;
 	}
 
@@ -112,7 +118,7 @@ bool ModuleEditor::CleanUp()
 }
 
 // General menu options
-static void ShowMenuBar() 
+static void ShowMenuBar()
 {
 	if (ImGui::BeginMainMenuBar()) 
 	{
@@ -120,13 +126,13 @@ static void ShowMenuBar()
 		{
 			if (ImGui::MenuItem("Exit")) 
 			{ 
-				App->editor->requestedExit = true;
+				App->editor->requestedExit = true; 
 			}
 
 			ImGui::EndMenu();
 		}
 
-		if (ImGui::BeginMenu("Scene"))
+		if (ImGui::BeginMenu("Scene")) 
 		{
 			if (ImGui::MenuItem("Configuration")) 
 			{ 
@@ -137,24 +143,24 @@ static void ShowMenuBar()
 			{ 
 				App->editor->showTextureConfig = true; 
 			}
-
+		
 			ImGui::EndMenu();
 		}
 
-		if (ImGui::BeginMenu("Tools")) 
+		if (ImGui::BeginMenu("Tools"))
 		{
 			if (ImGui::MenuItem("Hardware")) 
 			{ 
 				App->editor->showHardwareMenu = true; 
 			}
-
+		
 			ImGui::EndMenu();
 		}
 
-		if (ImGui::BeginMenu("Help")) 
+		if (ImGui::BeginMenu("Help"))
 		{
 			if (ImGui::MenuItem("About")) 
-			{ 
+			{
 				App->editor->showAboutMenu = true; 
 			}
 
@@ -181,15 +187,15 @@ static void ShowAbout()
 	{ 
 		ShellExecute(0, 0, "https://www.libsdl.org/index.php", 0, 0, SW_SHOW); 
 	}
-
+	
 	if (ImGui::MenuItem("Glew v2.1.0")) 
-	{ 
+	{
 		ShellExecute(0, 0, "http://glew.sourceforge.net/", 0, 0, SW_SHOW); 
 	}
-
-	if (ImGui::MenuItem("ImGui v1.66"))
+	
+	if (ImGui::MenuItem("ImGui v1.66")) 
 	{ 
-		ShellExecute(0, 0, "https://github.com/ocornut/imgui/tree/docking", 0, 0, SW_SHOW);
+		ShellExecute(0, 0, "https://github.com/ocornut/imgui/tree/docking", 0, 0, SW_SHOW); 
 	}
 
 	ImGui::Separator();
@@ -198,7 +204,6 @@ static void ShowAbout()
 	{ 
 		ShellExecute(0, 0, "https://github.com/Gabroide/", 0, 0, SW_SHOW); 
 	}
-
 	ImGui::Separator();
 	ImGui::TextWrapped(MITLicense);
 	ImGui::End();
@@ -214,40 +219,66 @@ static void ShowHardware()
 }
 
 // Scene config
-static void ShowSceneConfig() 
+static void ShowSceneConfig(std::vector<float> fps, std::vector<float> ms) 
 {
-	ImGui::Begin("Camera", &App->editor->showSceneConfig);
-	ImGui::InputFloat("ms", &App->deltaTime);
-	ImGui::InputInt("FPS", &App->FPS, 0, 0);
+	ImGui::Begin("Camera", &App->editor->showSceneConfig, ImGuiWindowFlags_AlwaysAutoResize);
+	bool fovXEdited = false, fovYEdited = false;
 	
-	float forward[3] = { App->camera->cameraFront.x, App->camera->cameraFront.y, App->camera->cameraFront.z };
-	ImGui::InputFloat3("Front", forward, "%.3f");
+	if (ImGui::CollapsingHeader("Performance")) 
+	{
+		char title[25];
+		sprintf_s(title, 25, "Framerate %0.1f", fps[fps.size() - 1]);
+		ImGui::PlotHistogram("##framerate", &fps[0], fps.size(), 0, title, 0.0f, 200.0f, ImVec2(310, 100));
+		sprintf_s(title, 25, "Milliseconds %0.1f", ms[ms.size() - 1]);
+		ImGui::PlotHistogram("##framerate", &ms[0], ms.size(), 0, title, 0.0f, 40.0f, ImVec2(310, 100));
+	}
 	
-	float up[3] = { App->camera->cameraUp.x, App->camera->cameraUp.y, App->camera->cameraUp.z };
-	ImGui::InputFloat3("Up", up, "%.3f");
+	if (ImGui::CollapsingHeader("Camera position")) 
+	{
+		float forward[3] = { App->camera->cameraFront.x, App->camera->cameraFront.y, App->camera->cameraFront.z };
+		ImGui::InputFloat3("Front", forward, "%.3f");
+		
+		float up[3] = { App->camera->cameraUp.x, App->camera->cameraUp.y, App->camera->cameraUp.z };
+		ImGui::InputFloat3("Up", up, "%.3f");
 	
-	float eye[3] = { App->camera->cameraPos.x, App->camera->cameraPos.y, App->camera->cameraPos.z };
-	ImGui::InputFloat3("Position", eye, "%.3f");
-	ImGui::Separator();
-	ImGui::SliderFloat("Mov Speed", &App->camera->cameraSpeed, 0.0f, 100.0f);
-	ImGui::SliderFloat("Rot Speed", &App->camera->rotationSpeed, 0.0f, 100.0f);
-	ImGui::SliderFloat("Mouse Sens", &App->camera->mouseSensitivity, 0.0f, 1.0f);
-	ImGui::Separator();
-	ImGui::SliderFloat("Near Plane", &App->camera->frustum.nearPlaneDistance, 0.1f, App->camera->frustum.farPlaneDistance);
-	ImGui::SliderFloat("Far Plane", &App->camera->frustum.farPlaneDistance, 0.1f, 1000.0f);
+		float eye[3] = { App->camera->cameraPos.x, App->camera->cameraPos.y, App->camera->cameraPos.z };
+		ImGui::InputFloat3("Position", eye, "%.3f");
+	}
 	
-	ImGui::SliderFloat("Hotizontal FOV", &App->camera->frustum.horizontalFov, 0.01f, 1.0f);
-	ImGui::SliderFloat("Vertical FOV", &App->camera->frustum.verticalFov, 0.01f, 1.0f);
-	ImGui::InputFloat("AspectRatio", &App->camera->screenRatio, 0, 0, "%.3f");
-	ImGui::Separator();
-	ImGui::SliderFloat3("Background color", App->renderer->bgColor, 0.0f, 1.0f);
+	if (ImGui::CollapsingHeader("Camera config")) 
+	{
+		ImGui::SliderFloat("Mov Speed", &App->camera->cameraSpeed, 0.0f, 100.0f);
+		ImGui::SliderFloat("Rot Speed", &App->camera->rotationSpeed, 0.0f, 100.0f);
+		ImGui::SliderFloat("Mouse Sens", &App->camera->mouseSensitivity, 0.0f, 1.0f);
+		ImGui::Separator();
+		fovXEdited = ImGui::SliderFloat("Horz. Fov", &App->camera->fovX, 1.0f, 45.0f, "%.00f", 1.0f);
+		
+		if (ImGui::IsItemEdited()) 
+		{
+			App->camera->SetHorizontalFOV(App->camera->fovX);
+		}
+		
+		fovYEdited = ImGui::SliderFloat("Vertical. Fov", &App->camera->fovX, 1.0f, 45.0f, "%.00f", 1.0f);
+		
+		if (ImGui::IsItemEdited()) 
+		{
+			App->camera->SetVerticalFOV(App->camera->fovY);
+		}
+
+		ImGui::InputFloat("AspectRatio", &App->camera->screenRatio, 0, 0, "%.3f");
+		ImGui::SliderFloat("Near Plane", &App->camera->frustum.nearPlaneDistance, 0.1f, App->camera->frustum.farPlaneDistance);
+		ImGui::SliderFloat("Far Plane", &App->camera->frustum.farPlaneDistance, 0.1f, 500.0f);
+		ImGui::Separator();
+		ImGui::SliderFloat3("Background color", App->renderer->bgColor, 0.0f, 1.0f);
+	}
+
 	ImGui::End();
 }
 
 //Texture config
 static void ShowTextureConfig() 
 {
-	ImGui::Begin("Textures", &App->editor->showTextureConfig);
+	ImGui::Begin("Textures", &App->editor->showTextureConfig, ImGuiWindowFlags_AlwaysAutoResize);
 	const char* items[] = { "./textures/Lenna.png", "./textures/Lennin.dds", "./textures/Lolnope.jpg", "./textures/Lolyes.gif" };
 	static const char* current_item = items[0];
 	
@@ -257,7 +288,8 @@ static void ShowTextureConfig()
 		{
 			bool is_selected = (current_item == items[n]);
 			
-			if (ImGui::Selectable(items[n], is_selected)) {
+			if (ImGui::Selectable(items[n], is_selected)) 
+			{
 				current_item = items[n];
 				App->textures->ReloadTexture(items[n], App->exercise->texture0);
 			}
@@ -270,23 +302,31 @@ static void ShowTextureConfig()
 
 		ImGui::EndCombo();
 	}
+	
+	ImGui::Separator();
+	
+	if (ImGui::CollapsingHeader("Texture information")) 
+	{
+		ImGui::InputText("Format", App->textures->imgFormat, sizeof(App->textures->imgFormat));
+		ImGui::InputInt("Width", &App->textures->imgWidth, 0, 0);
+		ImGui::InputInt("Height", &App->textures->imgHeight, 0, 0);
+		ImGui::InputInt("Pixel depth", &App->textures->imgPixelDepth, 0, 0);
+	}
+	
+	if (ImGui::CollapsingHeader("Texture config")) 
+	{
+		PrintTextureParams(current_item);
+		ImGui::Separator();
+		PrintMipMapOption(current_item);
+	}
 
-	ImGui::Separator();
-	ImGui::Text(App->textures->imgFormat); ImGui::SameLine(); ImGui::Text("Format");
-	ImGui::InputInt("Width", &App->textures->imgWidth, 0, 0);
-	ImGui::InputInt("Height", &App->textures->imgHeight, 0, 0);
-	ImGui::InputInt("Pixel depth", &App->textures->imgPixelDepth, 0, 0);
-	ImGui::Separator();
-	PrintMipMapOption(current_item);
-	ImGui::Separator();
-	PrintTextureParams(current_item);
 	ImGui::End();
 }
 
 // Texture functions
 static void PrintTextureParams(const char* currentTexture) 
 {
-	
+	// Wrap methods
 	const char* wrapMethods[] = { "GL_TEXTURE_WRAP_R", "GL_TEXTURE_WRAP_S", "GL_TEXTURE_WRAP_T" };
 	const int wrapMethodsValues[] = { GL_TEXTURE_WRAP_R, GL_TEXTURE_WRAP_S, GL_TEXTURE_WRAP_T };
 	static const char* currentWrap = wrapMethods[0];
@@ -302,16 +342,17 @@ static void PrintTextureParams(const char* currentTexture)
 				currentWrap = wrapMethods[wr];
 				App->textures->SetNewParameter(currentTexture, App->exercise->texture0, App->textures->textFilter, App->textures->resizeMethod, wrapMethodsValues[wr], App->textures->clampMethod);
 			}
+
 			if (wrapSelected)
 			{
 				ImGui::SetItemDefaultFocus();
 			}
 		}
+	
 		ImGui::EndCombo();
 	}
-	
-	ImGui::Separator();
-	
+
+	// Resize methods
 	const char* resizeMethods[] = { "Linear", "Nearest" };
 	const int resizeMethodsValues[] = { GL_LINEAR, GL_NEAREST };
 	static const char* currentResize = resizeMethods[0];
@@ -327,19 +368,17 @@ static void PrintTextureParams(const char* currentTexture)
 				currentResize = resizeMethods[rs];
 				App->textures->SetNewParameter(currentTexture, App->exercise->texture0, App->textures->textFilter, resizeMethodsValues[rs], App->textures->wrapMethod, App->textures->clampMethod);
 			}
-	
+		
 			if (resizeSelected)
 			{
 				ImGui::SetItemDefaultFocus();
 			}
 		}
-	}
-	
+
 		ImGui::EndCombo();
 	}
-	
-	ImGui::Separator();
-	
+
+	// Clamp methods
 	const char* clampMethods[] = { "GL_CLAMP", "GL_CLAMP_TO_BORDER", "GL_REPEAT", "GL_MIRRORED_REPEAT" };
 	const int clampMethodsValues[] = { GL_CLAMP, GL_CLAMP_TO_BORDER, GL_REPEAT, GL_MIRRORED_REPEAT };
 	static const char* currentClamp = clampMethods[0];
@@ -355,7 +394,7 @@ static void PrintTextureParams(const char* currentTexture)
 				currentClamp = clampMethods[cl];
 				App->textures->SetNewParameter(currentTexture, App->exercise->texture0, App->textures->textFilter, App->textures->resizeMethod, App->textures->wrapMethod, clampMethodsValues[cl]);
 			}
-
+		
 			if (clampSelected)
 			{
 				ImGui::SetItemDefaultFocus();
@@ -364,9 +403,8 @@ static void PrintTextureParams(const char* currentTexture)
 	
 		ImGui::EndCombo();
 	}
-	
-	ImGui::Separator();
-	
+
+	// Texture filter methods
 	const char* filterMethods[] = { "GL_TEXTURE_MIN_FILTER", "GL_TEXTURE_MAG_FILTER" };
 	const int filterMethodsValues[] = { GL_TEXTURE_MIN_FILTER, GL_TEXTURE_MAG_FILTER };
 	static const char* currentFilter = filterMethods[0];
@@ -382,12 +420,13 @@ static void PrintTextureParams(const char* currentTexture)
 				currentFilter = filterMethods[fl];
 				App->textures->SetNewParameter(currentTexture, App->exercise->texture0, filterMethodsValues[fl], App->textures->resizeMethod, App->textures->wrapMethod, App->textures->clampMethod);
 			}
-
+		
 			if (filterSelected)
 			{
 				ImGui::SetItemDefaultFocus();
 			}
 		}
+
 		ImGui::EndCombo();
 	}
 }
@@ -415,6 +454,7 @@ static void PrintMipMapOption(const char* currentTexture)
 				ImGui::SetItemDefaultFocus();
 			}
 		}
+
 		ImGui::EndCombo();
 	}
 }

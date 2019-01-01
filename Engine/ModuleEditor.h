@@ -25,13 +25,16 @@ class ModuleEditor : public Module
 		void				HandleInputs(SDL_Event& event);
 
 public:
-	bool	showAboutMenu		= false;
-	bool	showHardwareMenu	= false;
-	bool	requestedExit		= false;
-	bool	showSceneConfig		= false;
-	bool	showTextureConfig	= false;
-
-	ImGuiIO io;
+	bool				showAboutMenu		= false;
+	bool				showHardwareMenu	= false;
+	bool				requestedExit		= false;
+	bool				showSceneConfig		= false;
+	bool				showTextureConfig	= false;
+	
+	ImGuiIO				io;
+	
+	std::vector<float>	fps_log;
+	std::vector<float>	ms_log;
 
 };
 

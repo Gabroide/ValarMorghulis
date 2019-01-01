@@ -17,15 +17,16 @@ class ModuleShader;
 class Application
 {
 public:
+
 	Application();
 	~Application();
 
 	bool			Init();
 	bool			CleanUp();
 
-	update_status	Update();
-	
 	void			Tick();
+
+	update_status	Update();
 
 public:
 	ModuleRender*			renderer	= nullptr;
@@ -40,9 +41,11 @@ public:
 public:
 	float	lastTickTime	= 0;
 	float	deltaTime		= 0;
+	float	auxTimer		= 0;
 
-	int		FPS				= 60 * deltaTime;
-
+	int		FPS				= 0;
+	int		frameCounter	= 0;
+	
 private:
 	std::list<Module*> modules;
 

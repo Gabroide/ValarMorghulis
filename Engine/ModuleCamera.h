@@ -44,31 +44,37 @@ public:
 	
 	void			InitFrustum();
 	void			MouseUpdate(int mouseXpos, int mouseYpos);
-	void			SetHorizontalFOV(bool increasing);
-	void			SetVerticalFOV(bool increasing);
+	void			SetHorizontalFOV(float& fovXDegrees);
+	void			SetVerticalFOV(float& fovXDegrees);
 	void			MoveCamera(CameraMovement cameraSide);
 	void			RotateCamera();
+	void			SetScreenNewScreenSize(float& newWidth, float& newHeight);
+	void			MoveCamera(CameraMovement cameraSide);
 
 	math::float4x4	ProjectionMatrix();
 	math::float4x4	LookAt(math::float3& cameraPos, math::float3& cameraFront, math::float3& cameraUp);
 
 public:
-	bool		firstMouse = true;
-	
-	int			lastX			= 0;
-	int			lastY			= 0;
-	int			screenWidth		= SCREEN_WIDTH;
-	int			screenHeight	= SCREEN_HEIGHT;
+	bool			firstMouse	= true;
 
-	float		cameraSpeed;
-	float		rotationSpeed;
-	float		mouseSensitivity;
-	float		fov;
-	float		pitch;
-	float		yaw;
-
-	Frustum		frustum;
+	int				lastX		= 0;
+	int				lastY		= 0;
 	
+	float			cameraSpeed;
+	float			rotationSpeed;
+	float			mouseSensitivity;
+	float			fov;
+	float			screenWidth		= SCREEN_WIDTH;
+	float			screenHeight	= SCREEN_HEIGHT;
+	float			screenRatio		= screenWidth / screenHeight;
+	float			fovY			= 45.0f;
+	float			fovX			= 45.0f;
+	float			pitch;
+	float			yaw;
+
+	Frustum			frustum;
+
+	// Camera states
 	math::float3 cameraPos;
 	math::float3 cameraFront;
 	math::float3 cameraUp;

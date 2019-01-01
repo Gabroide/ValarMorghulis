@@ -79,10 +79,18 @@ bool Application::CleanUp()
 
 void Application::Tick()
 {
+	frameCounter++;
 	float ticksNow = SDL_GetTicks();
 	deltaTime = (ticksNow - lastTickTime) / 1000;
 	lastTickTime = ticksNow;
-	FPS = deltaTime * 60;
+	auxTimer += deltaTime;
+
+	if (auxTimer >= 1.0f) 
+	{
+		FPS = frameCounter;
+		auxTimer = 0;
+		frameCounter = 0;
+	}
 }
 
 #endif // __Application_cpp__
