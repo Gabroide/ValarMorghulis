@@ -20,9 +20,9 @@ Application::Application()
 	modules.push_back(renderer = new ModuleRender());
 	modules.push_back(editor = new ModuleEditor());
 	modules.push_back(camera = new ModuleCamera());
+	modules.push_back(input = new ModuleInput());
 	modules.push_back(shader = new ModuleShader());
 	modules.push_back(textures = new ModuleTextures());
-	modules.push_back(input = new ModuleInput());
 	modules.push_back(exercise = new ModuleRenderExercise());
 }
 
@@ -49,7 +49,7 @@ bool Application::Init()
 
 update_status Application::Update()
 {
-	update_statupdate_status ret = UPDATE_CONTINUE;
+	update_status ret = UPDATE_CONTINUE;
 
 	Tick();
 
@@ -70,18 +70,16 @@ bool Application::CleanUp()
 	bool ret = true;
 
 	for (list<Module*>::reverse_iterator it = modules.rbegin(); it != modules.rend() && ret; ++it)
-	{
 		ret = (*it)->CleanUp();
-	}
 
 	return ret;
 }
 
 void Application::Tick()
 {
-	frameCounter++;
+	++frameCounter;
 	float ticksNow = SDL_GetTicks();
-	deltaTime = (ticksNow - lastTickTime) / 1000;
+	deltaTime = (ticksNow - lastTickTime)*0.001;
 	lastTickTime = ticksNow;
 	auxTimer += deltaTime;
 
