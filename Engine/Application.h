@@ -12,7 +12,7 @@ class ModuleTextures;
 class ModuleEditor;
 class ModuleCamera;
 class ModuleInput;
-class ModuleRenderExercise;
+class ModuleScene;
 class ModuleShader;
 
 class Application
@@ -30,22 +30,22 @@ public:
 	void			Tick();
 
 public:
-	ModuleRender*			renderer	= nullptr;
-	ModuleWindow*			window		= nullptr;
-	ModuleTextures*			textures	= nullptr;
-	ModuleEditor*			editor		= nullptr;
-	ModuleCamera*			camera		= nullptr;
-	ModuleInput*			input		= nullptr;
-	ModuleRenderExercise*	exercise	= nullptr;
-	ModuleShader*			shader		= nullptr;
+	ModuleRender*	renderer		= nullptr;
+	ModuleWindow*	window			= nullptr;
+	ModuleTextures*	textures		= nullptr;
+	ModuleEditor*	editor			= nullptr;
+	ModuleCamera*	camera			= nullptr;
+	ModuleInput*	input			= nullptr;
+	ModuleScene*	scene			= nullptr;
+	ModuleShader*	shader			= nullptr;
 
 public:
-	float					lastTickTime	= 0.0f;
-	float					deltaTime		= 0.0f;
-	float					auxTimer		= 0.0f;
+	float			lastTickTime	= 0.0f;
+	float			deltaTime		= 0.0f;
+	float			auxTimer		= 0.0f;
 	
-	int						frameCounter	= 0;
-	int						FPS				= 0;
+	int				frameCounter	= 0;
+	int				FPS				= 0;
 
 private:
 	std::list<Module*> modules;
