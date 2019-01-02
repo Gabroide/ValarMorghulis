@@ -25,6 +25,7 @@ bool ModuleRenderExercise::Init()
 	if (texture0 == -1) 
 	{
 		LOG("Error: Texture cannot be loaded");
+	
 		return false;
 	}
 
@@ -34,6 +35,7 @@ bool ModuleRenderExercise::Init()
 	if (!progDefault) 
 	{
 		LOG("Error: Program cannot be compiled");
+	
 		return false;
 	}
 
@@ -75,6 +77,7 @@ bool ModuleRenderExercise::Init()
 
 update_status ModuleRenderExercise::Update()
 {
+	// This is what kind of info GL is going to read and where do it needs to read from
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glVertexAttribPointer(
@@ -89,12 +92,14 @@ update_status ModuleRenderExercise::Update()
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)(sizeof(float) * 3 * 6));
 
+	//Printing Colors with default shader
+
 	glUseProgram(progDefault);
 
 	// Editor References
 	DrawReferenceGround();
 	DrawReferenceAxis();
-	
+
 	// Fragment shader coloring
 	int fragUnifLocation = glGetUniformLocation(progDefault, "newColor");
 	float color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -104,7 +109,7 @@ update_status ModuleRenderExercise::Update()
 	math::float4x4 Model(math::float4x4::identity); // Not moving anything
 
 	glUniformMatrix4fv(glGetUniformLocation(progDefault, "proj"), 1, GL_TRUE, &App->camera->ProjectionMatrix()[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(progDefault, "view"), 1, GL_TRUE, &App->camera->LookAt(App->camera->cameraPos, App->camera->cameraFront, App->camera->cameraUp)[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(progDefault, "view"), 1, GL_TRUE, &App->camera->viewMatrix[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(progDefault, "model"), 1, GL_TRUE, &Model[0][0]);
 
 	// Printing texture with texture shader
@@ -115,7 +120,7 @@ update_status ModuleRenderExercise::Update()
 	glUniform1i(glGetUniformLocation(progTexture, "texture0"), 0);
 
 	glUniformMatrix4fv(glGetUniformLocation(progTexture, "proj"), 1, GL_TRUE, &App->camera->ProjectionMatrix()[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(progTexture, "view"), 1, GL_TRUE, &App->camera->LookAt(App->camera->cameraPos, App->camera->cameraFront, App->camera->cameraUp)[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(progTexture, "view"), 1, GL_TRUE, &App->camera->viewMatrix[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(progTexture, "model"), 1, GL_TRUE, &Model[0][0]);
 
 	// Draw every GL_TRIANGLE that starts at vec[0] and you can find 6 of them
@@ -146,7 +151,6 @@ bool ModuleRenderExercise::CleanUp()
 void ModuleRenderExercise::DrawReferenceGround() 
 {
 	glLineWidth(1.0f);
-
 	float d = 200.0f;
 	glBegin(GL_LINES);
 

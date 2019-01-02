@@ -42,49 +42,52 @@ public:
 
 	update_status	PreUpdate()	override;
 	
+	void			LookAt(math::float3& cameraPos, math::float3& cameraFront);
 	void			InitFrustum();
 	void			CameraMovementKeyboard();
 	void			CameraMovementMouse();
-	void			RotateCameraKeyboard(CameraMovement cameraSide);
-	void			RotateCameraMouse(const iPoint& mousePosition);
+	void			MouseUpdate(const iPoint& mousePosition);
 	void			SetScreenNewScreenSize(unsigned newWidth, unsigned newHeight);
 	void			MoveCamera(CameraMovement cameraSide);
+	void			RotateCamera(CameraMovement cameraSide);
 	void			SetHorizontalFOV(float& fovXDegrees);
 	void			SetVerticalFOV(float& fovYDegrees);
-	void			Zooming();
+	void			Zooming(bool positive);
 	void			FocusObject(math::float3& objectCenterPos);
+	void			UpdatePitchYaw();
 
 	math::float4x4	ProjectionMatrix();
-	math::float4x4	LookAt(math::float3& cameraPos, math::float3& cameraFront, math::float3& cameraUp);
 	
 public:
 	bool			firstMouse	= true;
-	bool			orbiting	= false;
-
+	
 	int				lastX		= 0;
 	int				lastY		= 0;
 
-	float			screenRatio	= screenWidth / screenHeight;
-	float			fovY		= 45.0f;
-	float			fovX		= 45.0f;
-	float			zoomValue	= 0.0f;
-	float			pitch;
-	float			yaw;
 	float			cameraSpeed;
 	float			rotationSpeed;
-	float			zoomSpeed;
 	float			mouseSensitivity;
 	float			fov;
+	float			screenRatio = screenWidth / screenHeight;
+	float			fovY			= 45.0f;
+	float			fovX			= 45.0f;
+	float			zoomValue		= 0.0f;
+	float			pitch;
+	float			yaw;
 
 	unsigned		screenWidth		= SCREEN_WIDTH;
 	unsigned		screenHeight	= SCREEN_HEIGHT;
-	
+
 	Frustum			frustum;
 	
 	math::float3	cameraPos;
 	math::float3	cameraFront;
-	math::float3	cameraUp;
+	math::float3	front;
+	math::float3	side;
+	math::float3	up;
 	math::float3	sceneCenter		= math::float3(0.0f, 0.0f, 0.0f);
+
+	math::float4x4	viewMatrix;
 
 };
 

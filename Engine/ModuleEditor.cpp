@@ -34,7 +34,8 @@ ModuleEditor::~ModuleEditor()
 
 }
 
-bool ModuleEditor::Init() {
+bool ModuleEditor::Init() 
+{
 	const char* glsl_version = "#version 130";
 
 	// Setup Dear ImGui binding
@@ -154,7 +155,7 @@ static void ShowMenuBar()
 			{ 
 				App->editor->showTextureConfig = true; 
 			}
-			
+		
 			ImGui::EndMenu();
 		}
 
@@ -169,7 +170,7 @@ static void ShowMenuBar()
 			{ 
 				App->editor->showHardwareMenu = true; 
 			}
-		
+			
 			ImGui::EndMenu();
 		}
 
@@ -183,13 +184,13 @@ static void ShowMenuBar()
 			ImGui::EndMenu();
 		}
 	}
-
 	ImGui::EndMainMenuBar();
 }
 
 // About
 static void ShowAbout() 
 {
+
 	const char* MITLicense = "Copyright 2018 - Chimera Engine \n\nPermission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the 'Software'), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions";
 
 	ImGui::Begin("About", &App->editor->showAboutMenu);
@@ -213,7 +214,7 @@ static void ShowAbout()
 	{ 
 		ShellExecute(0, 0, "https://github.com/ocornut/imgui/tree/docking", 0, 0, SW_SHOW); 
 	}
-
+	
 	if (ImGui::MenuItem("Devil v1.8.0")) 
 	{ 
 		ShellExecute(0, 0, "http://openil.sourceforge.net/", 0, 0, SW_SHOW); 
@@ -225,6 +226,16 @@ static void ShowAbout()
 	if (ImGui::MenuItem("Gabriel Cambronero")) 
 	{ 
 		ShellExecute(0, 0, "https://github.com/Gabroide/", 0, 0, SW_SHOW); 
+	}
+
+	if (ImGui::MenuItem("Engine Code"))
+	{
+		ShellExecute(0, 0, "https://github.com/Gabroide/", 0, 0, SW_SHOW);
+	}
+
+	if (ImGui::MenuItem("Last Release"))
+	{
+		ShellExecute(0, 0, "https://github.com/Gabroide/", 0, 0, SW_SHOW);
 	}
 
 	ImGui::Separator();
@@ -239,7 +250,6 @@ static void ShowHardware()
 	ImGui::Begin("Hardware specs", &App->editor->showHardwareMenu, ImGuiWindowFlags_AlwaysAutoResize);
 	ImGui::Text("CPU Count: "); ImGui::SameLine(); ImGui::TextColored(ImVec4(0.8f, 0.5f, 1.0f, 1.0f), "%d", SDL_GetCPUCount());
 	ImGui::Text("System RAM: "); ImGui::SameLine(); ImGui::TextColored(ImVec4(0.8f, 0.5f, 1.0f, 1.0f), "%d", SDL_GetSystemRAM());
-
 	ImGui::End();
 }
 
@@ -257,13 +267,15 @@ static void ShowSceneConfig(std::vector<float> fps, std::vector<float> ms)
 		sprintf_s(title, 25, "Milliseconds %0.1f", ms[ms.size() - 1]);
 		ImGui::PlotHistogram("##framerate", &ms[0], ms.size(), 0, title, 0.0f, 40.0f, ImVec2(310, 100));
 	}
-	
+
 	if (ImGui::CollapsingHeader("Camera position")) 
 	{
 		float forward[3] = { App->camera->cameraFront.x, App->camera->cameraFront.y, App->camera->cameraFront.z };
 		ImGui::InputFloat3("Front", forward, "%.3f");
-		float up[3] = { App->camera->cameraUp.x, App->camera->cameraUp.y, App->camera->cameraUp.z };
+	
+		float up[3] = { App->camera->up.x, App->camera->up.y, App->camera->up.z };
 		ImGui::InputFloat3("Up", up, "%.3f");
+		
 		float eye[3] = { App->camera->cameraPos.x, App->camera->cameraPos.y, App->camera->cameraPos.z };
 		ImGui::InputFloat3("Position", eye, "%.3f");
 		ImGui::Separator();
@@ -271,7 +283,8 @@ static void ShowSceneConfig(std::vector<float> fps, std::vector<float> ms)
 		ImGui::InputFloat("Yaw", &App->camera->yaw, 0, 0, 0);
 	}
 
-	if (ImGui::CollapsingHeader("Camera config")) {
+	if (ImGui::CollapsingHeader("Camera config")) 
+	{
 		ImGui::SliderFloat("Mov Speed", &App->camera->cameraSpeed, 0.0f, 100.0f);
 		ImGui::SliderFloat("Rot Speed", &App->camera->rotationSpeed, 0.0f, 100.0f);
 		ImGui::SliderFloat("Mouse Sens", &App->camera->mouseSensitivity, 0.0f, 1.0f);
@@ -282,26 +295,27 @@ static void ShowSceneConfig(std::vector<float> fps, std::vector<float> ms)
 		{
 			App->camera->SetHorizontalFOV(App->camera->fovX);
 		}
-		
+		// TODO: Not working properly
 		fovYEdited = ImGui::SliderFloat("Vertical. Fov", &App->camera->fovY, 1.0f, 45.0f, "%.00f", 1.0f);
 		
-		if (ImGui::IsItemEdited()) {
-			{	App->camera->SetVerticalFOV(App->camera->fovY);
-			}
+		if (ImGui::IsItemEdited()) 
+		{
+			App->camera->SetVerticalFOV(App->camera->fovY);
 		}
-	
+
 		ImGui::InputFloat("AspectRatio", &App->camera->screenRatio, 0, 0, "%.3f");
 		ImGui::SliderFloat("Near Plane", &App->camera->frustum.nearPlaneDistance, 0.1f, App->camera->frustum.farPlaneDistance);
 		ImGui::SliderFloat("Far Plane", &App->camera->frustum.farPlaneDistance, 0.1f, 500.0f);
 		ImGui::Separator();
 		ImGui::SliderFloat3("Background color", App->renderer->bgColor, 0.0f, 1.0f);
 	}
-	
+
 	ImGui::End();
 }
 
 //Texture config
-static void ShowTextureConfig() {
+static void ShowTextureConfig() 
+{
 	ImGui::Begin("Textures", &App->editor->showTextureConfig, ImGuiWindowFlags_AlwaysAutoResize);
 	const char* items[] = { "./textures/Lenna.png", "./textures/Lennin.dds", "./textures/Lolnope.jpg", "./textures/Lolyes.gif" };
 	static const char* current_item = items[0];
@@ -371,7 +385,6 @@ static void PrintTextureParams(const char* currentTexture)
 				ImGui::SetItemDefaultFocus();
 			}
 		}
-
 		ImGui::EndCombo();
 	}
 	
@@ -391,13 +404,12 @@ static void PrintTextureParams(const char* currentTexture)
 				currentResize = resizeMethods[rs];
 				App->textures->SetNewParameter(currentTexture, App->exercise->texture0, App->textures->textFilter, resizeMethodsValues[rs], App->textures->wrapMethod, App->textures->clampMethod);
 			}
-		
+
 			if (resizeSelected)
 			{
 				ImGui::SetItemDefaultFocus();
 			}
 		}
-	
 		ImGui::EndCombo();
 	}
 	
@@ -411,13 +423,13 @@ static void PrintTextureParams(const char* currentTexture)
 		for (int cl = 0; cl < IM_ARRAYSIZE(clampMethods); cl++)
 		{
 			bool clampSelected = (currentClamp == clampMethods[cl]);
-			
+		
 			if (ImGui::Selectable(clampMethods[cl], clampSelected)) 
 			{
 				currentClamp = clampMethods[cl];
 				App->textures->SetNewParameter(currentTexture, App->exercise->texture0, App->textures->textFilter, App->textures->resizeMethod, App->textures->wrapMethod, clampMethodsValues[cl]);
 			}
-		
+
 			if (clampSelected)
 			{
 				ImGui::SetItemDefaultFocus();
@@ -492,5 +504,6 @@ static void ShowZoomMagnifier()
 	ImGuiWindowFlags zommingFlags = ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoDocking;
 	ImGui::Begin("Zooming", &App->editor->showHardwareMenu, zommingFlags);
 	ImGui::InputFloat("Zoom value", &App->camera->zoomValue, 0, 0, 2);
+
 	ImGui::End();
 }
