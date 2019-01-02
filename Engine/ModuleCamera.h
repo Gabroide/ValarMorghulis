@@ -5,6 +5,7 @@
 #include "Globals.h"
 #include "Point.h"
 
+
 #include "SDL\include\SDL.h" // TODO: clean SDL
 
 #include "glew-2.1.0\include\GL\glew.h"
@@ -44,31 +45,32 @@ public:
 	
 	void			LookAt(math::float3& cameraPos, math::float3& cameraFront);
 	void			InitFrustum();
+	void			UpdatePitchYaw();
 	void			CameraMovementKeyboard();
 	void			CameraMovementMouse();
-	void			MouseUpdate(const iPoint& mousePosition);
-	void			SetScreenNewScreenSize(unsigned newWidth, unsigned newHeight);
+	void			RotateCameraKeyBoard(CameraMovement cameraSide);
+	void			RotateCameraMouse(const iPoint& mousePosition);
 	void			MoveCamera(CameraMovement cameraSide);
-	void			RotateCamera(CameraMovement cameraSide);
+	void			SetScreenNewScreenSize(unsigned newWidth, unsigned newHeight);
+	void			FocusObject(math::float3& objectCenterPos);
 	void			SetHorizontalFOV(float& fovXDegrees);
 	void			SetVerticalFOV(float& fovYDegrees);
-	void			Zooming(bool positive);
-	void			FocusObject(math::float3& objectCenterPos);
-	void			UpdatePitchYaw();
+	void			Zooming();
 
 	math::float4x4	ProjectionMatrix();
-	
-public:
-	bool			firstMouse	= true;
-	
-	int				lastX		= 0;
-	int				lastY		= 0;
 
-	float			cameraSpeed;
-	float			rotationSpeed;
+public:
+	bool			orbiting		= false;
+	bool			firstMouse		= true;
+
+	int				lastX			= 0;
+	int				lastY			= 0;
+
 	float			mouseSensitivity;
-	float			fov;
-	float			screenRatio = screenWidth / screenHeight;
+	float			rotationSpeed;
+	float			cameraSpeed;
+	float			zoomSpeed;
+	float			screenRatio		= screenWidth / screenHeight;
 	float			fovY			= 45.0f;
 	float			fovX			= 45.0f;
 	float			zoomValue		= 0.0f;
@@ -79,15 +81,15 @@ public:
 	unsigned		screenHeight	= SCREEN_HEIGHT;
 
 	Frustum			frustum;
-	
+
 	math::float3	cameraPos;
 	math::float3	cameraFront;
 	math::float3	front;
 	math::float3	side;
 	math::float3	up;
-	math::float3	sceneCenter		= math::float3(0.0f, 0.0f, 0.0f);
+	math::float3	objectCenter	= math::float3(0.0f, 0.0f, 0.0f);
 
-	math::float4x4	viewMatrix;
+	math::float4x4 viewMatrix;
 
 };
 
