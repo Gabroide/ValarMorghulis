@@ -15,6 +15,7 @@
 #include "Math\MathConstants.h"
 #include "Math\MathFunc.h"
 #include "Geometry\Frustum.h"
+#include "MathGeoLib.h" // TODO: find out the owners of IsNan and Clamp
 
 class ModuleCamera : public Module
 {
@@ -44,13 +45,13 @@ public:
 	void			InitFrustum();
 	void			CameraMovementKeyboard();
 	void			CameraMovementMouse();
-	void			MouseUpdate(const iPoint& mousePosition);
+	void			RotateCameraKeyboard(CameraMovement cameraSide);
+	void			RotateCameraMouse(const iPoint& mousePosition);
 	void			SetScreenNewScreenSize(unsigned newWidth, unsigned newHeight);
 	void			MoveCamera(CameraMovement cameraSide);
-	void			RotateCamera(CameraMovement cameraSide);
 	void			SetHorizontalFOV(float& fovXDegrees);
 	void			SetVerticalFOV(float& fovYDegrees);
-	void			Zooming(bool positive);
+	void			Zooming();
 	void			FocusObject(math::float3& objectCenterPos);
 
 	math::float4x4	ProjectionMatrix();
@@ -58,6 +59,7 @@ public:
 	
 public:
 	bool			firstMouse	= true;
+	bool			orbiting	= false;
 
 	int				lastX		= 0;
 	int				lastY		= 0;
@@ -70,6 +72,7 @@ public:
 	float			yaw;
 	float			cameraSpeed;
 	float			rotationSpeed;
+	float			zoomSpeed;
 	float			mouseSensitivity;
 	float			fov;
 
