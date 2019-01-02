@@ -145,15 +145,19 @@
     <ClInclude Include="MathGeoLib\include\Math\TransformOps.h" />
     <ClInclude Include="MathGeoLib\include\Time\Clock.h" />
     <ClInclude Include="Module.h" />
+    <ClInclude Include="ModuleCamera.h" />
     <ClInclude Include="ModuleEditor.h" />
     <ClInclude Include="ModuleInput.h" />
     <ClInclude Include="modulemodelloader.h" />
     <ClInclude Include="ModulePrograms.h" />
     <ClInclude Include="ModuleRender.h" />
     <ClInclude Include="ModuleRenderExercise.h" />
+    <ClInclude Include="ModuleScene.h" />
     <ClInclude Include="ModuleShader.h" />
     <ClInclude Include="ModuleTextures.h" />
     <ClInclude Include="ModuleWindow.h" />
+    <ClInclude Include="Point.h" />
+    <ClInclude Include="Timer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
@@ -191,12 +195,14 @@
     <ClCompile Include="MathGeoLib\include\Math\SSEMath.cpp" />
     <ClCompile Include="MathGeoLib\include\Math\TransformOps.cpp" />
     <ClCompile Include="MathGeoLib\include\Time\Clock.cpp" />
+    <ClCompile Include="ModuleCamera.cpp" />
     <ClCompile Include="ModuleEditor.cpp" />
     <ClCompile Include="ModuleInput.cpp" />
     <ClCompile Include="ModuleModelLoader.cpp" />
     <ClCompile Include="ModulePrograms.cpp" />
     <ClCompile Include="ModuleRender.cpp" />
     <ClCompile Include="ModuleRenderExercise.cpp" />
+    <ClCompile Include="ModuleScene.cpp" />
     <ClCompile Include="ModuleShader.cpp" />
     <ClCompile Include="ModuleTextures.cpp" />
     <ClCompile Include="ModuleWindow.cpp" />
@@ -204,6 +210,8 @@
   <ItemGroup>
     <None Include="Game\Shaders\default.fs" />
     <None Include="Game\Shaders\default.vs" />
+    <None Include="Game\Shaders\texture.fs" />
+    <None Include="Game\Shaders\texture.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

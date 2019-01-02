@@ -1,12 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="log.cpp" />
-    <ClCompile Include="ModuleInput.cpp" />
     <ClCompile Include="ModulePrograms.cpp" />
-    <ClCompile Include="ModuleRender.cpp" />
-    <ClCompile Include="ModuleTextures.cpp" />
-    <ClCompile Include="ModuleWindow.cpp" />
     <ClCompile Include="MathGeoLib\include\Geometry\AABB.cpp">
       <Filter>MathGeoLib\Geometry</Filter>
     </ClCompile>
@@ -119,14 +114,31 @@
     <ClCompile Include="ModuleShader.cpp">
       <Filter>Modules\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ModuleInput.cpp">
+      <Filter>Modules\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="log.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="ModuleRender.cpp">
+      <Filter>Modules\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ModuleWindow.cpp">
+      <Filter>Modules\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ModuleCamera.cpp">
+      <Filter>Modules\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ModuleTextures.cpp">
+      <Filter>Modules\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ModuleScene.cpp">
+      <Filter>Modules\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Module.h" />
-    <ClInclude Include="ModuleInput.h" />
     <ClInclude Include="ModulePrograms.h" />
-    <ClInclude Include="ModuleRender.h" />
-    <ClInclude Include="ModuleTextures.h" />
-    <ClInclude Include="ModuleWindow.h" />
     <ClInclude Include="MathGeoLib\include\Geometry\AABB.h">
       <Filter>MathGeoLib\Geometry</Filter>
     </ClInclude>
@@ -318,10 +330,34 @@
       <Filter>Modules\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ModuleRenderExercise.h">
-      <Filter>Modules</Filter>
+      <Filter>Modules\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Point.h">
+      <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="ModuleShader.h">
-      <Filter>Modules</Filter>
+      <Filter>Modules\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ModuleWindow.h">
+      <Filter>Modules\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ModuleCamera.h">
+      <Filter>Modules\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ModuleTextures.h">
+      <Filter>Modules\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ModuleInput.h">
+      <Filter>Modules\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ModuleRender.h">
+      <Filter>Modules\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ModuleScene.h">
+      <Filter>Modules\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer.h">
+      <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -355,12 +391,21 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{046673ba-3190-4d6d-823e-a258f12dcec9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Utils">
+      <UniqueIdentifier>{53a849f2-8fd6-4d1e-8c04-cc80338598a3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="Game\Shaders\default.fs">
       <Filter>Shaders</Filter>
     </None>
     <None Include="Game\Shaders\default.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Game\Shaders\texture.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Game\Shaders\texture.vs">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

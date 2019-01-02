@@ -3,13 +3,14 @@
 #include "Application.h"
 #include "ModuleRender.h"
 #include "Globals.h"
+#include "Timer.h"
 
 #include "SDL\include\SDL.h"
 
-#pragma comment( lib, ".\Source\SDL\libx86\SDL2.lib" )
-#pragma comment( lib, ".\Source\SDL\libx86\SDL2main.lib" )
+#pragma comment( lib, "SDL\libx86\SDL2.lib" )
+#pragma comment( lib, "SDL\libx86\SDL2main.lib" )
 
-enum main_states 
+enum main_states
 {
 	MAIN_CREATION,
 	MAIN_START,
@@ -36,7 +37,13 @@ int main(int argc, char ** argv)
 			break;
 
 		case MAIN_START:
+		{
+			Timer time;
+			TimerPerfomance timeP;
+			time.Start();
+			timeP.Start();
 			LOG("Application Init --------------");
+			
 			if (App->Init() == false)
 			{
 				LOG("Application Init exits with error -----");
@@ -47,8 +54,14 @@ int main(int argc, char ** argv)
 				state = MAIN_UPDATE;
 				LOG("Application Update --------------");
 			}
-
-			break;
+		
+			timeP.Stop();
+			time.Stop();
+			LOG("Start in %ums", time.GetTicks());
+			LOG("Start in %ums", timeP.GetTicks());
+		}
+		
+		break;
 
 		case MAIN_UPDATE:
 		{
@@ -61,14 +74,13 @@ int main(int argc, char ** argv)
 			}
 
 			if (update_return == UPDATE_STOP)
-			{
 				state = MAIN_FINISH;
-			}}
-
+		}
 		break;
 
 		case MAIN_FINISH:
 			LOG("Application CleanUp --------------");
+			
 			if (App->CleanUp() == false)
 			{
 				LOG("Application CleanUp exits with error -----");
@@ -79,14 +91,11 @@ int main(int argc, char ** argv)
 			}
 
 			state = MAIN_EXIT;
-
 			break;
-
 		}
 	}
 
 	delete App;
 	LOG("Bye :)\n");
-	
 	return main_return;
 }
