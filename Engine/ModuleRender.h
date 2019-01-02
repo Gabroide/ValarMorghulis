@@ -3,6 +3,14 @@
 
 #include "Module.h"
 #include "Globals.h"
+#include "ModuleModelLoader.h"
+
+#include "glew-2.1.0\include\GL\glew.h"
+
+#include "SDL\include\SDL.h"
+
+#include "IMGUI\imgui.h"
+#include "IMGUI\imgui_impl_sdl.h"
 
 struct SDL_Texture;
 struct SDL_Renderer;
@@ -21,10 +29,17 @@ public:
 	update_status	Update()		override;
 	update_status	PostUpdate()	override;
 
-	void WindowResized(unsigned width, unsigned height);
+	void			RenderMesh(const ModuleModelLoader::Mesh& mesh, const ModuleModelLoader::Material& material, unsigned program, const math::float4x4& model, const math::float4x4& view, const math::float4x4& proj);
 
 public:
-	void* context;
+	unsigned		program0;
+	unsigned		program1;
+
+public:
+	void*			context;
+
+private:
+	void			DrawReferenceDebug(unsigned program, const math::float4x4& model, const math::float4x4& view, const math::float4x4& proj);
 
 };
 

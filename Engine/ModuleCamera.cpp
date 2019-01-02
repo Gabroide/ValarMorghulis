@@ -8,9 +8,9 @@
 // Constructor
 ModuleCamera::ModuleCamera() 
 {
-	front = math::float3(0.0f, 0.0f, -1.0f);
+	front = math::float3(-0.5f, -0.5f, -0.5f);
 	up = math::float3(0.0f, 1.0f, 0.0f);
-	cameraPos = math::float3(0.0f, 0.0f, 1.0f);
+	cameraPos = math::float3(7.0f, 7.0f, 7.0f);
 
 	cameraSpeed = 17.0f;
 	rotationSpeed = 65.0f;
@@ -45,7 +45,7 @@ update_status ModuleCamera::PreUpdate()
 		FocusObject(objectCenter);
 	}
 
-	if (App->input->GetKey(SDL_SCANCODE_LALT) == KEY_DOWN)
+	if (App->input->GetKey(SDL_SCANCODE_LALT) == KEY_DOWN) 
 	{
 		orbiting = true;
 	}
@@ -118,14 +118,15 @@ void ModuleCamera::RotateCameraKeyBoard(CameraMovement cameraSide)
 	case Upwards:
 		pitch += normRotationSpeed;
 		break;
-	
+
 	case Downwards:
 		pitch -= normRotationSpeed;
 		break;
+
 	case Left:
 		yaw -= normRotationSpeed;
 		break;
-	
+
 	case Right:
 		yaw += normRotationSpeed;
 		break;
@@ -134,16 +135,28 @@ void ModuleCamera::RotateCameraKeyBoard(CameraMovement cameraSide)
 	pitch = math::Clamp(pitch, -80.0f, 80.0f);
 
 	math::float3 rotation;
-	rotation.x = SDL_sinf(math::DegToRad(yaw)) * SDL_cosf(math::DegToRad(pitch));
-	rotation.y = SDL_sinf(math::DegToRad(pitch));
-	rotation.z = -SDL_cosf(math::DegToRad(yaw)) * SDL_cosf(math::DegToRad(pitch));
-	front = rotation.Normalized();
-	up = math::float3(0.0f, 1.0f, 0.0f);
+	
+	if (orbiting) 
+	{
+		math::float3 cameraTarget = cameraPos + front * 5;
+		cameraPos.x = cameraTarget.x + 5 * SDL_sinf(math::DegToRad(-yaw)) * -SDL_cosf(math::DegToRad(-pitch));
+		cameraPos.y = cameraTarget.x + 5 * -SDL_sinf(math::DegToRad(-pitch));
+		cameraPos.z = cameraTarget.x + 5 * -SDL_cosf(math::DegToRad(-yaw)) * -SDL_cosf(math::DegToRad(-pitch));
+		front = (cameraTarget - cameraPos).Normalized();
+	}
+	else 
+	{
+		rotation.x = SDL_sinf(math::DegToRad(yaw)) * SDL_cosf(math::DegToRad(pitch));
+		rotation.y = SDL_sinf(math::DegToRad(pitch));
+		rotation.z = -SDL_cosf(math::DegToRad(yaw)) * SDL_cosf(math::DegToRad(pitch));
+		front = rotation.Normalized();
+	}
+
 	LookAt(cameraPos, (cameraPos + front));
 }
 
-void ModuleCamera::RotateCameraMouse(const iPoint& mousePosition) {
-
+void ModuleCamera::RotateCameraMouse(const iPoint& mousePosition) 
+{
 	if (firstMouse) 
 	{
 		lastX = mousePosition.x;
@@ -181,7 +194,7 @@ void ModuleCamera::RotateCameraMouse(const iPoint& mousePosition) {
 		rotation.z = -SDL_cosf(math::DegToRad(yaw)) * SDL_cosf(math::DegToRad(pitch));
 		front = rotation.Normalized();
 	}
-	
+
 	LookAt(cameraPos, (cameraPos + front));
 }
 

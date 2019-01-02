@@ -22,6 +22,12 @@ ModuleInput::~ModuleInput()
 	RELEASE_ARRAY(keyboard);
 }
 
+bool ModuleInput::Init()
+{
+
+	return UPDATE_CONTINUE;
+}
+
 // Called each loop iteration
 update_status ModuleInput::PreUpdate()
 {
@@ -99,7 +105,7 @@ update_status ModuleInput::PreUpdate()
 
 			case SDL_WINDOWEVENT_RESIZED:
 			case SDL_WINDOWEVENT_SIZE_CHANGED:
-				App->renderer->WindowResized(event.window.data1, event.window.data2);
+				App->window->WindowResized(event.window.data1, event.window.data2);
 				break;
 			}
 			
@@ -121,22 +127,25 @@ update_status ModuleInput::PreUpdate()
 			break;
 
 		case SDL_MOUSEWHEEL:
-			if (event.wheel.y > 0) {
+			if (event.wheel.y > 0) 
+			{
 				mouse_buttons[4 - 1] = KEY_DOWN;
 			}
-			else {
+			else 
+			{
 				mouse_buttons[5 - 1] = KEY_DOWN;
 			}
-
+	
 			break;
+
 		}
 	}
 
 	if (GetWindowEvent(EventWindow::WE_QUIT) == true || GetKey(SDL_SCANCODE_ESCAPE) == KEY_DOWN)
 	{
-	
 		return UPDATE_STOP;
 	}
+
 	return UPDATE_CONTINUE;
 }
 
@@ -145,24 +154,20 @@ bool ModuleInput::CleanUp()
 {
 	LOG("Quitting SDL event subsystem");
 	SDL_QuitSubSystem(SDL_INIT_EVENTS);
-
 	return true;
 }
 
 bool ModuleInput::GetWindowEvent(EventWindow ev) const
 {
-
 	return windowEvents[ev];
 }
 
 const iPoint& ModuleInput::GetMousePosition() const
 {
-
 	return mouse;
 }
 
 const iPoint& ModuleInput::GetMouseMotion() const
 {
-
 	return mouse_motion;
 }

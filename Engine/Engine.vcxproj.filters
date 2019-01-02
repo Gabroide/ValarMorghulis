@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="ModulePrograms.cpp" />
     <ClCompile Include="MathGeoLib\include\Geometry\AABB.cpp">
       <Filter>MathGeoLib\Geometry</Filter>
     </ClCompile>
@@ -98,7 +97,6 @@
     <ClCompile Include="MathGeoLib\include\Time\Clock.cpp">
       <Filter>MathGeoLib\Time</Filter>
     </ClCompile>
-    <ClCompile Include="ModuleModelLoader.cpp" />
     <ClCompile Include="Application.cpp">
       <Filter>Main</Filter>
     </ClCompile>
@@ -135,10 +133,15 @@
     <ClCompile Include="ModuleScene.cpp">
       <Filter>Modules\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ModuleModelLoader.cpp">
+      <Filter>Modules\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ModuleProgram.cpp">
+      <Filter>Modules\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Module.h" />
-    <ClInclude Include="ModulePrograms.h" />
     <ClInclude Include="MathGeoLib\include\Geometry\AABB.h">
       <Filter>MathGeoLib\Geometry</Filter>
     </ClInclude>
@@ -319,7 +322,6 @@
     <ClInclude Include="MathGeoLib\include\MathGeoLibFwd.h">
       <Filter>MathGeoLib</Filter>
     </ClInclude>
-    <ClInclude Include="modulemodelloader.h" />
     <ClInclude Include="Application.h">
       <Filter>Main</Filter>
     </ClInclude>
@@ -358,6 +360,12 @@
     </ClInclude>
     <ClInclude Include="Timer.h">
       <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="modulemodelloader.h">
+      <Filter>Modules\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ModuleProgram.h">
+      <Filter>Modules\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

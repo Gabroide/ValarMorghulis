@@ -26,26 +26,22 @@ public:
 	bool			Init()		override;
 	bool			CleanUp()	override;
 
-	void			ReloadTexture(const char* newPath, GLuint& texture);
-	void			SetNewParameter(const char* newPath, GLuint& texture, GLuint newTextFilter, GLuint newResizeMethod, GLuint newWrapMethod, GLuint newClampMethod);
-	void			SwitchMipMaps(const char* newPath, GLuint& texture, bool state);
+	unsigned	 	Load(const char* path);
 
-	GLuint const	Load(const char* path);
-
-public:
-	bool	generateMipMaps = false;
-
-	int		imgWidth;
-	int		imgHeight;
-	int		imgPixelDepth;
-	
-	GLuint	textFilter		= 0;
-	GLuint	resizeMethod	= 0;
-	GLuint	wrapMethod		= 0;
-	GLuint	clampMethod		= 0;
+	void			ReloadTexture(const char* newPath, unsigned texture);
+	void			Unload(unsigned texture);
+	void			SetNewParameter(const char* newPath, unsigned texture, unsigned newTextFilter, unsigned newResizeMethod, unsigned newWrapMethod, unsigned newClampMethod);
+	void			SwitchMipMaps(const char* newPath, unsigned texture, bool state);
 
 public:
-	const char* currentPathLoaded;
+	bool			generateMipMaps = false;
+
+	unsigned		textFilter = 0;
+	unsigned		resizeMethod = 0;
+	unsigned		wrapMethod = 0;
+	unsigned		clampMethod = 0;
+		
+public:
 	char*		imgFormat;
 
 };

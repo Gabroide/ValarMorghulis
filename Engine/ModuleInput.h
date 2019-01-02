@@ -31,6 +31,7 @@ public:
 	ModuleInput();
 	virtual ~ModuleInput();
 
+	bool			Init()							override;
 	bool			CleanUp()							override;
 	bool			GetWindowEvent(EventWindow code)	const;
 

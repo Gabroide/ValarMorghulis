@@ -12,9 +12,8 @@ class ModuleTextures;
 class ModuleEditor;
 class ModuleCamera;
 class ModuleInput;
-class ModuleScene;
-class ModuleShader;
-
+class ModuleProgram;
+class ModuleModelLoader;
 class Application
 {
 public:
@@ -30,14 +29,14 @@ public:
 	void			Tick();
 
 public:
-	ModuleRender*	renderer		= nullptr;
-	ModuleWindow*	window			= nullptr;
-	ModuleTextures*	textures		= nullptr;
-	ModuleEditor*	editor			= nullptr;
-	ModuleCamera*	camera			= nullptr;
-	ModuleInput*	input			= nullptr;
-	ModuleScene*	scene			= nullptr;
-	ModuleShader*	shader			= nullptr;
+	ModuleRender*		renderer		= nullptr;
+	ModuleWindow*		window			= nullptr;
+	ModuleTextures*		textures		= nullptr;
+	ModuleEditor*		editor			= nullptr;
+	ModuleCamera*		camera			= nullptr;
+	ModuleInput*		input			= nullptr;
+	ModuleProgram*		program			= nullptr;
+	ModuleModelLoader*	modelLoader		= nullptr;
 
 public:
 	float			lastTickTime	= 0.0f;
