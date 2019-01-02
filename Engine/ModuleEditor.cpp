@@ -6,8 +6,11 @@
 #include "ModuleTextures.h"
 #include "ModuleScene.h"
 #include "ModuleEditor.h"
-#include "GL/glew.h"
-#include "SDL.h"
+
+#include "SDL\include\SDL.h"
+
+#include "glew-2.1.0\include\GL\glew.h"
+
 
 static void ShowMenuBar();
 static void ShowAbout();
@@ -29,7 +32,7 @@ ModuleEditor::ModuleEditor()
 // Destructor
 ModuleEditor::~ModuleEditor()
 {
-
+	
 }
 
 bool ModuleEditor::Init() 
@@ -53,8 +56,8 @@ bool ModuleEditor::Init()
 	return true;
 }
 
-update_status ModuleEditor::PreUpdate() {
-
+update_status ModuleEditor::PreUpdate() 
+{
 	fps_log.erase(fps_log.begin());
 	fps_log.push_back(App->FPS);
 	ms_log.erase(ms_log.begin());
@@ -103,9 +106,14 @@ update_status ModuleEditor::Update()
 
 	if (requestedExit)
 	{
-	
 		return UPDATE_STOP;
 	}
+	return UPDATE_CONTINUE;
+}
+
+update_status ModuleEditor::PostUpdate() 
+{
+
 	return UPDATE_CONTINUE;
 }
 
@@ -131,11 +139,7 @@ static void ShowMenuBar()
 	{
 		if (ImGui::BeginMenu("File")) 
 		{
-			if (ImGui::MenuItem("Exit"))
-			{ 
-				App->editor->requestedExit = true; 
-			}
-		
+			if (ImGui::MenuItem("Exit")) { App->editor->requestedExit = true; }
 			ImGui::EndMenu();
 		}
 
@@ -150,7 +154,7 @@ static void ShowMenuBar()
 			{ 
 				App->editor->showTextureConfig = true; 
 			}
-
+			
 			ImGui::EndMenu();
 		}
 
@@ -165,7 +169,7 @@ static void ShowMenuBar()
 			{ 
 				App->editor->showHardwareMenu = true; 
 			}
-			
+		
 			ImGui::EndMenu();
 		}
 
@@ -199,7 +203,7 @@ static void ShowAbout()
 	{ 
 		ShellExecute(0, 0, "https://www.libsdl.org/index.php", 0, 0, SW_SHOW); 
 	}
-	
+
 	if (ImGui::MenuItem("Glew v2.1.0")) 
 	{ 
 		ShellExecute(0, 0, "http://glew.sourceforge.net/", 0, 0, SW_SHOW); 
@@ -216,21 +220,21 @@ static void ShowAbout()
 	}
 	
 	ImGui::Separator();
-	ImGui::Text("Authors:");
+	ImGui::Text("Author's Repository:");
 
 	if (ImGui::MenuItem("Gabriel Cambronero")) 
 	{ 
 		ShellExecute(0, 0, "https://github.com/Gabroide?tab=repositories", 0, 0, SW_SHOW); 
 	}
-	
+
 	if (ImGui::MenuItem("Engine's Code"))
 	{
 		ShellExecute(0, 0, "https://github.com/Gabroide/ValarMorghulis/tree/master/Engine", 0, 0, SW_SHOW);
 	}
-	// TODO: add the final link
+
 	if (ImGui::MenuItem("Last Release"))
 	{
-		ShellExecute(0, 0, "https://github.com/Gabroide/ValarMorghulis/tree/master/Engine/Release", 0, 0, SW_SHOW);
+		ShellExecute(0, 0, "https://github.com/Gabroide/ValarMorghulis/tree/master/Release", 0, 0, SW_SHOW);
 	}
 
 	ImGui::Separator();
@@ -321,7 +325,6 @@ static void ShowTextureConfig()
 			if (ImGui::Selectable(items[n], is_selected)) 
 			{
 				current_item = items[n];
-				App->textures->ReloadTexture(items[n], App->exercise->texture0);
 			}
 		
 			if (is_selected)
@@ -338,9 +341,6 @@ static void ShowTextureConfig()
 	if (ImGui::CollapsingHeader("Texture information")) 
 	{
 		ImGui::InputText("Format", App->textures->imgFormat, sizeof(App->textures->imgFormat));
-		ImGui::InputInt("Width", &App->textures->imgWidth, 0, 0);
-		ImGui::InputInt("Height", &App->textures->imgHeight, 0, 0);
-		ImGui::InputInt("Pixel depth", &App->textures->imgPixelDepth, 0, 0);
 	}
 	
 	if (ImGui::CollapsingHeader("Texture config")) 
@@ -370,7 +370,6 @@ static void PrintTextureParams(const char* currentTexture)
 			if (ImGui::Selectable(wrapMethods[wr], wrapSelected)) 
 			{
 				currentWrap = wrapMethods[wr];
-				App->textures->SetNewParameter(currentTexture, App->exercise->texture0, App->textures->textFilter, App->textures->resizeMethod, wrapMethodsValues[wr], App->textures->clampMethod);
 			}
 		
 			if (wrapSelected)
@@ -396,7 +395,6 @@ static void PrintTextureParams(const char* currentTexture)
 			if (ImGui::Selectable(resizeMethods[rs], resizeSelected)) 
 			{
 				currentResize = resizeMethods[rs];
-				App->textures->SetNewParameter(currentTexture, App->exercise->texture0, App->textures->textFilter, resizeMethodsValues[rs], App->textures->wrapMethod, App->textures->clampMethod);
 			}
 		
 			if (resizeSelected)
@@ -422,7 +420,6 @@ static void PrintTextureParams(const char* currentTexture)
 			if (ImGui::Selectable(clampMethods[cl], clampSelected)) 
 			{
 				currentClamp = clampMethods[cl];
-				App->textures->SetNewParameter(currentTexture, App->exercise->texture0, App->textures->textFilter, App->textures->resizeMethod, App->textures->wrapMethod, clampMethodsValues[cl]);
 			}
 		
 			if (clampSelected)
@@ -448,7 +445,6 @@ static void PrintTextureParams(const char* currentTexture)
 			if (ImGui::Selectable(filterMethods[fl], filterSelected)) 
 			{
 				currentFilter = filterMethods[fl];
-				App->textures->SetNewParameter(currentTexture, App->exercise->texture0, filterMethodsValues[fl], App->textures->resizeMethod, App->textures->wrapMethod, App->textures->clampMethod);
 			}
 		
 			if (filterSelected)
@@ -476,7 +472,6 @@ static void PrintMipMapOption(const char* currentTexture)
 			if (ImGui::Selectable(mipMapState[mm], is_selected)) 
 			{
 				currentMMState = mipMapState[mm];
-				App->textures->SwitchMipMaps(currentTexture, App->exercise->texture0, valueMipMapValue[mm]);
 			}
 		
 			if (is_selected)

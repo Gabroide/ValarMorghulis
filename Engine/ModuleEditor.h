@@ -21,6 +21,7 @@ class ModuleEditor : public Module
 		
 		update_status	PreUpdate()	override;
 		update_status	Update()	override;
+		update_status	PostUpdate()	override;
 		
 		void			HandleInputs(SDL_Event& event);
 
