@@ -1,6 +1,7 @@
 #include "Application.h"
 #include "ModuleTextures.h"
 #include "ModuleModelLoader.h"
+#include "ModuleCamera.h"
 
 // Constructor
 ModuleModelLoader::ModuleModelLoader() 
@@ -17,12 +18,12 @@ ModuleModelLoader::~ModuleModelLoader()
 bool ModuleModelLoader::Init() 
 {
 
-	return LoadModel("BakerHouse.fbx");
+	return true;
 }
 
 bool ModuleModelLoader::LoadModel(const char* pathFile) 
 {
-	const aiScene* scene = aiImportFile(pathFile, NULL);
+	const aiScene* scene = aiImportFile(pathFile, aiProcessPreset_TargetRealtime_MaxQuality);
 
 	if (scene) 
 	{
@@ -59,6 +60,9 @@ bool ModuleModelLoader::CleanUp()
 			App->textures->Unload(materials[i].texture0);
 		}
 	}
+
+	meshes.clear();
+	materials.clear();
 
 	return true;
 }

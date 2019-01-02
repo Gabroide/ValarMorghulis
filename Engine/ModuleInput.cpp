@@ -108,6 +108,15 @@ update_status ModuleInput::PreUpdate()
 				App->window->WindowResized(event.window.data1, event.window.data2);
 				break;
 			}
+
+		case SDL_DROPFILE:
+		{
+			char* fileDroppedPath = event.drop.file;
+			App->modelLoader->CleanUp();
+			App->modelLoader->LoadModel(fileDroppedPath);
+			SDL_free(fileDroppedPath);
+			break;
+		}
 			
 			break;
 

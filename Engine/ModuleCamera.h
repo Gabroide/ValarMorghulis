@@ -47,9 +47,8 @@ public:
 	void			InitFrustum();
 	void			UpdatePitchYaw();
 	void			CameraMovementKeyboard();
-	void			CameraMovementMouse();
-	void			RotateCameraKeyBoard(CameraMovement cameraSide);
-	void			RotateCameraMouse(const iPoint& mousePosition);
+	void			RotateCameraKeyboard(CameraMovement cameraSide, bool orbit = false);
+	void			RotateCameraMouse(const iPoint& mousePosition, bool orbit = false);
 	void			MoveCamera(CameraMovement cameraSide);
 	void			SetScreenNewScreenSize(unsigned newWidth, unsigned newHeight);
 	void			FocusObject(math::float3& objectCenterPos);
