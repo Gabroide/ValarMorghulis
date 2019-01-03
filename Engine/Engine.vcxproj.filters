@@ -166,7 +166,10 @@
     <ClCompile Include="Component.cpp">
       <Filter>Components\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ComponentMaterial.cpp" />
+    <ClCompile Include="ComponentMaterial.cpp">
+      <Filter>Components\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ComponentMesh.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MathGeoLib\include\Geometry\AABB.h">
@@ -421,7 +424,10 @@
     <ClInclude Include="Component.h">
       <Filter>Components\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ComponentMaterial.h" />
+    <ClInclude Include="ComponentMaterial.h">
+      <Filter>Components\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentMesh.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="MathGeoLib">
