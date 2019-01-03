@@ -12,24 +12,28 @@ class ModuleWindow : public Module
 public:
 
 	ModuleWindow();
-
-	// Destructor
 	virtual ~ModuleWindow();
 
-	// Called before quitting
 	bool			Init()		override;
-
-	// Called before quitting
 	bool			CleanUp()	override;
 
+	void			DrawGUI();
 	void			WindowResized(unsigned width, unsigned height);
 
 public:
-	//The window we'll be rendering to
-	SDL_Window* window = NULL;
+	bool			fullscreen		= false;
+	bool			resizable		= true;
+	bool			borderless		= false;
 
-	//The surface contained by the window
-	SDL_Surface* screen_surface = NULL;
+	int				width			= SCREEN_WIDTH;
+	int				height			= SCREEN_HEIGHT;
+	
+	float			screenRatio		= SCREEN_WIDTH / SCREEN_HEIGHT;
+
+public:
+	SDL_Window*		window			= nullptr;
+	SDL_Surface*	screen_surface	= nullptr;
+	
 };
 
 #endif // __ModuleWindow_h__

@@ -9,34 +9,33 @@ class Module
 {
 public:
 
-	Module()
-	{
-	}
+	Module() { }
 
 	virtual bool Init() 
 	{
-		return true; 
+		return true;
 	}
 
-	virtual update_status PreUpdate()
+	virtual update_status PreUpdate() 
 	{
 		return UPDATE_CONTINUE;
 	}
 
-	virtual update_status Update()
+	virtual update_status Update() 
 	{
 		return UPDATE_CONTINUE;
 	}
 
-	virtual update_status PostUpdate()
+	virtual update_status PostUpdate() 
 	{
 		return UPDATE_CONTINUE;
 	}
 
 	virtual bool CleanUp() 
-	{ 
-		return true; 
+	{
+		return true;
 	}
+
 };
 
 #endif // __Modules_h__

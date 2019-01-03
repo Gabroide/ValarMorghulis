@@ -1,43 +1,52 @@
 #ifndef __MpduleEditor_h__
 #define __ModuleEditor_h__
 
-#include <vector>
-
 #include "Module.h"
 #include "Globals.h"
 
-#include "imgui\imgui.h"
-#include "imgui\imgui_impl_sdl.h"
-#include "imgui\imgui_impl_opengl3.h"
+#include "Dock.h"
+#include "DockAbout.h"
+#include "DockConsole.h"
+#include "DockConfig.h"
+#include "DockScene.h"
+
+#include "imgui.h"
+#include "imgui_impl_sdl.h"
+#include "imgui_impl_opengl3.h"
+#include <vector>
+
+class Dock;
+class DockConsole;
+class DockScene;
+class DockConfig;
 
 class ModuleEditor : public Module
 {
-	public:
-		ModuleEditor();
-		~ModuleEditor();
+public:
+	ModuleEditor();
+	~ModuleEditor();
 
-		bool			Init()		override;
-		bool			CleanUp()	override;
-		
-		update_status	PreUpdate()	override;
-		update_status	Update()	override;
-		update_status	PostUpdate()	override;
-		
-		void			HandleInputs(SDL_Event& event);
+	bool				Init()		override;
+	bool				CleanUp()	override;
+
+	update_status		PreUpdate()	override;
+	update_status		Update()	override;
+
+	void				AddFPSCount(float fps) const;
+	void				CreateDockSpace();
+	void				PrintDocks();
+	void				RenderGUI();
+	bool				SceneFocused() const;
+	void				ProcessInputEvent(SDL_Event * event) const;
 
 public:
-	bool				showAboutMenu		= false;
-	bool				showHardwareMenu	= false;
-	bool				requestedExit		= false;
-	bool				showSceneConfig		= false;
-	bool				showTextureConfig	= false;
-	bool				showConsole			= false;
-	bool				showZoomMagnifier	= false;
+	DockAbout*		about		= nullptr;
+	DockConsole*	console		= nullptr;
+	DockScene*		scene		= nullptr;
+	DockConfig*		config		= nullptr;
 
-	ImGuiIO				io;
-
-	std::vector<float>	fps_log;
-	std::vector<float>	ms_log;
+private:
+	std::list<Dock*> docks;
 
 };
 

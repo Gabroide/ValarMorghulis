@@ -2,6 +2,8 @@
 #include "Application.h"
 #include "ModuleEditor.h"
 #include "ModuleInput.h"
+#include "ModuleTextures.h"
+#include "ModuleWindow.h"
 #include "ModuleRender.h"
 
 #include "SDL\include\SDL.h"
@@ -17,78 +19,91 @@ ModuleInput::ModuleInput() : Module(), mouse({ 0, 0 }), mouse_motion({ 0,0 })
 }
 
 // Destructor
-ModuleInput::~ModuleInput()
+ModuleInput::~ModuleInput() 
 {
-	RELEASE_ARRAY(keyboard);
+	delete[](keyboard);
+	keyboard = nullptr;
 }
 
-bool ModuleInput::Init()
+bool ModuleInput::Init() 
 {
+	LOG("Init SDL input event system");
+	bool ret = true;
+	SDL_Init(0);
 
-	return UPDATE_CONTINUE;
+	if (SDL_InitSubSystem(SDL_INIT_EVENTS) < 0) 
+	{
+		LOG("SDL_EVENTS could not initialize! SDL_Error: %s\n", SDL_GetError());
+		ret = false;
+	}
+
+	return ret;
 }
 
-// Called each loop iteration
-update_status ModuleInput::PreUpdate()
+update_status ModuleInput::PreUpdate() 
 {
 	static SDL_Event event;
 
 	mouse_motion = { 0, 0 };
+	mouse_wheel = 0;
 	memset(windowEvents, false, WE_COUNT * sizeof(bool));
 
 	const Uint8* keys = SDL_GetKeyboardState(NULL);
 
-	for (int i = 0; i < MAX_KEYS; ++i)
+	for (int i = 0; i < MAX_KEYS; ++i) 
 	{
-		if (keys[i] == 1)
+		if (keys[i] == 1) 
 		{
-			if (keyboard[i] == KEY_IDLE)
+			if (keyboard[i] == KEY_IDLE) 
 			{
 				keyboard[i] = KEY_DOWN;
 			}
-			else
+			else 
 			{
 				keyboard[i] = KEY_REPEAT;
 			}
 		}
-		else
+		else 
 		{
-			if (keyboard[i] == KEY_REPEAT || keyboard[i] == KEY_DOWN)
+			if (keyboard[i] == KEY_REPEAT || keyboard[i] == KEY_DOWN) 
 			{
 				keyboard[i] = KEY_UP;
 			}
-			else
+			else 
 			{
 				keyboard[i] = KEY_IDLE;
 			}
 		}
 	}
 
-	for (int i = 0; i < NUM_MOUSE_BUTTONS; ++i)
+	for (int i = 0; i < NUM_MOUSE_BUTTONS; ++i) 
 	{
-		if (mouse_buttons[i] == KEY_DOWN)
+		if (mouse_buttons[i] == KEY_DOWN) 
 		{
 			mouse_buttons[i] = KEY_REPEAT;
 		}
 
-		if (mouse_buttons[i] == KEY_UP)
+		if (mouse_buttons[i] == KEY_UP) 
 		{
 			mouse_buttons[i] = KEY_IDLE;
 		}
 	}
 
-	while (SDL_PollEvent(&event) != 0)
+	while (SDL_PollEvent(&event) != 0) 
 	{
-		switch (event.type)
+		App->editor->ProcessInputEvent(&event);
+		
+		switch (event.type) 
 		{
+
 		case SDL_QUIT:
 			windowEvents[WE_QUIT] = true;
 			break;
 		
 		case SDL_WINDOWEVENT:
-			switch (event.window.event)
+			switch (event.window.event) 
 			{
-				//case SDL_WINDOWEVENT_LEAVE:
+
 			case SDL_WINDOWEVENT_HIDDEN:
 			case SDL_WINDOWEVENT_MINIMIZED:
 			case SDL_WINDOWEVENT_FOCUS_LOST:
@@ -108,17 +123,34 @@ update_status ModuleInput::PreUpdate()
 				App->window->WindowResized(event.window.data1, event.window.data2);
 				break;
 			}
+			break;
 
 		case SDL_DROPFILE:
 		{
 			char* fileDroppedPath = event.drop.file;
-			App->modelLoader->CleanUp();
-			App->modelLoader->LoadModel(fileDroppedPath);
+
+			std::string extension(fileDroppedPath);
+			std::size_t found = extension.find_last_of(".");
+			extension = extension.substr(found + 1, extension.length());
+
+			if (extension == "fbx") 
+			{
+				App->model->DeleteModels();
+				App->model->Load(fileDroppedPath);
+			}
+			else if (extension == "png" || extension == "dds") 
+			{
+				Texture newTexture = App->textures->Load(fileDroppedPath);
+				App->model->ApplyTexture(newTexture);
+			}
+			else 
+			{
+				SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "The file you are trying to drop is not accepted.", App->window->window);
+			}
+
 			SDL_free(fileDroppedPath);
 			break;
 		}
-			
-			break;
 
 		case SDL_MOUSEBUTTONDOWN:
 			mouse_buttons[event.button.button - 1] = KEY_DOWN;
@@ -129,28 +161,20 @@ update_status ModuleInput::PreUpdate()
 			break;
 
 		case SDL_MOUSEMOTION:
-			mouse_motion.x = event.motion.xrel / SCREEN_SIZE;
-			mouse_motion.y = event.motion.yrel / SCREEN_SIZE;
-			mouse.x = event.motion.x / SCREEN_SIZE;
-			mouse.y = event.motion.y / SCREEN_SIZE;
+			mouse_motion.x = (float)event.motion.xrel / (float)App->window->width;
+			mouse_motion.y = (float)event.motion.yrel / (float)App->window->height;
+			mouse.x = (float)event.motion.x / (float)App->window->width;
+			mouse.y = (float)event.motion.y / (float)App->window->height;
 			break;
 
 		case SDL_MOUSEWHEEL:
-			if (event.wheel.y > 0) 
-			{
-				mouse_buttons[4 - 1] = KEY_DOWN;
-			}
-			else 
-			{
-				mouse_buttons[5 - 1] = KEY_DOWN;
-			}
-	
+			mouse_wheel = event.wheel.y;
 			break;
 
 		}
 	}
 
-	if (GetWindowEvent(EventWindow::WE_QUIT) == true || GetKey(SDL_SCANCODE_ESCAPE) == KEY_DOWN)
+	if (GetWindowEvent(EventWindow::WE_QUIT) == true || GetKey(SDL_SCANCODE_ESCAPE) == KEY_DOWN) 
 	{
 		return UPDATE_STOP;
 	}
@@ -159,24 +183,41 @@ update_status ModuleInput::PreUpdate()
 }
 
 // Called before quitting
-bool ModuleInput::CleanUp()
+bool ModuleInput::CleanUp() 
 {
 	LOG("Quitting SDL event subsystem");
 	SDL_QuitSubSystem(SDL_INIT_EVENTS);
+
 	return true;
 }
 
-bool ModuleInput::GetWindowEvent(EventWindow ev) const
+// ---------
+bool ModuleInput::GetWindowEvent(EventWindow ev) const 
 {
+
 	return windowEvents[ev];
 }
 
-const iPoint& ModuleInput::GetMousePosition() const
+const fPoint& ModuleInput::GetMousePosition() const 
 {
+
 	return mouse;
 }
 
-const iPoint& ModuleInput::GetMouseMotion() const
+const int ModuleInput::GetMouseWheel() const 
 {
+
+	return mouse_wheel;
+}
+
+const fPoint& ModuleInput::GetMouseMotion() const 
+{
+
 	return mouse_motion;
+}
+
+void ModuleInput::DrawGUI() 
+{
+	ImGui::Text("Mouse position:");
+	ImGui::BulletText("X:%.2f | Y:%.2f", mouse.x * App->window->width, mouse.y * App->window->height);
 }

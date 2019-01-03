@@ -1,59 +1,66 @@
 #include "Globals.h"
 #include "Application.h"
-#include "ModuleCamera.h"
+#include "ModuleRender.h"
 #include "ModuleWindow.h"
 
 // Constructor
-ModuleWindow::ModuleWindow()
-{
-
+ModuleWindow::ModuleWindow() 
+{ 
+	
 }
 
 // Destructor
-ModuleWindow::~ModuleWindow()
+ModuleWindow::~ModuleWindow() 
 {
-
+	
 }
 
-// Called before render is available
-bool ModuleWindow::Init()
+bool ModuleWindow::Init() 
 {
 	LOG("Init SDL window & surface");
 	bool ret = true;
 
-	if (SDL_Init(SDL_INIT_VIDEO) < 0)
+	if (SDL_Init(SDL_INIT_VIDEO) < 0) 
 	{
-		LOG("SDL_VIDEO could not initialize! SDL_Error: %s\n", SDL_GetError());
+		LOG("Error: SDL_VIDEO could not be initialized. %s\n", SDL_GetError());
 		ret = false;
 	}
 	else
 	{
-		//Create window
 		int width = SCREEN_WIDTH;
 		int height = SCREEN_HEIGHT;
 		Uint32 flags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
 
-		if (FULLSCREEN == true)
+		if (FULLSCREEN == true) 
 		{
 			flags |= SDL_WINDOW_FULLSCREEN;
 		}
 
-		if (RESIZEABLE == true)
+		if (RESIZEABLE == true) 
 		{
 			flags |= SDL_WINDOW_RESIZABLE;
 		}
 
+		if (BORDERLESS == true) 
+		{
+			flags |= SDL_WINDOW_BORDERLESS;
+		}
+
+		if (FULLSCREEN_DESKTOP == true) 
+		{
+			flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+		}
+
 		window = SDL_CreateWindow(TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, flags);
 
-		if (window == NULL)
+		if (window != nullptr) 
+		{
+			screen_surface = SDL_GetWindowSurface(window);
+		}
+		else 
 		{
 			LOG("Window could not be created! SDL_Error: %s\n", SDL_GetError());
 			ret = false;
-		}
-		else
-		{
-			//Get window surface
-			screen_surface = SDL_GetWindowSurface(window);
 		}
 	}
 
@@ -61,17 +68,15 @@ bool ModuleWindow::Init()
 }
 
 // Called before quitting
-bool ModuleWindow::CleanUp()
+bool ModuleWindow::CleanUp() 
 {
 	LOG("Destroying SDL window and quitting all SDL systems");
 
-	//Destroy window
-	if (window != NULL)
+	if (window != nullptr) 
 	{
 		SDL_DestroyWindow(window);
 	}
 
-	//Quit SDL subsystems
 	SDL_Quit();
 
 	return true;
@@ -79,6 +84,53 @@ bool ModuleWindow::CleanUp()
 
 void ModuleWindow::WindowResized(unsigned width, unsigned height) 
 {
-	glViewport(0, 0, width, height);
-	App->camera->SetScreenNewScreenSize(width, height);
+	this->width = width;
+	this->height = height;
+	App->renderer->SetScreenNewScreenSize();
+}
+
+void ModuleWindow::DrawGUI() 
+{
+	if (ImGui::Checkbox("FullScreen", &fullscreen)) 
+	{
+		if (fullscreen) 
+		{
+			SDL_DisplayMode displayMode;
+			SDL_GetDesktopDisplayMode(0, &displayMode);
+			SDL_SetWindowSize(App->window->window, displayMode.w, displayMode.h);
+			SDL_SetWindowFullscreen(App->window->window, SDL_WINDOW_FULLSCREEN);
+		}
+		else 
+		{
+			SDL_SetWindowFullscreen(App->window->window, 0);
+		}
+	}
+
+	ImGui::SameLine();
+	
+	if (ImGui::Checkbox("Resizable", &resizable)) 
+	{
+		if (resizable) 
+		{
+			SDL_SetWindowResizable(App->window->window, SDL_TRUE);
+		}
+		else 
+		{
+			SDL_SetWindowResizable(App->window->window, SDL_FALSE);
+		}
+	}
+
+	ImGui::NewLine();
+	
+	if (ImGui::Checkbox("Borderless", &borderless)) 
+	{
+		if (borderless) 
+		{
+			SDL_SetWindowBordered(App->window->window, SDL_FALSE);
+		}
+		else 
+		{
+			SDL_SetWindowBordered(App->window->window, SDL_TRUE);
+		}
+	}
 }

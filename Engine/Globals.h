@@ -15,32 +15,18 @@ enum update_status
 	UPDATE_ERROR
 };
 
-// Deletes a buffer
-#define RELEASE( x ) \
-    {\
-       if( x != nullptr )\
-       {\
-         delete x;\
-	     x = nullptr;\
-       }\
-    }
-
-// Deletes an array of buffers
-#define RELEASE_ARRAY( x ) \
-	{\
-       if( x != nullptr )\
-       {\
-           delete[] x;\
-	       x = nullptr;\
-		 }\
-	 }
-
 // Configuration -----------
-#define SCREEN_WIDTH 800
-#define SCREEN_HEIGHT 600
+#define SCREEN_WIDTH 1024
+#define SCREEN_HEIGHT 720
 #define FULLSCREEN false
 #define RESIZEABLE true
-#define SCREEN_SIZE 2
-#define TITLE "Valar Morghulis Game"
+#define BORDERLESS false
+#define FULLSCREEN_DESKTOP false
+#define VSYNC true
+#define TITLE "Valar Morghulis engine"
+#define AUTHOR "Gabriel Cambronero"
+#define DESCRIPTION "C++/C engine for game development"
+#define REPOSITORY "https://github.com/Gabroide/ValarMorghulis"
+#define LICENSE "https://github.com/Gabroide/ValarMorghulis/blob/master/LICENSE"
 
 #endif // __Globals_h__

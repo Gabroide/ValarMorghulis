@@ -139,9 +139,30 @@
     <ClCompile Include="ModuleProgram.cpp">
       <Filter>Modules\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Dock.cpp">
+      <Filter>Docks\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DockAbout.cpp">
+      <Filter>Docks\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DockConfig.cpp">
+      <Filter>Docks\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DockConsole.cpp">
+      <Filter>Docks\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DockScene.cpp" />
+    <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="Model.cpp" />
+    <ClCompile Include="ModuleModel.cpp">
+      <Filter>Modules\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ModuleTime.cpp">
+      <Filter>Modules\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Module.h" />
     <ClInclude Include="MathGeoLib\include\Geometry\AABB.h">
       <Filter>MathGeoLib\Geometry</Filter>
     </ClInclude>
@@ -358,15 +379,37 @@
     <ClInclude Include="ModuleScene.h">
       <Filter>Modules\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Timer.h">
-      <Filter>Utils</Filter>
-    </ClInclude>
     <ClInclude Include="modulemodelloader.h">
       <Filter>Modules\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ModuleProgram.h">
       <Filter>Modules\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Module.h">
+      <Filter>Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="Dock.h">
+      <Filter>Docks\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DockAbout.h">
+      <Filter>Docks\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DockConfig.h">
+      <Filter>Docks\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DockConsole.h">
+      <Filter>Docks\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DockScene.h" />
+    <ClInclude Include="Mesh.h" />
+    <ClInclude Include="Model.h" />
+    <ClInclude Include="ModuleModel.h">
+      <Filter>Modules\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ModuleTime.h">
+      <Filter>Modules\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="MathGeoLib">
@@ -401,6 +444,15 @@
     </Filter>
     <Filter Include="Utils">
       <UniqueIdentifier>{53a849f2-8fd6-4d1e-8c04-cc80338598a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Docks">
+      <UniqueIdentifier>{3f2b9dff-f805-4829-8b75-f71759ac3d0d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Docks\Header Files">
+      <UniqueIdentifier>{a059cc79-6c02-4239-bf62-3335e78ec96a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Docks\Source Files">
+      <UniqueIdentifier>{1bd3d46d-8300-49d0-8d23-700f56fd67be}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

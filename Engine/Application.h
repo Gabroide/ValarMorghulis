@@ -12,8 +12,11 @@ class ModuleTextures;
 class ModuleEditor;
 class ModuleCamera;
 class ModuleInput;
+class ModuleScene;
 class ModuleProgram;
-class ModuleModelLoader;
+class ModuleTime;
+class ModuleModel;
+
 class Application
 {
 public:
@@ -26,25 +29,16 @@ public:
 
 	update_status	Update();
 	
-	void			Tick();
-
 public:
-	ModuleRender*		renderer		= nullptr;
-	ModuleWindow*		window			= nullptr;
-	ModuleTextures*		textures		= nullptr;
-	ModuleEditor*		editor			= nullptr;
-	ModuleCamera*		camera			= nullptr;
-	ModuleInput*		input			= nullptr;
-	ModuleProgram*		program			= nullptr;
-	ModuleModelLoader*	modelLoader		= nullptr;
-
-public:
-	float			lastTickTime	= 0.0f;
-	float			deltaTime		= 0.0f;
-	float			auxTimer		= 0.0f;
-	
-	int				frameCounter	= 0;
-	int				FPS				= 0;
+	ModuleRender*	renderer	= nullptr;
+	ModuleWindow*	window		= nullptr;
+	ModuleInput*	input		= nullptr;
+	ModuleTextures*	textures	= nullptr;
+	ModuleEditor*	editor		= nullptr;
+	ModuleCamera*	camera		= nullptr;
+	ModuleProgram*	program		= nullptr;
+	ModuleTime*		time		= nullptr;
+	ModuleModel*	model		= nullptr;
 
 private:
 	std::list<Module*> modules;
