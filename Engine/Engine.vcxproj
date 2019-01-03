@@ -86,6 +86,7 @@
     <ClInclude Include="Component.h" />
     <ClInclude Include="ComponentMaterial.h" />
     <ClInclude Include="ComponentMesh.h" />
+    <ClInclude Include="ComponentTransform.h" />
     <ClInclude Include="Dock.h" />
     <ClInclude Include="DockAbout.h" />
     <ClInclude Include="DockConfig.h" />
@@ -176,6 +177,7 @@
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="ComponentMaterial.cpp" />
     <ClCompile Include="ComponentMesh.cpp" />
+    <ClCompile Include="ComponentTransform.cpp" />
     <ClCompile Include="Dock.cpp" />
     <ClCompile Include="DockAbout.cpp" />
     <ClCompile Include="DockConfig.cpp" />
