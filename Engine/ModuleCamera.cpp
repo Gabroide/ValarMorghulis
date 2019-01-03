@@ -185,6 +185,7 @@ void ModuleCamera::Zoom()
 
 void ModuleCamera::FocusSelectedObject() 
 {
+	front = (selectedObjectBB.CenterPoint() - cameraPos).Normalized();
 	UpdatePitchYaw();
 	App->renderer->LookAt(cameraPos, (cameraPos + front));
 }

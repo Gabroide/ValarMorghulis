@@ -3,7 +3,8 @@
 #include "ModuleCamera.h"
 #include "ModuleTextures.h"
 #include "ModuleProgram.h"
-#include "imgui.h"
+
+#include "IMGUI\imgui.h"
 
 // Constructor
 Model::Model(const char* file) 
@@ -13,13 +14,14 @@ Model::Model(const char* file)
 	s = s.substr(0, found + 1);
 	this->path = s.c_str();
 	LoadModel(file);
-	App->camera->selectedObjectBB = BoundingBox;
-	App->camera->FocusSelectedObject();
+
+	// Updating the focused object
+	App->camera->selectedObjectBB = boundingBox;
 }
 
 // Destructor
 Model::~Model() 
-{ 
+{
 	
 }
 
@@ -49,7 +51,7 @@ void Model::GenerateMeshData(const aiNode* node, const aiScene* scene)
 
 	for (unsigned int i = 0; i < node->mNumMeshes; i++) 
 	{
-		aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
+		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
 		meshes.emplace_back(mesh);
 	}
 
@@ -67,10 +69,32 @@ void Model::Draw() const
 	}
 }
 
-void Model::DrawTexture() 
+void Model::DrawInfo() const 
 {
-	if (ImGui::CollapsingHeader("Textures")) 
+	if (ImGui::CollapsingHeader("Meshes loaded")) 
 	{
+		for (auto& meshSelected : meshes) 
+		{
+			if (ImGui::CollapsingHeader(meshSelected.name, ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick)) 
+			{
+				if (&meshSelected != nullptr) 
+				{
+					ImGui::Text("Triangles Count: %d", meshSelected.numIndices / 3);
+					ImGui::Text("Vertices Count: %d", meshSelected.vertices.size());
+					ImGui::Text("Mesh size:\n X: %f | Y: %f | Z: %f", meshSelected.bbox.Size().x, meshSelected.bbox.Size().y, meshSelected.bbox.Size().z);
+
+				}
+				else 
+				{
+					ImGui::Text("No mesh attached");
+				}
+			}
+		}
+	}
+
+	if (ImGui::CollapsingHeader("Texture")) 
+	{
+
 		for (auto &texture : textures) 
 		{
 			ImGui::Text("Size:  Width: %d | Height: %d", texture.width, texture.height);
@@ -78,7 +102,9 @@ void Model::DrawTexture()
 			ImGui::Image((ImTextureID)texture.id, { size,size });
 		}
 	}
+
 }
+
 
 void Model::UpdateTexture(Texture texture) 
 {
@@ -115,29 +141,10 @@ void Model::GenerateMaterialData(const aiScene* scene)
 // Axis Aligned Bounding Box
 void Model::GetAABB() 
 {
-	if (meshes.size() == 0 || meshes.front().vertices.size() == 0) 
+	for (auto& mesh : meshes) 
 	{
-
-		return;
+		boundingBox.Enclose(mesh.bbox);
 	}
 
-	math::float3 minV;
-	math::float3 maxV;
-	minV = maxV = meshes.front().vertices[0];
-
-	for (auto &mesh : meshes) 
-	{
-		for (auto &vertice : mesh.vertices) 
-		{
-			minV.x = min(minV.x, vertice.x);
-			minV.y = min(minV.y, vertice.y);
-			minV.z = min(minV.z, vertice.z);
-			maxV.x = max(maxV.x, vertice.x);
-			maxV.y = max(maxV.y, vertice.y);
-			maxV.z = max(maxV.z, vertice.z);
-		}
-	}
-
-	BoundingBox.minPoint = minV;
-	BoundingBox.maxPoint = maxV;
+	boundingBox.FaceCenterPoint(5);
 }

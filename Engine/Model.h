@@ -33,9 +33,9 @@ public:
 
 	void					Draw() const;
 	void					UpdateTexture(Texture texture);
-	void					DrawTexture();
-
-	AABB					BoundingBox;
+	
+public:
+	AABB					boundingBox;
 	
 private:
 	bool					LoadModel(const char* pathFile);
