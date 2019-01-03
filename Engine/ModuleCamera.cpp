@@ -170,28 +170,21 @@ void ModuleCamera::RotateCamera(const fPoint& mousePosition, bool orbit)
 	App->renderer->LookAt(cameraPos, (cameraPos + front));
 }
 
-void ModuleCamera::Zoom() 
+void ModuleCamera::Zoom()
 {
-	if (App->input->GetMouseWheel() != 0) 
+	const int wheelSlide = App->input->GetMouseWheel();
+
+	if (wheelSlide != 0)
 	{
-		App->renderer->frustum.verticalFov -= App->input->GetMouseWheel() * 20.0f * App->time->deltaTime;
-		App->renderer->frustum.horizontalFov = 2.0f * atanf(tanf(App->renderer->frustum.verticalFov * 0.5f) * ((float)App->window->width / (float)App->window->height));
+		float zoomValue = App->renderer->frustum.verticalFov + -wheelSlide * 20.0f * App->time->deltaTime;
+		float newAngleFov = math::Clamp(zoomValue, math::DegToRad(minFov), math::DegToRad(maxFov));
+		App->renderer->frustum.verticalFov = newAngleFov;
+		App->renderer->frustum.horizontalFov = 2.0f * atanf(tanf(newAngleFov = 0.5f) * ((float)App->window->width / (float)App->window->height));
 	}
 }
 
 void ModuleCamera::FocusSelectedObject() 
 {
-	float dist = cameraPos.Distance(selectedObjectBB.CenterPoint());
-	
-	if (dist < selectedObjectBB.ClosestPoint(cameraPos).x || dist < selectedObjectBB.ClosestPoint(cameraPos).y || dist < selectedObjectBB.ClosestPoint(cameraPos).z) 
-	{
-		// TODO: this should be the distance from the camera to the closest point added to the camera pos
-		cameraPos = selectedObjectBB.CornerPoint(0).Add(10);
-	}
-
-	front = selectedObjectBB.CenterPoint() - cameraPos;
-	front.Normalize();
-
 	UpdatePitchYaw();
 	App->renderer->LookAt(cameraPos, (cameraPos + front));
 }

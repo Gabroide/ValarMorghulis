@@ -48,6 +48,8 @@ public:
 	float			yaw;
 	float			lastX				= 0.0f;
 	float			lastY				= 0.0f;
+	float			maxFov				= 100.0f;
+	float			minFov				= 1.0f;
 
 	math::float3	cameraPos			= math::float3(10.0f, 10.0f, 10.0f);
 	math::float3	front				= math::float3(-0.577350259f, -0.577350259f, -0.577350259f);
