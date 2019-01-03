@@ -156,9 +156,6 @@
     <ClCompile Include="ModuleModel.cpp">
       <Filter>Modules\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ModuleTime.cpp">
-      <Filter>Modules\Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="DockScene.cpp">
       <Filter>Docks\Source Files</Filter>
@@ -424,9 +421,6 @@
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="ModuleModel.h">
-      <Filter>Modules\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ModuleTime.h">
       <Filter>Modules\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Timer.h" />

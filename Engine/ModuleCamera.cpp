@@ -4,13 +4,12 @@
 #include "ModuleWindow.h"
 #include "ModuleRender.h"
 #include "ModuleEditor.h"
-#include "ModuleTime.h"
 #include "ModuleCamera.h"
 
-// Constructor
+// Construcor
 ModuleCamera::ModuleCamera() 
-{ 
-
+{
+	
 }
 
 // Destructor
@@ -29,8 +28,8 @@ bool ModuleCamera::Init()
 
 update_status ModuleCamera::PreUpdate() 
 {
-	if (App->editor->SceneFocused()) 
-	{
+	if (App->editor->SceneFocused()) {
+
 		if (App->input->GetMouseButtonDown(SDL_BUTTON_RIGHT) == KEY_REPEAT) 
 		{
 			CameraMovementKeyboard();
@@ -58,6 +57,7 @@ update_status ModuleCamera::PreUpdate()
 			else if (App->input->GetMouseButtonDown(SDL_BUTTON_LEFT) == KEY_REPEAT) 
 			{
 				SDL_ShowCursor(SDL_ENABLE);
+				firstMouse = true;
 			}
 		}
 		else if (App->input->GetKey(SDL_SCANCODE_LALT) == KEY_UP) 
@@ -91,7 +91,7 @@ bool ModuleCamera::CleanUp()
 
 void ModuleCamera::MoveCamera(CameraMovement cameraSide) 
 {
-	float normMoveSpeed = cameraSpeed * App->time->deltaTime;
+	float normMoveSpeed = cameraSpeed * App->deltaTime;
 
 	switch (cameraSide) 
 	{
@@ -150,16 +150,16 @@ void ModuleCamera::RotateCamera(const fPoint& mousePosition, bool orbit)
 
 	if (orbit) 
 	{
-		math::float3 cameraTarget = cameraPos + front * 5;
+		math::float3 cameraTarget(cameraPos + front * 5);
 		float distanceToOrbit = cameraTarget.Length();
-		cameraPos.x = distanceToOrbit * SDL_sinf(math::DegToRad(yaw)) * SDL_cosf(math::DegToRad(pitch));
-		cameraPos.y = distanceToOrbit * SDL_sinf(math::DegToRad(pitch));
-		cameraPos.z = distanceToOrbit * -SDL_cosf(math::DegToRad(yaw)) * SDL_cosf(math::DegToRad(pitch));
+
+		cameraPos.x = sin(math::DegToRad(yaw)) * cos(math::DegToRad(pitch)) * distanceToOrbit;
+		cameraPos.y = sin(math::DegToRad(pitch)) * distanceToOrbit;
+		cameraPos.z = -cos(math::DegToRad(yaw)) * cos(math::DegToRad(pitch)) * distanceToOrbit;
 		front = (cameraTarget - cameraPos).Normalized();
 	}
 	else 
 	{
-		// We are facing -z so we invert the x/z trigonometry and set the yaw to 0
 		math::float3 rotation;
 		rotation.x = sin(math::DegToRad(yaw)) * cos(math::DegToRad(pitch));
 		rotation.y = sin(math::DegToRad(pitch)) * cos(math::DegToRad(pitch));
@@ -170,35 +170,36 @@ void ModuleCamera::RotateCamera(const fPoint& mousePosition, bool orbit)
 	App->renderer->LookAt(cameraPos, (cameraPos + front));
 }
 
-void ModuleCamera::Zoom()
+void ModuleCamera::Zoom() 
 {
 	const int wheelSlide = App->input->GetMouseWheel();
-
-	if (wheelSlide != 0)
+	
+	if (wheelSlide != 0) 
 	{
-		float zoomValue = App->renderer->frustum.verticalFov + -wheelSlide * 20.0f * App->time->deltaTime;
+		float zoomValue = App->renderer->frustum.verticalFov + -wheelSlide * 20.0f * App->deltaTime;
 		float newAngleFov = math::Clamp(zoomValue, math::DegToRad(minFov), math::DegToRad(maxFov));
 		App->renderer->frustum.verticalFov = newAngleFov;
-		App->renderer->frustum.horizontalFov = 2.0f * atanf(tanf(newAngleFov = 0.5f) * ((float)App->window->width / (float)App->window->height));
+		App->renderer->frustum.horizontalFov = 2.0f * atanf(tanf(newAngleFov * 0.5f) * ((float)App->window->width / (float)App->window->height));
 	}
 }
 
 void ModuleCamera::FocusSelectedObject() 
 {
-	while (selectedObject->boundingBox.ClosestPoint(cameraPos).Equals(cameraPos))
+	while (selectedObject->boundingBox.ClosestPoint(cameraPos).Equals(cameraPos)) 
 	{
 		cameraPos = cameraPos.Mul(2.0f);
 	}
 
 	front = (selectedObject->boundingBox.CenterPoint() - cameraPos).Normalized();
-	UpdatePitchYaw();
+
 	App->renderer->LookAt(cameraPos, (cameraPos + front));
+	UpdatePitchYaw();
 }
 
 void ModuleCamera::UpdatePitchYaw() 
 {
-	pitch = -math::RadToDeg(atanf(front.y / front.x));
-	yaw = -math::RadToDeg(atanf(front.x / front.z));
+	pitch = -math::RadToDeg(SDL_asinf(-front.y));
+	yaw = math::RadToDeg(SDL_atan2f(front.z, front.x)) + 90.0f;
 
 	if (math::IsNan(pitch))
 	{
@@ -261,6 +262,7 @@ void ModuleCamera::DrawGUI()
 	ImGui::InputFloat("Mouse sensitivity", &mouseSensitivity, 1.0f, 100.0f);
 
 	float fov = math::RadToDeg(App->renderer->frustum.verticalFov);
+	
 	if (ImGui::SliderFloat("FOV", &fov, 40, 120)) 
 	{
 		App->renderer->frustum.verticalFov = math::DegToRad(fov);
