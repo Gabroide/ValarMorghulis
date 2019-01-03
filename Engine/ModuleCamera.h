@@ -56,8 +56,10 @@ public:
 	math::float3	side;
 	math::float3	up					= math::float3(0.0f, 1.0f, 0.0f);
 
-	AABB			selectedObjectBB;
+	math::AABB		selectedObjectBB;
 
+public:
+	Model*			selectedObject;
 };
 
 #endif // __ModuleCamera_h__

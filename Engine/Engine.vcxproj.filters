@@ -151,7 +151,6 @@
     <ClCompile Include="DockConsole.cpp">
       <Filter>Docks\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DockScene.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="ModuleModel.cpp">
@@ -161,6 +160,9 @@
       <Filter>Modules\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Timer.cpp" />
+    <ClCompile Include="DockScene.cpp">
+      <Filter>Docks\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MathGeoLib\include\Geometry\AABB.h">
@@ -400,7 +402,6 @@
     <ClInclude Include="DockConsole.h">
       <Filter>Docks\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DockScene.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="ModuleModel.h">
@@ -410,6 +411,9 @@
       <Filter>Modules\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Timer.h" />
+    <ClInclude Include="DockScene.h">
+      <Filter>Docks\Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="MathGeoLib">

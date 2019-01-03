@@ -35,7 +35,7 @@ public:
 	void					UpdateTexture(Texture texture);
 	
 public:
-	AABB					boundingBox;
+	AABB					boundingBox = AABB({ 0, 0, 0}, { 0, 0, 0});
 	
 private:
 	bool					LoadModel(const char* pathFile);

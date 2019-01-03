@@ -16,7 +16,7 @@ Model::Model(const char* file)
 	LoadModel(file);
 
 	// Updating the focused object
-	App->camera->selectedObjectBB = boundingBox;
+	App->camera->selectedObject = this;
 }
 
 // Destructor
