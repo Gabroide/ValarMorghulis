@@ -11,6 +11,8 @@
 
 #include "assimp\version.h"
 
+#include "mmgr\mmgr.h"
+
 // Constructor
 DockAbout::DockAbout() 
 {
@@ -58,10 +60,13 @@ void DockAbout::Draw()
 		ImGui::BulletText("MathGeoLib (version 1.5)");
 		ImGui::BulletText("Glew (version %s)", glewGetString(GLEW_VERSION));
 		ImGui::BulletText("Assimp (version %d.%d.%d)", aiGetVersionMajor(), aiGetVersionMinor(), aiGetVersionRevision());
+		ImGui::BulletText("mmgr (version 1.0)");
+		
 		ImGui::TreePop();
 	}
 
 	ImGui::Separator();
+
 	if (ImGui::SmallButton("License")) 
 	{
 		ShellExecuteA(NULL, "open", LICENSE, NULL, NULL, SW_SHOWNORMAL);
