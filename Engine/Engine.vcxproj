@@ -93,6 +93,7 @@
     <ClInclude Include="DockConfig.h" />
     <ClInclude Include="DockConsole.h" />
     <ClInclude Include="DockScene.h" />
+    <ClInclude Include="GameObject.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="MathGeoLib\include\Algorithm\Random\LCG.h" />
     <ClInclude Include="MathGeoLib\include\Geometry\AABB.h" />
@@ -185,6 +186,7 @@
     <ClCompile Include="DockConfig.cpp" />
     <ClCompile Include="DockConsole.cpp" />
     <ClCompile Include="DockScene.cpp" />
+    <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="log.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MathGeoLib\include\Algorithm\Random\LCG.cpp" />

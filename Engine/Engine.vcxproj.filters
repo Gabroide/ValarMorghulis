@@ -178,6 +178,7 @@
     <ClCompile Include="ComponentAudio.cpp">
       <Filter>Components\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GameObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MathGeoLib\include\Geometry\AABB.h">
@@ -444,6 +445,7 @@
     <ClInclude Include="ComponentAudio.h">
       <Filter>Components\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GameObject.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="MathGeoLib">
