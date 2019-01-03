@@ -84,6 +84,7 @@
   <ItemGroup>
     <ClInclude Include="Application.h" />
     <ClInclude Include="Component.h" />
+    <ClInclude Include="ComponentAudio.h" />
     <ClInclude Include="ComponentMaterial.h" />
     <ClInclude Include="ComponentMesh.h" />
     <ClInclude Include="ComponentTransform.h" />
@@ -175,6 +176,7 @@
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="Component.cpp" />
+    <ClCompile Include="ComponentAudio.cpp" />
     <ClCompile Include="ComponentMaterial.cpp" />
     <ClCompile Include="ComponentMesh.cpp" />
     <ClCompile Include="ComponentTransform.cpp" />

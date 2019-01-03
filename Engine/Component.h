@@ -10,7 +10,8 @@ enum class componentType
 	CAMERA,
 	TRANSFORM,
 	MESH,
-	MATERIAL
+	MATERIAL,
+	AUDIO
 };
 
 class Component
