@@ -141,8 +141,8 @@ void ModuleEditor::CreateDockSpace()
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 
-	ImGuiWindowFlags windowFlags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar;
-	windowFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+	ImGuiWindowFlags windowFlags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize;
+	windowFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoMove;
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 	ImGui::Begin("DockSpace", NULL, windowFlags);
@@ -163,7 +163,7 @@ void ModuleEditor::ProcessInputEvent(SDL_Event* event) const
 	ImGui_ImplSDL2_ProcessEvent(event);
 }
 
-void ModuleEditor::AddFPSCount(float fps) const 
+void ModuleEditor::AddFPSCount(float fps, float ms) const 
 {
-	config->AddFps(fps);
+	config->AddFps(fps, ms);
 }
