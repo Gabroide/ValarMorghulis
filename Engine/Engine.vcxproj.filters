@@ -163,6 +163,7 @@
     <ClCompile Include="DockScene.cpp">
       <Filter>Docks\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Component.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MathGeoLib\include\Geometry\AABB.h">
@@ -414,6 +415,7 @@
     <ClInclude Include="DockScene.h">
       <Filter>Docks\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Component.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="MathGeoLib">
@@ -457,6 +459,12 @@
     </Filter>
     <Filter Include="Docks\Source Files">
       <UniqueIdentifier>{1bd3d46d-8300-49d0-8d23-700f56fd67be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Components">
+      <UniqueIdentifier>{dc9cbc91-a660-4d8f-bc6f-9c59786f6a07}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Components\GameObject">
+      <UniqueIdentifier>{dced7573-fc2c-4be0-9b6f-5ee348aa2dc5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
