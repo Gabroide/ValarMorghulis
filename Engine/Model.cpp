@@ -3,6 +3,7 @@
 #include "ModuleCamera.h"
 #include "ModuleTextures.h"
 #include "ModuleProgram.h"
+#include "ModuleScene.h"
 
 #include "IMGUI\imgui.h"
 
@@ -29,6 +30,19 @@ bool Model::LoadModel(const char* pathFile)
 {
 	assert(pathFile != nullptr);
 
+	std::string fullFilePath(pathFile);
+	std::size_t found = fullFilePath.find("\\");
+
+	while (found != std::string::npos)
+	{
+		fullFilePath.replace(found, std::string("\\").length(), "/");
+		found = fullFilePath.find("\\");
+	}
+
+	found = fullFilePath.find_last_of("/");
+	std::string name = fullFilePath.substr(found + 1, fullFilePath.length());
+	name = name.substr(0, name.length() - 4);
+
 	const aiScene* scene = aiImportFile(pathFile, { aiProcess_Triangulate | aiProcess_GenUVCoords });
 
 	if (scene) 
@@ -36,6 +50,9 @@ bool Model::LoadModel(const char* pathFile)
 		GenerateMeshData(scene->mRootNode, scene);
 		GenerateMaterialData(scene);
 		GetAABB();
+
+		GameObject(name.c_str(), App->scene->root);
+		App->camera->selectedObject = this;
 	}
 	else 
 	{
@@ -49,13 +66,13 @@ void Model::GenerateMeshData(const aiNode* node, const aiScene* scene)
 {
 	assert(scene != nullptr);
 
-	for (unsigned int i = 0; i < node->mNumMeshes; i++) 
+	for (unsigned int i = 0u; i < node->mNumMeshes; i++) 
 	{
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
 		meshes.emplace_back(mesh);
 	}
 
-	for (unsigned int i = 0; i < node->mNumChildren; i++) 
+	for (unsigned int i = 0u; i < node->mNumChildren; i++) 
 	{
 		GenerateMeshData(node->mChildren[i], scene);
 	}
@@ -63,7 +80,7 @@ void Model::GenerateMeshData(const aiNode* node, const aiScene* scene)
 
 void Model::Draw() const 
 {
-	for (auto &mesh : meshes) 
+	for (auto& mesh : meshes) 
 	{
 		mesh.Draw(App->program->textureProgram, textures);
 	}
@@ -95,7 +112,7 @@ void Model::DrawInfo() const
 	if (ImGui::CollapsingHeader("Texture")) 
 	{
 
-		for (auto &texture : textures) 
+		for (auto& texture : textures) 
 		{
 			ImGui::Text("Size:  Width: %d | Height: %d", texture.width, texture.height);
 			float size = ImGui::GetWindowWidth();
@@ -118,7 +135,7 @@ void Model::GenerateMaterialData(const aiScene* scene)
 {
 	assert(scene != nullptr);
 
-	for (unsigned i = 0; i < scene->mNumMaterials; ++i) 
+	for (unsigned i = 0u; i < scene->mNumMaterials; ++i) 
 	{
 		const aiMaterial* materialSrc = scene->mMaterials[i];
 
