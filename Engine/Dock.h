@@ -24,8 +24,14 @@ public:
 		enabled = !enabled;
 	}
 
+	bool IsFocused()
+	{
+		return focused;
+	}
+
 public:
 	bool enabled = true;
+	bool focused = true;
 
 };
 
