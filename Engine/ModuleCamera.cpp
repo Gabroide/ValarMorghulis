@@ -198,8 +198,8 @@ void ModuleCamera::FocusSelectedObject()
 
 void ModuleCamera::UpdatePitchYaw() 
 {
-	pitch = -math::RadToDeg(SDL_asinf(-front.y));
-	yaw = math::RadToDeg(SDL_atan2f(front.z, front.x)) + 90.0f;
+	pitch = -math::RadToDeg(asinf(-front.y));
+	yaw = math::RadToDeg(atan2f(front.z, front.x)) + 90.0f;
 
 	if (math::IsNan(pitch))
 	{
