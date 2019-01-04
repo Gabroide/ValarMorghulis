@@ -3,8 +3,12 @@
 #include "ModuleModel.h"
 
 // Constructor
-ComponentMesh::ComponentMesh(GameObject* goContainer) : Component(goContainer, ComponentType::MESH)
+ComponentMesh::ComponentMesh(GameObject* goContainer, aiMesh* mesh) : Component(goContainer, ComponentType::MESH)
 {
+	if (mesh != nullptr)
+	{
+		computeMesh(mesh);
+	}
 }
 
 // Destructor
@@ -101,19 +105,17 @@ void ComponentMesh::CleanUp()
 	}
 }
 
-
-void ComponentMesh::Draw(unsigned shaderProgram, const std::vector<Texture>& textures) const 
+void ComponentMesh::Draw(unsigned shaderProgram, const Texture* texture) const 
 {
-
 	glActiveTexture(GL_TEXTURE0);
 
-	if (App->model->checkersTexture) 
+	if (texture == nullptr) 
 	{
 		glBindTexture(GL_TEXTURE_2D, App->model->checkTexture.id);
 	}
 	else 
 	{
-		glBindTexture(GL_TEXTURE_2D, textures[materialIndex].id);
+		glBindTexture(GL_TEXTURE_2D, texture->id);
 	}
 
 	glUniform1i(glGetUniformLocation(shaderProgram, "texture0"), 0);
