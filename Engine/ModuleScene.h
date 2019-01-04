@@ -14,19 +14,20 @@ public:
 	ModuleScene();
 	~ModuleScene();
 
-	bool			Init() override;
-	bool			CleanUp() override;
+	bool			Init()		override;
+	bool			CleanUp()	override;
 	
-	update_status	Update() override;
+	update_status	Update()	override;
 	
 	void			Draw();
+	void			DrawHierarchy();
 
 public:
 	GameObject*		CreateGameObject(const char* goName, GameObject* goParent);
 
 public:
-	GameObject*		root = nullptr;
-
+	GameObject*		root		= nullptr;
+	GameObject*		goSelected	= nullptr;
 };
 
 #endif // __ModuleScene_h__
