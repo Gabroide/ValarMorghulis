@@ -43,6 +43,7 @@ public:
 	ModuleProgram*		program				= nullptr;
 	ModuleTime*			time				= nullptr;
 	ModuleModel*		model				= nullptr;
+	ModuleScene*		scene				= nullptr;
 
 public:
 	bool				gamePaused			= false;

@@ -10,6 +10,7 @@
 #include "ModuleTextures.h"
 #include "ModuleInput.h"
 #include "ModuleModel.h"
+#include "ModuleScene.h"
 
 // Constructor
 Application::Application() 
@@ -22,7 +23,7 @@ Application::Application()
 	modules.push_back(program = new ModuleProgram());
 	modules.push_back(editor = new ModuleEditor());
 	modules.push_back(model = new ModuleModel());
-
+	modules.push_back(scene = new ModuleScene());
 }
 
 // Destructor
@@ -46,11 +47,11 @@ bool Application::Init()
 	}
 
 	msTimer.Start();
-	gameModeEmabled = false;
+	gameModeEnabled = false;
 	counting = false;
 	gameDeltaTime = 0;
 	
-	App->model->Load("./Models/BakerHouse/BakerHouse.fbx");
+	//App->model->Load("./Models/BakerHouse/BakerHouse.fbx");
 
 	return ret;
 }

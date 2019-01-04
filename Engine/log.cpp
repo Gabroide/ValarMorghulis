@@ -2,7 +2,9 @@
 #include "Application.h"
 #include "ModuleEditor.h"
 
-void log(const char file[], int line, const char* format, ...) {
+void log(const char file[], int line, const char* format, ...) 
+{
+	assert(format != nullptr);
 
 	static char tmpStr[4096];
 	static char tmpStr2[4096];
