@@ -1,7 +1,7 @@
 #include "ComponentTransform.h"
 
 // Constructor
-ComponentTransform::ComponentTransform()
+ComponentTransform::ComponentTransform(GameObject* goContainer) : Component(goContainer, ComponentType::TRANSFORM)
 {
 }
 
