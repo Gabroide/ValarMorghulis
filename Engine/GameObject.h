@@ -1,32 +1,43 @@
 #ifndef __GameObject_h__
 #define __GameObject_h__
 
-#include <vector>
+#include <list>
 #include <assert.h>
 
 #include "Globals.h"
 #include "Component.h"
+#include "Componentransform.h"
 
 class Component;
+class ComponentTransform;
+
+enum class ComponentType;
 
 class GameObject
 {
 public:
+	GameObject();
 	GameObject(const char* goName);
+	GameObject(const char* goName, GameObject* goParent);
 	~GameObject();
 
-	void	Update();
+	void				Update();
+	void				Draw();
+	void				RemoveComponent(Component* component);
 
 public:
-	Component*	CreaeComponent(componentType type);
+	Component*			AddComponent(ComponentType type);
 
 public:
-	std::vector<Component*>		components;
-	std::vector<GameObject*>	children;
+	std::list<Component*> components;
+	std::list<GameObject*> goChilds;
 
 public:
-	const char* name	= nullptr;
-	GameObject* parent	= nullptr;
+	const char*			name		= nullptr;
+
+	GameObject*			parent		= nullptr;
+
+	ComponentTransform*	transform	= nullptr;
 
 };
 
