@@ -36,6 +36,7 @@ public:
 	update_status	PreUpdate()	override;
 	
 	void			DrawGUI();
+	void			FileDropped(const char* ev);
 
 	// Get mouse / axis position
 	const int		GetMouseWheel() const;
