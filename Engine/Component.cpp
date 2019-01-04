@@ -1,7 +1,7 @@
 #include "Component.h"
 
 // Constructor
-Component::Component()
+Component::Component(CameObject* goContainer, componentType type)
 {
 
 }
@@ -12,17 +12,7 @@ Component::~Component()
 
 }
 
-void Component::Enable()
-{
-	
-}
-
 void Component::Update()
-{
-	
-}
-
-void Component::Disable()
 {
 	
 }
