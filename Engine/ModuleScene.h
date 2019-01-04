@@ -1,6 +1,8 @@
 #ifndef __ModuleScene_h__
 #define __ModuleScene_h__
 
+#include <list>
+
 #include "Module.h"
 #include "GameObject.h"
 
@@ -12,10 +14,18 @@ public:
 	ModuleScene();
 	~ModuleScene();
 
-	GameObject* CreateGameObject(const char* goName);
+	bool			Init() override;
+	bool			CleanUp() override;
+	
+	update_status	Update() override;
+	
+	void			Draw();
 
 public:
-	GameObject* root = nullptr;
+	GameObject*		CreateGameObject(const char* goName, GameObject* goParent);
+
+public:
+	GameObject*		root = nullptr;
 
 };
 
