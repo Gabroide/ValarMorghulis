@@ -11,6 +11,7 @@
 #include "ModuleInput.h"
 #include "ModuleModel.h"
 #include "ModuleScene.h"
+#include "ModuleDebugDraw.h"
 
 // Constructor
 Application::Application() 
@@ -24,6 +25,7 @@ Application::Application()
 	modules.push_back(editor = new ModuleEditor());
 	modules.push_back(model = new ModuleModel());
 	modules.push_back(scene = new ModuleScene());
+	module.push_back(debug = new ModuleDebugDraw);
 }
 
 // Destructor

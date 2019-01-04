@@ -17,6 +17,7 @@ class ModuleScene;
 class ModuleProgram;
 class ModuleTime;
 class ModuleModel;
+class ModuleDebugDraw;
 
 class Application
 {
