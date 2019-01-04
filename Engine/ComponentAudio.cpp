@@ -1,7 +1,7 @@
 #include "ComponentAudio.h"
 
 // Constructor
-ComponentAudio::ComponentAudio()
+ComponentAudio::ComponentAudio(GameObject* goContainer) : Component(goContainer, ComponentType::AUDIO)
 {
 }
 

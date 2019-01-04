@@ -6,7 +6,7 @@
 class ComponentAudio : public Component
 {
 public:
-	ComponentAudio();
+	ComponentAudio(GameObject* goContainer);
 	~ComponentAudio();
 };
 
