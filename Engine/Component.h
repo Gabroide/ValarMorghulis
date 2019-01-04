@@ -7,6 +7,7 @@ class GameObject;
 
 enum class ComponentType
 {
+	EMPTY = 0,
 	CAMERA,
 	TRANSFORM,
 	MESH,
@@ -19,9 +20,11 @@ class Component
 {
 public:
 	Component(GameObject* goContainer, ComponentType type);
-	virual ~Component();
+	virtual ~Component();
 
-	virtual void Update();
+	virtual void	 Update();
+
+	void			Remove();
 
 public:
 	virtual void Enable()
@@ -40,7 +43,8 @@ public:
 	ComponentType	componentType	= ComponentType::EMPTY;
 
 public:
-	GameObject*		goConainer		= nullptr;
+	GameObject*		goContainer		= nullptr;
+
 
 };
 
