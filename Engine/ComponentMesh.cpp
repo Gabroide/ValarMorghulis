@@ -1,7 +1,7 @@
 #include "ComponentMesh.h"
 
 // Constructor
-ComponentMesh::ComponentMesh()
+ComponentMesh::ComponentMesh(GameObject* goContainer) : Component(goContainer, ComponentType::MESH)
 {
 }
 
