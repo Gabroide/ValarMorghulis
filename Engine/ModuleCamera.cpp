@@ -185,12 +185,19 @@ void ModuleCamera::Zoom()
 
 void ModuleCamera::FocusSelectedObject() 
 {
-	while (selectedObject->boundingBox.ClosestPoint(cameraPos).Equals(cameraPos)) 
+	if (selectedObject == nullptr)
 	{
-		cameraPos = cameraPos.Mul(2.0f);
+		front = (cameraPos - math::float3(0.0f, 0.0f, 0.0f)).Normalized();
 	}
+	else
+	{
+		while (selectedObject->boundingBox.ClosestPoint(cameraPos).Equals(cameraPos))
+		{
+			cameraPos = cameraPos.Mul(2.0f);
+		}
 
-	front = (selectedObject->boundingBox.CenterPoint() - cameraPos).Normalized();
+		front = (selectedObject->boundingBox.CenterPoint() - cameraPos).Normalized();
+	}
 
 	App->renderer->LookAt(cameraPos, (cameraPos + front));
 	UpdatePitchYaw();
