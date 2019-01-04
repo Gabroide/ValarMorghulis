@@ -7,12 +7,12 @@
 #include "ComponentMesh.h"
 #include "ComponentTransform.h"
 
+#include "IMGUI\imgui.h"
+
 // Constructor
 GameObject::GameObject()
 {
-	this->name = "GameObject";
-	this->parent = App->scene->root;
-	this->scene->root->goChilds.push_back(this);
+
 }
 
 GameObject::GameObject(const char* goName)
@@ -85,6 +85,40 @@ void GameObject::Draw()
 	}
 
 	LOG("Drawing GO %s", name);
+}
+
+void GameObject::DrawHierarchy(GameObject* goSelected) 
+{
+	ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | goSelected == this ? ImGuiTreeNodeFlags_Selected : NULL;
+
+	ImGui::PushID(this);
+	
+	if (goChilds.empty()) 
+	{
+		node_flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+	}
+
+	bool obj_open = ImGui::TreeNodeEx(this, node_flags, name);
+
+	if (ImGui::IsItemClicked()) 
+	{
+		App->scene->goSelected = this;
+	}
+
+	if (obj_open) 
+	{
+		for (auto &child : goChilds) 
+		{
+			child->DrawHierarchy(goSelected);
+		}
+
+		if (!(node_flags & ImGuiTreeNodeFlags_NoTreePushOnOpen)) 
+		{
+			ImGui::TreePop();
+		}
+	}
+
+	ImGui::PopID();
 }
 
 Component* GameObject::AddComponent(ComponentType type)

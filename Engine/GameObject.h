@@ -5,8 +5,6 @@
 #include <assert.h>
 
 #include "Globals.h"
-#include "Component.h"
-#include "Componentransform.h"
 
 class Component;
 class ComponentTransform;
@@ -24,6 +22,7 @@ public:
 	void				Update();
 	void				Draw();
 	void				RemoveComponent(Component* component);
+	void				DrawHierarchy(GameObject* goSelected);
 
 public:
 	Component*			AddComponent(ComponentType type);
