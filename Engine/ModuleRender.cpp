@@ -4,7 +4,7 @@
 #include "ModuleCamera.h"
 #include "ModuleWindow.h"
 #include "ModuleProgram.h"
-#include "DebugDraw.h"
+#include "ModuleScene.h"
 
 // Constructor
 ModuleRender::ModuleRender() 
@@ -54,6 +54,8 @@ update_status ModuleRender::Update()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	DrawDebugData();
+
+	App->scene->Draw();
 
 	glUseProgram(0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
