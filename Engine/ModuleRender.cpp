@@ -4,6 +4,7 @@
 #include "ModuleCamera.h"
 #include "ModuleWindow.h"
 #include "ModuleProgram.h"
+#include "DebugDraw.h"
 
 // Constructor
 ModuleRender::ModuleRender() 
@@ -52,17 +53,7 @@ update_status ModuleRender::Update()
 	glClearColor(bgColor[0], bgColor[1], bgColor[2], bgColor[3]);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glUseProgram(App->program->textureProgram);
-	ModelTransform(App->program->textureProgram);
-	ProjectionMatrix(App->program->textureProgram);
-	ViewMatrix(App->program->textureProgram);
-	App->model->DrawModels();
-
-	glUseProgram(App->program->basicProgram);
-	ModelTransform(App->program->basicProgram);
-	ProjectionMatrix(App->program->basicProgram);
-	ViewMatrix(App->program->basicProgram);
-	DrawReferenceDebug();
+	DrawDebugData();
 
 	glUseProgram(0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -78,6 +69,7 @@ update_status ModuleRender::PostUpdate()
 	return UPDATE_CONTINUE;
 }
 
+//Debugs
 void ModuleRender::DrawReferenceDebug() 
 {
 	// White grid
@@ -139,6 +131,14 @@ void ModuleRender::DrawReferenceDebug()
 	glLineWidth(1.0f);
 
 	glUseProgram(0);
+}
+
+void ModuleRender::DrawDebugData()
+{
+	if (showGrid)
+	{
+		dd::xzSquareGrid(-100.0f, 100.0f, 0.0f, 1.0f, math::float3(0.65f, 0.65f, 0.65f));
+	}
 }
 
 void ModuleRender::SetScreenNewScreenSize() 
@@ -207,7 +207,6 @@ void ModuleRender::LookAt(math::float3& cameraPos, math::float3& target)
 {
 	math::float3 front(target - cameraPos); front.Normalize();
 
-	// We are not implementing roll, so we will calculate the up again mantaining the verticalitiy
 	math::float3 side(front.Cross(App->camera->up)); side.Normalize();
 	math::float3 up(side.Cross(front));
 

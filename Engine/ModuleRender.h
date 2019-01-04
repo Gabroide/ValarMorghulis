@@ -38,6 +38,7 @@ public:
 	void			ModelTransform(unsigned programUsed);
 	void			LookAt(math::float3& cameraPos, math::float3& target);
 	void			SetScreenNewScreenSize();
+	void			DrawDebugData();
 
 private:
 	void			DrawReferenceDebug();
@@ -48,9 +49,9 @@ public:
 
 	float			bgColor[4]		= { 0.0f, 0.0f, 0.0f, 1.0f };
 	
-	unsigned		fbo				= 0;
-	unsigned		rbo				= 0;
-	unsigned		renderTexture	= 0;
+	unsigned		fbo				= 0u;
+	unsigned		rbo				= 0u;
+	unsigned		renderTexture	= 0u;
 
 	Frustum			frustum;
 	
@@ -59,6 +60,10 @@ public:
 public:
 	void*			context			= nullptr;
 	
+protected:
+	bool			showAxis		= true;
+	bool			showGrid		= true;
+
 };
 
 #endif // __ModuleRender_h__
