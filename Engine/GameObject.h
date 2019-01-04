@@ -2,6 +2,7 @@
 #define __GameObject_h__
 
 #include <vector>
+#include <assert.h>
 
 #include "Globals.h"
 #include "Component.h"
@@ -11,8 +12,13 @@ class Component;
 class GameObject
 {
 public:
-	GameObject();
+	GameObject(const char* goName);
 	~GameObject();
+
+	void	Update();
+
+public:
+	Component*	CreaeComponent(componentType type);
 
 public:
 	std::vector<Component*>		components;
