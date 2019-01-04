@@ -6,6 +6,10 @@
 #include "ModuleTextures.h"
 #include "ModuleProgram.h"
 #include "ModuleModel.h"
+#include "ModuleScene.h"
+#include "ComponentMesh.h"
+#include "ComponentMaterial.h"
+#include "GameObject.h"
 
 #include "glew-2.1.0\include\GL\glew.h"
 
@@ -25,6 +29,11 @@ unsigned ModuleModel::Load(const char* path)
 {
 	assert(path != nullptr);
 
+	std::string fullFilePath(path);
+	std::size_t found = fullFilePath.find_last_of("/");
+	std::string name = fullFilePath.substr(found + 1, fullFilePath.length().c_str());
+
+	GameObject(name.c_str(), nullptr);
 	models.emplace_back(path);
 
 	LOG("Loaded Model: %s", path);
