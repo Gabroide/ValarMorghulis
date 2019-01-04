@@ -16,8 +16,7 @@ class ModuleInput;
 class ModuleScene;
 class ModuleProgram;
 class ModuleTime;
-class ModuleModel;
-class ModuleDebugDraw;
+class ModuleSceneLoader;
 
 class Application
 {
@@ -43,8 +42,9 @@ public:
 	ModuleCamera*		camera				= nullptr;
 	ModuleProgram*		program				= nullptr;
 	ModuleTime*			time				= nullptr;
-	ModuleModel*		model				= nullptr;
 	ModuleScene*		scene				= nullptr;
+	ModuleSceneLoader*	loader				= nullptr;
+
 
 public:
 	bool				gamePaused			= false;
