@@ -7,15 +7,13 @@
 #include "ComponentMesh.h"
 #include "ComponentTransform.h"
 
-#include "IMGUI\imgui.h"
-
 // Constructor
 GameObject::GameObject()
 {
 
 }
 
-GameObject::GameObject(const char* goName)
+GameObject::GameObject(const char* goName, const aiMatrix4x4& transform)
 {
 	if (goName != nullptr)
 	{
@@ -27,10 +25,12 @@ GameObject::GameObject(const char* goName)
 	}
 
 	this->parent = App->scene->root;
+	this->transform = (ComponentTransform*)AddComponent(ComponentType::TRANSFORM);
+	this->transform;
 	App->scene->root->goChilds.push_back(this);
 }
 
-GameObject::GameObject(const char* goName, GameObject* goParent)
+GameObject::GameObject(const char* goName, const aiMatrix4x4 transform, GameObject* goParent)
 {
 	if (goName != nullptr)
 	{
@@ -74,7 +74,10 @@ GameObject::~GameObject()
 
 void GameObject::Update()
 {
-	
+	for (const auto& child : goChilds)
+	{
+		child->Update();
+	}
 }
 
 void GameObject::Draw()
@@ -136,7 +139,7 @@ Component* GameObject::AddComponent(ComponentType type)
 		break;
 
 	case ComponentType::MESH:
-		component = new ComponentMesh(this);
+		component = new ComponentMesh(this, nullptr);
 		break;
 
 	case ComponentType::;MATERIAL:

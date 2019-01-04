@@ -6,6 +6,8 @@
 
 #include "Globals.h"
 
+#include "IMGUI\imgui.h"
+
 class Component;
 class ComponentTransform;
 
@@ -15,8 +17,8 @@ class GameObject
 {
 public:
 	GameObject();
-	GameObject(const char* goName);
-	GameObject(const char* goName, GameObject* goParent);
+	GameObject(const char* goName, const aiMatrix4x4& transform);
+	GameObject(const char* goName, const aiMatrix4x4& transform, GameObject* goParent);
 	~GameObject();
 
 	void				Update();
