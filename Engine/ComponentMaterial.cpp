@@ -1,7 +1,7 @@
 #include "ComponentMaterial.h"
 
 // Constructor
-ComponentMaterial::ComponentMaterial()
+ComponentMaterial::ComponentMaterial(GameObject* goContainer) : Component(goContainer, ComponentType::MATERIAL)
 {
 
 }
