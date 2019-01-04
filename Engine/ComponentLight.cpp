@@ -1,7 +1,7 @@
 #include "ComponentLight.h"
 
 // Constructor
-ComponentLight::ComponentLight()
+ComponentLight::ComponentLight(GameObject* goContainer) : Component(goContainer, ComponentType::LIGHT)
 {
 
 }
