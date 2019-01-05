@@ -2,9 +2,12 @@
 
 layout(location = 0) in vec3 vertex_position;
 
-uniform mat4 proj;
-uniform mat4 view;
-uniform mat4 model;
+layout (std140) uniform matrices;
+{
+	mat4 proj;
+	mat4 view;
+	mat4 model;
+};
 
 void main()
 {
