@@ -1,6 +1,6 @@
 #include "ComponentMesh.h"
 #include "Application.h"
-#include "ModuleModel.h"
+#include "ModuleSceneLoader.h"
 
 // Constructor
 ComponentMesh::ComponentMesh(GameObject* goContainer, aiMesh* mesh) : Component(goContainer, ComponentType::MESH)
@@ -108,15 +108,6 @@ void ComponentMesh::CleanUp()
 void ComponentMesh::Draw(unsigned shaderProgram, const Texture* texture) const 
 {
 	glActiveTexture(GL_TEXTURE0);
-
-	if (texture == nullptr) 
-	{
-		glBindTexture(GL_TEXTURE_2D, App->model->checkTexture.id);
-	}
-	else 
-	{
-		glBindTexture(GL_TEXTURE_2D, texture->id);
-	}
 
 	glUniform1i(glGetUniformLocation(shaderProgram, "texture0"), 0);
 
