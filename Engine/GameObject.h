@@ -18,7 +18,7 @@ class GameObject
 public:
 	GameObject();
 	GameObject(const char* goName, const aiMatrix4x4& transform);
-	GameObject(const char* goName, const aiMatrix4x4& transform, GameObject* goParent);
+	GameObject(const char* goName, const aiMatrix4x4 transform, GameObject* goParent);
 	~GameObject();
 
 	void				Update();
@@ -28,6 +28,7 @@ public:
 
 public:
 	Component*			AddComponent(ComponentType type);
+	const char*			GetFileFolder() const;
 
 public:
 	std::list<Component*> components;

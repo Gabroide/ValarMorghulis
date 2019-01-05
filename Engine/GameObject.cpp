@@ -26,7 +26,7 @@ GameObject::GameObject(const char* goName, const aiMatrix4x4& transform)
 
 	this->parent = App->scene->root;
 	this->transform = (ComponentTransform*)AddComponent(ComponentType::TRANSFORM);
-	this->transform;
+	this->transform->AddTransform(transform);
 	App->scene->root->goChilds.push_back(this);
 }
 
@@ -122,6 +122,15 @@ void GameObject::DrawHierarchy(GameObject* goSelected)
 	}
 
 	ImGui::PopID();
+}
+
+const char* GameObject::GetFileFolder() const
+{
+	std::string s(filepath);
+	std::size_t found = s.find_last_of("/\\");
+	s = s.substr(0, found + 1);
+
+	return s.c_str();
 }
 
 Component* GameObject::AddComponent(ComponentType type)
