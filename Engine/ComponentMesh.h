@@ -4,6 +4,7 @@
 #include "Mesh.h"
 #include "assert.h"
 #include "Component.h"
+#include "Model.h"
 
 class ComponentMesh : public Component
 {
@@ -15,21 +16,23 @@ public:
 	void						CleanUp();
 	void						Draw(unsigned shaderProgram, const Texture* texture) const;
 
+	const unsigned				MaterialIndex();
+
 public:
-	int							numIndices = 0;
-	int							materialIndex = 0;
+	int							numIndices		= 0;
+	int							materialIndex	= 0;
 	
 	AABB						bbox;
 
 	std::vector<math::float3>	vertices;
 	
 public:
-	const char*					name = nullptr;
+	const char*					name			= nullptr;
 
 private:
-	unsigned					vao = 0u;
-	unsigned					vbo = 0u;
-	unsigned					ibo = 0u;
+	unsigned					vao				= 0u;
+	unsigned					vbo				= 0u;
+	unsigned					ibo				= 0u;
 
 };
 

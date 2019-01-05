@@ -1,6 +1,5 @@
 #include "ComponentMesh.h"
 #include "Application.h"
-#include "ModuleSceneLoader.h"
 
 // Constructor
 ComponentMesh::ComponentMesh(GameObject* goContainer, aiMesh* mesh) : Component(goContainer, ComponentType::MESH)
@@ -87,6 +86,12 @@ void ComponentMesh::ComputeMesh(aiMesh* mesh)
 	materialIndex = mesh->mMaterialIndex;
 }
 
+const unsigned ComponentMesh::MaterialIndex()
+{
+
+	return meterialIndex;
+}
+
 void ComponentMesh::CleanUp() 
 {
 	if (vao != 0) 
@@ -108,6 +113,11 @@ void ComponentMesh::CleanUp()
 void ComponentMesh::Draw(unsigned shaderProgram, const Texture* texture) const 
 {
 	glActiveTexture(GL_TEXTURE0);
+
+	if (texture != nullptr)
+	{
+		glBindTexture(GL_TEXTURE_2D, texture->id);
+	}
 
 	glUniform1i(glGetUniformLocation(shaderProgram, "texture0"), 0);
 
