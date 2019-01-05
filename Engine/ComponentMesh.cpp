@@ -89,7 +89,7 @@ void ComponentMesh::ComputeMesh(aiMesh* mesh)
 const unsigned ComponentMesh::MaterialIndex()
 {
 
-	return meterialIndex;
+	return materialIndex;
 }
 
 void ComponentMesh::CleanUp() 
