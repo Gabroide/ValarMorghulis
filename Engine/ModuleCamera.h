@@ -4,9 +4,13 @@
 #include "Module.h"
 #include "Globals.h"
 #include "Point.h"
+#include "GameObject.h"
+
+#include "SDL\include\SDL.h"
+
+#include "glew-2.1.0\include\GL\glew.h"
+
 #include "MathGeoLib.h"
-#include "GL/glew.h"
-#include "SDL.h"
 
 class ModuleCamera : public Module
 {
@@ -44,8 +48,8 @@ public:
 	float			mouseSensitivity	= 65.0f;
 	float			rotationSpeed		= 65.0f;;
 	float			cameraSpeed			= 17.0f;
-	float			pitch;
-	float			yaw;
+	float			pitch				= 0.0f;
+	float			yaw					= 0.0f;
 	float			lastX				= 0.0f;
 	float			lastY				= 0.0f;
 	float			maxFov				= 100.0f;
@@ -59,7 +63,7 @@ public:
 	math::AABB		selectedObjectBB;
 
 public:
-	Model*			selectedObject;
+	GameObject*			goSelected		= nullptr;
 };
 
 #endif // __ModuleCamera_h__
