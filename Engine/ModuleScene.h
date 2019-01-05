@@ -6,7 +6,11 @@
 #include "Module.h"
 #include "GameObject.h"
 
+#include "Assimp\matrix4x4.h"
+
 class GameObject;
+
+enum class ComponentType;
 
 class ModuleScene : public Module
 {
@@ -24,6 +28,7 @@ public:
 
 public:
 	GameObject*		CreateGameObject(const char* goName, GameObject* goParent);
+	GameObject*		CreateGameObject(const char* goName, const aiMatrix4x4& transform, GameObject* goParent);
 
 public:
 	GameObject*		root		= nullptr;
