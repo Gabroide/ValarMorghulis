@@ -1,20 +1,22 @@
 #include "ComponentMaterial.h"
 #include "ModuleTextures.h"
 #include "Application.h"
+#include "ModuleProgram.h"
 
 // Constructor
 ComponentMaterial::ComponentMaterial(GameObject* goContainer, const aiMaterial* material) : Component(goContainer, ComponentType::MATERIAL) 
 {
-
+	this->shader = App->program->textureProgram;
+	ComputeMaterial(material);
 }
 
 // Destructor
 ComponentMaterial::~ComponentMaterial() 
 {
-	
+	DeleteTexture();
 }
 
-void ComponentMaterial::SetMaterial(const aiMaterial* material) 
+void ComponentMaterial::ComputeMaterial(const aiMaterial* material) 
 {
 	std::string texturePath;
 	if (material != nullptr) 

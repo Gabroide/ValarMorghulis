@@ -3,6 +3,7 @@
 
 #include "assert.h"
 #include "Component.h"
+#include "Model.h"
 
 #include "glew-2.1.0\include\GL\glew.h"
 
@@ -16,7 +17,7 @@ public:
 	ComponentMaterial(GameObject* goContainer, const aiMaterial* material);
 	~ComponentMaterial();
 
-	void			SetMaterial(const aiMaterial* material);
+	void			ComputeMaterial(const aiMaterial* material);
 	void			DeleteTexture();
 
 public:
