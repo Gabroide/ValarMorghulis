@@ -33,14 +33,17 @@ public:
 
 	void					Draw() const;
 	void					UpdateTexture(Texture texture);
-	
+	void					DrawInfo() const;
+
+public:
+	GameObject*				GenerateMeshData(const aiNode* node, const aiScene* scene, const aiMatrix4x4& parentTransform, GameObject* goParent);
+
 public:
 	AABB					boundingBox = AABB({ 0, 0, 0}, { 0, 0, 0});
 	
 private:
 	bool					LoadModel(const char* pathFile);
 	
-	void					GenerateMeshData(const aiNode* node, const aiScene* scene);
 	void					GenerateMaterialData(const aiScene* scene);
 	void					GetAABB();
 
@@ -48,7 +51,7 @@ private:
 	std::vector<Texture>	textures;
 
 private:
-	const char*				path;
+	const char*				path		= nullptr;
 	
 };
 

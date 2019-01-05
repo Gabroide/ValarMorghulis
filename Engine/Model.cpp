@@ -4,6 +4,8 @@
 #include "ModuleTextures.h"
 #include "ModuleProgram.h"
 #include "ModuleScene.h"
+#include "ComponentMesh.h"
+#include "ComponentMaterial.h"
 
 #include "IMGUI\imgui.h"
 
@@ -17,7 +19,7 @@ Model::Model(const char* file)
 	LoadModel(file);
 
 	// Updating the focused object
-	App->camera->selectedObject = this;
+	App->camera->goSelected = this;
 }
 
 // Destructor
@@ -51,8 +53,8 @@ bool Model::LoadModel(const char* pathFile)
 		GenerateMaterialData(scene);
 		GetAABB();
 
-		GameObject(name.c_str(), App->scene->root);
-		App->camera->selectedObject = this;
+		GameObject* go = App->scene->CreateGameObject(name.c_str(), App->scene->root);
+		App->camera->goSelected = go;
 	}
 	else 
 	{
@@ -62,20 +64,27 @@ bool Model::LoadModel(const char* pathFile)
 	return scene;
 }
 
-void Model::GenerateMeshData(const aiNode* node, const aiScene* scene) 
+GameObject* Model::GenerateMeshData(const aiNode* node, const aiScene* scene, const aiMatrix4x4& parentTransform, GameObject* goParent) 
 {
 	assert(scene != nullptr);
+	assert(node != nullptr);
+	assert(goParent != nullptr);
+
+	aiMatrix4x4 transform = parentTransform * node->mTransformation;
+	GameObject* gameObject = App->scene->CreateGameObject(node->mName.C_Str(), transform, goParent);
 
 	for (unsigned int i = 0u; i < node->mNumMeshes; i++) 
 	{
-		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-		meshes.emplace_back(mesh);
+		ComponentMesh* mesh = (ComponentMesh*)gameObject->AddComponent(ComponentType::MESH);
+		mesh->ComputeMesh(scene->mMeshes[node->mMeshes[i]]);
 	}
 
 	for (unsigned int i = 0u; i < node->mNumChildren; i++) 
 	{
-		GenerateMeshData(node->mChildren[i], scene);
+		GameObject* child = GenerateMeshData(node->mChildren[i], scene, transform, gameObject);
 	}
+
+	return gameObject;
 }
 
 void Model::Draw() const 
