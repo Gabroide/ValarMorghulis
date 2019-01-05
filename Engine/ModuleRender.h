@@ -3,7 +3,6 @@
 
 #include "Module.h"
 #include "Globals.h"
-#include "ModuleModel.h"
 
 #include "SDL\include\SDL.h"
 
@@ -24,6 +23,7 @@ public:
 	~ModuleRender();
 
 	bool			Init()			override;
+	bool			CleanUp()		override;
 
 	update_status	PreUpdate()		override;
 	update_status	Update()		override;
@@ -33,12 +33,13 @@ public:
 	void			InitFrustum();
 	void			InitSDL();
 	void			InitOpenGL();
-	void			ViewMatrix(unsigned programUsed);
-	void			ProjectionMatrix(unsigned programUsed);
-	void			ModelTransform(unsigned programUsed);
-	void			LookAt(math::float3& cameraPos, math::float3& target);
+	void			ViewMatrix();
+	void			ProjectionMatrix();
 	void			SetScreenNewScreenSize();
 	void			DrawDebugData();
+	void			CreateUniformBlocks();
+
+	math::float4x4	LookAt(math::float3& cameraPos, math::float3& target);
 
 private:
 	void			DrawReferenceDebug();
@@ -51,11 +52,10 @@ public:
 	
 	unsigned		fbo				= 0u;
 	unsigned		rbo				= 0u;
+	unsigned		ubo				= 0u;
 	unsigned		renderTexture	= 0u;
 
 	Frustum			frustum;
-	
-	math::float4x4	viewMatrix;
 	
 public:
 	void*			context			= nullptr;
