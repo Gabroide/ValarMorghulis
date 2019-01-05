@@ -21,7 +21,7 @@ Mesh::Mesh(aiMesh* mesh)
 	// Texture coords
 	float* textureBuffer = (float*)glMapBufferRange(GL_ARRAY_BUFFER, sizeof(float) * 3 * mesh->mNumVertices, sizeof(float) * 2 * mesh->mNumVertices, GL_MAP_WRITE_BIT);
 	
-	for (int i = 0; i < mesh->mNumVertices; ++i) 
+	for (unsigned i = 0u; i < mesh->mNumVertices; ++i) 
 	{
 		*(textureBuffer++) = mesh->mTextureCoords[0][i].x;
 		*(textureBuffer++) = mesh->mTextureCoords[0][i].y;
@@ -38,7 +38,7 @@ Mesh::Mesh(aiMesh* mesh)
 
 	int* indices = (int*)glMapBufferRange(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(unsigned) * mesh->mNumFaces * 3, GL_MAP_WRITE_BIT);
 	
-	for (unsigned i = 0; i < mesh->mNumFaces; ++i) 
+	for (unsigned i = 0u; i < mesh->mNumFaces; ++i) 
 	{
 		assert(mesh->mFaces[i].mNumIndices == 3);
 
@@ -87,19 +87,11 @@ Mesh::~Mesh()
 	}
 }
 
-void Mesh::Draw(unsigned shaderProgram, const std::vector<Texture>& textures) const 
+void Mesh::Draw(unsigned shaderProgram, const Texture* texture) const 
 {
 	glActiveTexture(GL_TEXTURE0);
 
-	if (App->model->checkersTexture) 
-	{
-		glBindTexture(GL_TEXTURE_2D, App->model->checkTexture.id);
-	}
-	else 
-	{
-		glBindTexture(GL_TEXTURE_2D, textures[materialIndex].id);
-	}
-
+	glBindTexture(GL_TEXTURE_2D, texture->id);
 	glUniform1i(glGetUniformLocation(shaderProgram, "texture0"), 0);
 
 	glBindVertexArray(vao);

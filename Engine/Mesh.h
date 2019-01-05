@@ -20,18 +20,18 @@ public:
 	Mesh(aiMesh* mesh);
 	~Mesh();
 
-	void						Draw(unsigned shaderProgram, const std::vector<Texture>& textures) const;
+	void						Draw(unsigned shaderProgram, const Texture* texture) const;
 
 public:
-	int							numIndices = 0;
-	int							materialIndex = 0;
+	int							numIndices		= 0;
+	int							materialIndex	= 0;
 
 	std::vector<math::float3>	vertices;
 
 private:
-	unsigned vao;
-	unsigned vbo;
-	unsigned ibo;
+	unsigned					vao				= 0u;
+	unsigned					vbo				= 0u;
+	unsigned					ibo				= 0u;
 
 };
 
