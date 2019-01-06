@@ -11,11 +11,11 @@
 
 #include "MathGeoLib.h"
 /*
-"Math/float4x4.h"
-"Geometry/AABB.h"
+"Math\float4x4.h"
+"Geometry\AABB.h"
 */
 
-#include "assimp/matrix4x4.h"
+#include "assimp\matrix4x4.h"
 
 class Component;
 class ComponentTransform;
@@ -27,43 +27,48 @@ public:
 	GameObject();
 	GameObject(const char* goName, const aiMatrix4x4& transform, const char* fileLocation);
 	GameObject(const char* goName, const aiMatrix4x4& transform, GameObject* goParent, const char* fileLocation);
+	GameObject(GameObject* duplicateGameObject);
 	~GameObject();
 
-	void					Update();
+	void					Update() override;
 	void					Draw() const;
 	void					DrawProperties() const;
 	void					DrawHierarchy(GameObject* goSelected);
+	void					DrawBBox() const;
 	void					RemoveComponent(Component* component);
 	void					ModelTransform(unsigned shader) const;
 
-	AABB&					ComputeBBox() const;
+	AABB					ComputeBBox() const;
 
 	std::string				GetFileFolder() const;
 	std::vector<Component*> GetComponents(ComponentType type) const;
-	
+
 	math::float4x4			GetLocalTransform() const;
 	math::float4x4			GetGlobalTransform() const;
 
 public:
 	Component*				AddComponent(ComponentType type);
 	Component*				GetComponent(ComponentType type) const;
-
-public:
-	bool					enabled		= true;
-
-public:
-	const char*				filePath	= nullptr;
-	const char*				name		= "GameObject";
-
-	ComponentTransform*		transform	= nullptr;
-
-	GameObject*				parent		= nullptr;
 	
+public:
+	bool					enabled = true;
+	bool					drawGOBBox = false;
+	bool					drawChildsBBox = false;
+	bool					duplicating = false;
+
 	std::vector<Component*>	components;
 	std::list<GameObject*>	goChilds;
 
 public:
-	AABB&					bbox		= AABB();
+	const char*				filePath = nullptr;
+	const char*				name = "GameObject";
+	
+	GameObject*				parent = nullptr;
+	
+	ComponentTransform*		transform = nullptr;
+
+public:
+	AABB&					bbox = AABB();
 
 };
 
