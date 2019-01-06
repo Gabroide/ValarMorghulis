@@ -21,10 +21,15 @@ public:
 	void			ComputeMaterial(const aiMaterial* material);
 	void			DeleteTexture();
 
-public:
-	unsigned int	shader = 0u;
+	unsigned		GetShader() const;
 
 public:
+	Texture*		GetTexture() const;
+
+private:
+	unsigned int	shader = 0u;
+
+private:
 	Texture*		texture = nullptr;
 
 };
