@@ -24,17 +24,6 @@ update_status ModuleScene::Update()
 	return UPDATE_CONTINUE;
 }
 
-bool ModuleScene::CleanUp() 
-{
-
-	for (std::list<GameObject*>::reverse_iterator it = root->goChilds.rbegin(); it != root->goChilds.rend(); ++it) {
-		delete *it;
-	}
-
-	root->goChilds.clear();
-
-	return true;
-}
 
 void ModuleScene::Draw() 
 {
@@ -52,19 +41,10 @@ GameObject* ModuleScene::CreateGameObject(const char* goName, GameObject* goPare
 
 	if (goName != nullptr) 
 	{
-		gameObject = new GameObject(goName, transform, fileLocation);
+		char* go_name = new char[strlen(goName)];
+		strcpy(go_name, goName);
 
-		if (goParent != nullptr) 
-		{
-			gameObject->parent = goParent;
-			goParent->goChilds.push_back(gameObject);
-		}
-		else 
-		{
-			gameObject->parent = root;
-			root->goChilds.push_back(gameObject);
-		}
-
+		gameObject = new GameObjec(go_name, transform, goParent, fileLocation);
 	}
 	else 
 	{
@@ -73,13 +53,11 @@ GameObject* ModuleScene::CreateGameObject(const char* goName, GameObject* goPare
 			std::string childName = "ChildOf";
 			childName += goParent->name;
 
-			gameObject = new GameObject(childName, transform, goParent, fileLocation);
-			goParent->goChilds.push_back(gameObject);
+			gameObject = new GameObject(childName.c_str, transform, goParent, fileLocation);
 		}
 		else 
 		{
-			gameObject = new GameObject(std::string("GameObject"), transform, root, fileLocation);
-			root->goChilds.push_back(gameObject);
+			gameObject = new GameObject(std::string("GameObject").c_str, transform, root, fileLocation);
 		}
 	}
 

@@ -19,7 +19,6 @@ public:
 	~ModuleScene();
 
 	bool			Init()		override;
-	bool			CleanUp()	override;
 	
 	update_status	Update()	override;
 	
