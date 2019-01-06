@@ -29,13 +29,11 @@ public:
 	ModuleSceneLoader();
 	~ModuleSceneLoader();
 
-	bool Start();
+	bool Init();
 
 	void		LoadFile(const char* path);
 	void		LoadScene(const aiScene* scene);
-	
-public:
-	GameObject*	ProcessTree(const aiNode* node, const aiScene* scene, const aiMatrix4x4 &parentTransform, GameObject* parent);
+	void		ProcessTree(const aiNode* node, const aiScene* scene, const aiMatrix4x4 &parentTransform, GameObject* parent);
 
 public:
 	const char* filepath = nullptr;

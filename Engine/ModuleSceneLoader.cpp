@@ -20,8 +20,9 @@ ModuleSceneLoader::~ModuleSceneLoader()
 	
 }
 
-bool ModuleSceneLoader::Start() 
+bool ModuleSceneLoader::Init() 
 {
+	LoadFile("Models/BakerHouse.fbx");
 
 	return true;
 }
@@ -54,7 +55,7 @@ void ModuleSceneLoader::LoadScene(const aiScene* scene)
 	aiReleaseImport(scene);
 }
 
-GameObject* ModuleSceneLoader::ProcessTree(const aiNode* node, const aiScene* scene, const aiMatrix4x4& parentTransform, GameObject* goParent) 
+void ModuleSceneLoader::ProcessTree(const aiNode* node, const aiScene* scene, const aiMatrix4x4& parentTransform, GameObject* goParent) 
 {
 	assert(scene != nullptr);
 	assert(node != nullptr);
@@ -74,8 +75,6 @@ GameObject* ModuleSceneLoader::ProcessTree(const aiNode* node, const aiScene* sc
 
 	for (unsigned i = 0u; i < node->mNumChildren; i++) 
 	{
-		GameObject* child = ProcessTree(node->mChildren[i], scene, transform, gameObject);
+		ProcessTree(node->mChildren[i], scene, transform, gameObject);
 	}
-
-	return gameObject;
 }
