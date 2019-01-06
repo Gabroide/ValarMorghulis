@@ -6,6 +6,7 @@
 #include <string>
 
 #include "Mesh.h"
+#include "GameObject.h"
 
 #include "glew-2.1.0\include\GL\glew.h"
 
@@ -19,9 +20,9 @@
 
 struct Texture 
 {
-	int id;
-	int width;
-	int height;
+	int id = 0;
+	int width = 0;
+	int height = 0;
 	Texture(int id, int width, int height) : id(id), width(width), height(height) {}
 };
 
@@ -31,12 +32,7 @@ public:
 	Model(const char* file);
 	~Model();
 
-	void					Draw() const;
-	void					UpdateTexture(Texture texture);
 	void					DrawInfo() const;
-
-public:
-	GameObject*				GenerateMeshData(const aiNode* node, const aiScene* scene, const aiMatrix4x4& parentTransform, GameObject* goParent);
 
 public:
 	AABB					boundingBox = AABB({ 0, 0, 0}, { 0, 0, 0});
@@ -44,9 +40,12 @@ public:
 private:
 	bool					LoadModel(const char* pathFile);
 	
-	void					GenerateMaterialData(const aiScene* scene);
-	void					GetAABB();
+	void					GetModelBoundingBox();
 
+private:
+	GameObject*				ProcessTree(const aiNode* node, const aiScene* scene, const aiMatrix4x4& parentTransform, GameObject* goParent);
+
+private:
 	std::list<Mesh>			meshes;
 	std::vector<Texture>	textures;
 

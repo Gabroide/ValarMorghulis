@@ -152,7 +152,7 @@ Component* GameObject::AddComponent(ComponentType type)
 		break;
 
 	case ComponentType::;MATERIAL:
-		component = new ComponentMaterial(this);
+		component = new ComponentMaterial(this, nullptr);
 		break;
 
 	case ComponentType::AUDIO:
