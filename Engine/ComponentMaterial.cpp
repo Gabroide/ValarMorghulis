@@ -1,18 +1,25 @@
 #include "ComponentMaterial.h"
-#include "ModuleTextures.h"
-#include "Application.h"
 #include "ModuleProgram.h"
+#include "Application.h"
 
 // Constructor
-ComponentMaterial::ComponentMaterial(GameObject* goContainer) : Component(goContainer, ComponentType::MATERIAL)
+ComponentMaterial::ComponentMaterial(GameObject* goContainer) : Component(goContainer, ComponentType::MATERIAL) 
 {
 	shader = App->program->textureProgram;
 }
 
+// Constructor
 ComponentMaterial::ComponentMaterial(GameObject* goContainer, const aiMaterial* material) : Component(goContainer, ComponentType::MATERIAL) 
 {
 	shader = App->program->textureProgram;
 	ComputeMaterial(material);
+}
+
+// Constructor
+ComponentMaterial::ComponentMaterial(ComponentMaterial* duplicatedComponent) : Component(duplicatedComponent->goContainer, ComponentType::MATERIAL) 
+{
+	shader = duplicatedComponent->shader;
+	texture = duplicatedComponent->GetTexture();
 }
 
 // Destructor
@@ -24,6 +31,7 @@ ComponentMaterial::~ComponentMaterial()
 void ComponentMaterial::ComputeMaterial(const aiMaterial* material) 
 {
 	std::string texturePath;
+	
 	if (material != nullptr) 
 	{
 		aiTextureMapping mapping = aiTextureMapping_UV;
@@ -56,7 +64,7 @@ void ComponentMaterial::DeleteTexture()
 {
 	if (texture != nullptr) 
 	{
-		glDeleteTextures(1, (GLuint*)&texture->id);
+		glDeleteTextures(1, (GLuint*)& texture->id);
 	}
 
 	delete texture;
@@ -74,7 +82,6 @@ void ComponentMaterial::DrawProperties()
 		if (removed) 
 		{
 			ImGui::PopID();
-		
 			return;
 		}
 		
