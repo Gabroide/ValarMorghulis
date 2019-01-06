@@ -23,6 +23,8 @@ public:
 	virtual ~Component();
 
 	virtual void	 Update();
+	
+	bool			DrawComponentsState();
 
 	void			Remove();
 
@@ -37,8 +39,13 @@ public:
 		enabled = false;
 	};
 
+	virtual void	DrawProperties()
+	{
+
+	};
+
 public:
-	bool			enabled			= false;
+	bool			enabled			= true;
 
 	ComponentType	componentType	= ComponentType::EMPTY;
 
