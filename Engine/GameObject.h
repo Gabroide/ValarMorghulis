@@ -25,12 +25,13 @@ class GameObject
 {
 public:
 	GameObject();
-	GameObject(const std::string goName, const aiMatrix4x4& transform, const char* fileLocation);
-	GameObject(const std::string goName, const aiMatrix4x4& transform, GameObject* goParent, const char* fileLocation);
+	GameObject(const char* goName, const aiMatrix4x4& transform, const char* fileLocation);
+	GameObject(const char* goName, const aiMatrix4x4& transform, GameObject* goParent, const char* fileLocation);
 	~GameObject();
 
 	void					Update();
-	void					Draw();
+	void					Draw() const;
+	void					DrawProperties() const;
 	void					DrawHierarchy(GameObject* goSelected);
 	void					RemoveComponent(Component* component);
 	void					ModelTransform(unsigned shader) const;
@@ -48,12 +49,11 @@ public:
 	Component*				GetComponent(ComponentType type) const;
 
 public:
-	AABB&					bbox;
-
-	std::string				name		= "GameObject";
+	bool					enabled		= true;
 
 public:
 	const char*				filePath	= nullptr;
+	const char*				name		= "GameObject";
 
 	ComponentTransform*		transform	= nullptr;
 
@@ -61,6 +61,9 @@ public:
 	
 	std::vector<Component*>	components;
 	std::list<GameObject*>	goChilds;
+
+public:
+	AABB&					bbox		= AABB();
 
 };
 

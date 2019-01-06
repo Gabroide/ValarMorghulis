@@ -9,12 +9,12 @@
 #include "GameObject.h"
 
 // Constructor
-GameObject::GameObject() : bbox(AABB)
+GameObject::GameObject()
 {
 
 }
 
-GameObject::GameObject(const std::string goName, const aiMatrix4x4& transform, const char* fileLocation)
+GameObject::GameObject(const char* goName, const aiMatrix4x4& transform, const char* fileLocation)
 {
 	name = goName;
 	
@@ -29,7 +29,7 @@ GameObject::GameObject(const std::string goName, const aiMatrix4x4& transform, c
 	App->scene->root->goChilds.push_back(this);
 }
 
-GameObject::GameObject(const std::string goName, const aiMatrix4x4 transform, GameObject* goParent, const char* fileLocation)
+GameObject::GameObject(const char* goName, const aiMatrix4x4 transform, GameObject* goParent, const char* fileLocation)
 {
 	name = goName;
 
@@ -45,6 +45,9 @@ GameObject::GameObject(const std::string goName, const aiMatrix4x4 transform, Ga
 
 	}
 
+	this->transform = (ComponentTransform*)AddComponent(ComponentType::TRANSFORM);
+	this->transform->AddTransform(transform);
+
 	if (fileLocation != nullptr)
 	{
 		filePath = fileLocation;
@@ -54,19 +57,28 @@ GameObject::GameObject(const std::string goName, const aiMatrix4x4 transform, Ga
 // Destructor
 GameObject::~GameObject()
 {
-	for (std::list<GameObject*>::reverse_iterator it = goChilds.rbegin(); it != goChilds.rend(); ++it)
+	for (auto&	component : components)
 	{
-		delete *it;
-	}
-
-	goChilds.clear();
-
-	for (std::list<Component*>::reverse_iterator it = components.rbegin(); it != components.rend(); ++it)
-	{
-		delete *it;
+		delete component;
+		component = nullptr;
 	}
 
 	components.clear();
+
+	for (auto& child : goChilds)
+	{
+		delete child;
+		child = nullptr;
+	}
+
+	delete transform;
+	transform = nullptr;
+
+	delete parent;
+	parent = nullptr;
+
+	delete name;
+	name = nullptr;
 }
 
 void GameObject::Update()
@@ -77,7 +89,7 @@ void GameObject::Update()
 	}
 }
 
-void GameObject::Draw()
+void GameObject::Draw() const
 {
 	for (const auto& child : goChilds)
 	{
@@ -85,6 +97,12 @@ void GameObject::Draw()
 	}
 
 	LOG("Drawing GO %s", name);
+
+	if (!enabled)
+	{
+
+		return;
+	}
 
 	if (transform == nullptr)
 	{
@@ -111,7 +129,7 @@ void GameObject::Draw()
 
 	std::vector<Component*>meshes = GetComponents(ComponenType::MESH);
 
-	for (auto& mesh : meshes)
+	for (const auto& mesh : meshes)
 	{
 		if (mesh->enabled)
 		{
@@ -120,6 +138,18 @@ void GameObject::Draw()
 	}
 
 	glUseProgram(0);
+}
+
+void GameObject::DrawProperties() const
+{
+	assert(name != nullptr);
+
+	ImGui::InpuText("Name", (char*)name, sizeof(name));
+
+	for (auto& component : components)
+	{
+		component->DrawProperties();
+	}
 }
 
 void GameObject::DrawHierarchy(GameObject* goSelected) 
