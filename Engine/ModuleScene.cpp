@@ -46,7 +46,7 @@ void ModuleScene::DrawHierarchy()
 	root->DrawHierarchy(goSelected);
 }
 
-GameObject* ModuleScene::CreateGameObject(const char* goName, const aiMatrix4x4& transform, GameObject* goParent) 
+GameObject* ModuleScene::CreateGameObject(const char* goName, GameObject* goParent, const aiMatrix4x4& transform)
 {
 	GameObject* gameObject = nullptr;
 
@@ -74,14 +74,14 @@ GameObject* ModuleScene::CreateGameObject(const char* goName, const aiMatrix4x4&
 		{
 			childName += goParent->name;
 
-			gameObject = new GameObject(childName.c_str(), goParent);
+			gameObject = new GameObject(childName.c_str(), transform, goParent);
 			goParent->goChilds.push_back(gameObject);
 		}
 		else 
 		{
 			childName += root->name;
 
-			gameObject = new GameObject(childName.c_str(), root);
+			gameObject = new GameObject(childName.c_str(), transform, root);
 			root->goChilds.push_back(gameObject);
 		}
 	}
@@ -89,45 +89,4 @@ GameObject* ModuleScene::CreateGameObject(const char* goName, const aiMatrix4x4&
 	return gameObject;
 }
 
-GameObject* ModuleScene::CreateGameObject(const char* goName, GameObject* goParent) 
-{
-	GameObject* gameObject = nullptr;
 
-	if (goName != nullptr) 
-	{
-		gameObject = new GameObject(goName);
-
-		if (goParent != nullptr) 
-		{
-			gameObject->parent = goParent;
-			goParent->goChilds.push_back(gameObject);
-		}
-		else 
-		{
-			gameObject->parent = root;
-			root->goChilds.push_back(gameObject);
-		}
-	}
-	else
-	{
-		std::string childName = "MyParentIs";
-
-		if (goParent != nullptr) 
-		{
-			childName += goParent->name;
-
-			gameObject = new GameObject(childName.c_str(), goParent);
-			goParent->goChilds.push_back(gameObject);
-		}
-		else 
-		{
-			childName += root->name;
-
-			gameObject = new GameObject(childName.c_str(), root);
-			root->goChilds.push_back(gameObject);
-		}
-
-	}
-
-	return gameObject;
-}
