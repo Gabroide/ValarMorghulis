@@ -8,10 +8,12 @@
 
 #include "glew-2.1.0\include\GL\glew.h"
 
-#include "Math\float3.h"
-#include "Math\float4.h"
-#include "Math\Quat.h"
-
+#include "MathGeoLib.h"
+/*
+"Math/float3.h"
+"Math/float4.h"
+"Math/Quat.h"
+*/
 #include "assimp\cimport.h"
 #include "assimp\postprocess.h"
 #include "assimp\scene.h"
@@ -27,16 +29,16 @@ public:
 	ModuleSceneLoader();
 	~ModuleSceneLoader();
 
-	bool		Start();
+	bool Start();
 
 	void		LoadFile(const char* path);
 	void		LoadScene(const aiScene* scene);
 	
 public:
-	GameObject*	ProcessNode(const aiNode* node, const aiScene* scene, const aiMatrix4x4 &parentTransform, GameObject* parent);
+	GameObject*	ProcessTree(const aiNode* node, const aiScene* scene, const aiMatrix4x4 &parentTransform, GameObject* parent);
 
 public:
-	const char *filepath = nullptr;
+	const char* filepath = nullptr;
 
 };
 
