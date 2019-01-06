@@ -20,6 +20,7 @@ public:
 
 	void			ComputeMaterial(const aiMaterial* material);
 	void			DeleteTexture();
+	void			DrawProperties();
 
 	unsigned		GetShader() const;
 
