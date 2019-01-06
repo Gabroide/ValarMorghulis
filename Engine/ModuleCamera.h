@@ -5,6 +5,8 @@
 #include "Globals.h"
 #include "Point.h"
 #include "GameObject.h"
+#include "ComponentMesh.h"
+#include "ComponentTransform.h"
 
 #include "SDL\include\SDL.h"
 

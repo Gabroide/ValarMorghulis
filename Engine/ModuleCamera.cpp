@@ -1,13 +1,12 @@
-
+#include "ModuleCamera.h"
 #include "Globals.h"
 #include "Application.h"
 #include "ModuleInput.h"
 #include "ModuleWindow.h"
 #include "ModuleRender.h"
 #include "ModuleEditor.h"
-#include "ModuleCamera.h"
 
-// Construcor
+// Constructor
 ModuleCamera::ModuleCamera() 
 {
 	
@@ -29,7 +28,8 @@ bool ModuleCamera::Init()
 
 update_status ModuleCamera::PreUpdate() 
 {
-	if (App->editor->SceneFocused()) {
+	if (App->editor->SceneFocused()) 
+	{
 
 		if (App->input->GetMouseButtonDown(SDL_BUTTON_RIGHT) == KEY_REPEAT) 
 		{
@@ -119,7 +119,6 @@ void ModuleCamera::MoveCamera(CameraMovement cameraSide)
 	case Backwards:
 		cameraPos -= front * normMoveSpeed;
 		break;
-
 	default:
 		break;
 	}
@@ -182,22 +181,40 @@ void ModuleCamera::Zoom()
 		App->renderer->frustum.verticalFov = newAngleFov;
 		App->renderer->frustum.horizontalFov = 2.0f * atanf(tanf(newAngleFov * 0.5f) * ((float)App->window->width / (float)App->window->height));
 	}
+
 }
 
 void ModuleCamera::FocusSelectedObject() 
 {
-	if (goSelected == nullptr)
+	if (goSelected == nullptr) 
 	{
 		front = (cameraPos - math::float3(0.0f, 0.0f, 0.0f)).Normalized();
 	}
-	else
+	else 
 	{
-		while (goSelected->boundingBox.ClosestPoint(cameraPos).Equals(cameraPos))
+		Component* component = goSelected->GetComponent(ComponentType::MESH);
+		
+		if (component != nullptr) 
 		{
-			cameraPos = cameraPos.Mul(2.0f);
-		}
+			ComponentMesh* meshComponent = (ComponentMesh*)component;
 
-		front = (goSelected->boundingBox.CenterPoint() - cameraPos).Normalized();
+			while (meshComponent->bbox.ClosestPoint(cameraPos).Equals(cameraPos)) 
+			{
+				cameraPos = cameraPos.Mul(2.0f);
+			}
+
+			front = (meshComponent->bbox.CenterPoint() - cameraPos).Normalized();
+		}
+		else 
+		{
+			component = goSelected->GetComponent(ComponentType::TRANSFORM);
+			
+			if (component != nullptr) 
+			{
+				ComponentTransform* transformComponent = (ComponentTransform*)component;
+				front = (transformComponent->position - cameraPos).Normalized();
+			}
+		}
 	}
 
 	App->renderer->LookAt(cameraPos, (cameraPos + front));
@@ -206,7 +223,7 @@ void ModuleCamera::FocusSelectedObject()
 
 void ModuleCamera::UpdatePitchYaw() 
 {
-	pitch = -math::RadToDeg(asinf(-front.y));
+	pitch = -math::RadToDeg(sinf(-front.y));
 	yaw = math::RadToDeg(atan2f(front.z, front.x)) + 90.0f;
 
 	if (math::IsNan(pitch))
