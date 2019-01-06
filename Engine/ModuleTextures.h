@@ -3,14 +3,13 @@
 
 #include "Module.h"
 #include "Globals.h"
+#include "Model.h"
 
 #include "glew-2.1.0\include\GL\glew.h"
 
 #include "IMGUI\imgui.h"
 
 #include "DevIL\include\IL\ilut.h"
-
-struct Texture;
 
 class ModuleTextures : public Module
 {
@@ -21,19 +20,17 @@ public:
 	bool			Init() override;
 	
 	void			DrawGUI();
+	void			CreateComponentTexture();
 
-	Texture const   Load(const char* path);
+public:
+	Texture* const   Load(const char* path);
 	
 public:
-	bool			anisotropic_filter	= false;
 	bool			mipmaping			= false;
-
-	int				pixelDepth			= 0;
-	int				height				= 0;
-	int				format				= 0;
-	int				width				= 0;
+	
 	int				filterType			= GL_LINEAR;
-	int				wrapMode			= 0;
+	int				mipMapMode			= GL_NEAREST_MIPMAP_NEAREST;
+	int				wrapMode			= GL_CLAMP;
 
 };
 
