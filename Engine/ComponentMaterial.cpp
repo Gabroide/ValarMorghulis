@@ -4,6 +4,11 @@
 #include "ModuleProgram.h"
 
 // Constructor
+ComponentMaterial::ComponentMaterial(GameObject* goContainer) : Component(goContainer, ComponentType::MATERIAL)
+{
+	this->shader = App->program->textureProgram;
+}
+
 ComponentMaterial::ComponentMaterial(GameObject* goContainer, const aiMaterial* material) : Component(goContainer, ComponentType::MATERIAL) 
 {
 	this->shader = App->program->textureProgram;

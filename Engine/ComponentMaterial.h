@@ -3,7 +3,7 @@
 
 #include "assert.h"
 #include "Component.h"
-#include "Model.h"
+#include "ModuleTetures.h"
 
 #include "glew-2.1.0\include\GL\glew.h"
 
@@ -14,6 +14,7 @@
 class ComponentMaterial : public Component
 {
 public:
+	ComponentMaterial(GameObject* goContainer);
 	ComponentMaterial(GameObject* goContainer, const aiMaterial* material);
 	~ComponentMaterial();
 
