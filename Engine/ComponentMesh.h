@@ -1,10 +1,23 @@
 #ifndef __ComponentMesh_h__
 #define __ComponentMesh_h__
 
-#include "Mesh.h"
+#include <vector>
 #include "assert.h"
+
 #include "Component.h"
-#include "Model.h"
+#include "ModuleTextures.h"
+
+#include "glew-2.1.0\include\GL\glew.h"
+
+#include "MathGeoLib.h"
+/*
+"Geometry\AABB.h"
+"Math\float3.h"
+"Math\Quat.h"
+*/
+
+#include "Assimp\mesh.h"
+
 
 class ComponentMesh : public Component
 {
@@ -15,6 +28,7 @@ public:
 	void						ComputeMesh(aiMesh* mesh);
 	void						CleanUp();
 	void						Draw(unsigned shaderProgram, const Texture* texture) const;
+	void						DrawProperties();
 
 	const unsigned				MaterialIndex();
 
