@@ -233,7 +233,6 @@ void ModuleRender::ModelTransform(unsigned programUsed)
 	glUniformMatrix4fv(modelLocation, 1, GL_TRUE, &model[0][0]);
 }
 
-// We avoid the viewMatrix calc if camera not moving
 math::float4x4 ModuleRender::LookAt(math::float3& cameraPos, math::float3& target) 
 {
 	math::float3 front(target - cameraPos); front.Normalize();
@@ -259,7 +258,7 @@ void ModuleRender::InitFrustum()
 	frustum.front = -float3::unitZ;
 	frustum.up = float3::unitY;
 	frustum.nearPlaneDistance = 0.1f;
-	frustum.farPlaneDistance = 100.0f;
+	frustum.farPlaneDistance = 1000.0f;
 	frustum.verticalFov = math::pi / 4.0f;
 	frustum.horizontalFov = 2.f * atanf(tanf(frustum.verticalFov * 0.5f) * ((float)App->window->width / (float)App->window->height));
 }
