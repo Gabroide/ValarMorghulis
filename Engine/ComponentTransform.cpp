@@ -1,15 +1,28 @@
 #include "ComponentTransform.h"
 
+
 // Constructor
 ComponentTransform::ComponentTransform(GameObject* goContainer, const aiMatrix4x4& transform) : Component(goContainer, ComponentType::TRANSFORM) 
 {
 	AddTransform(transform);
 }
 
-// Destructor
-ComponentTransform::~ComponentTransform() { }
+// Constructor
+ComponentTransform::ComponentTransform(ComponentTransform* duplicatedTransform) 
+{
+	position = duplicatedTransform->position;
+	scale = duplicatedTransform->scale;
+	rotation = duplicatedTransform->rotation;
+	RotationToEuler();
+}
 
-void ComponentTransform::AddTransform(const aiMatrix4x4 & transform) 
+// Destructor
+ComponentTransform::~ComponentTransform() 
+{
+
+}
+
+void ComponentTransform::AddTransform(const aiMatrix4x4& transform) 
 {
 	aiVector3D translation;
 	aiVector3D scaling;
@@ -22,7 +35,7 @@ void ComponentTransform::AddTransform(const aiMatrix4x4 & transform)
 	RotationToEuler();
 }
 
-void ComponentTransform::SetRotation(const Quat & rot) 
+void ComponentTransform::SetRotation(const Quat& rot) 
 {
 	rotation = rot;
 	RotationToEuler();
@@ -36,7 +49,24 @@ void ComponentTransform::RotationToEuler()
 	eulerRotation.z = math::RadToDeg(eulerRotation.z);
 }
 
-void ComponentTransform::SetPosition(const float3 & pos) 
+void ComponentTransform::SetPosition(const float3& pos) 
 {
 	position = pos;
+}
+
+void ComponentTransform::DrawProperties() 
+{
+	if (ImGui::CollapsingHeader("Local Transformation")) 
+	{
+		ImGui::DragFloat3("Position", (float*)&position, 0.1f, -1000.f, 1000.f);
+
+		ImGui::DragFloat3("Rotation", (float*)&eulerRotation, 0.5f, -180, 180.f);
+
+		rotation = rotation.FromEulerXYZ(math::DegToRad(eulerRotation.x),
+			math::DegToRad(eulerRotation.y), math::DegToRad(eulerRotation.z));
+
+		ImGui::DragFloat3("Scale", (float*)&scale, 0.1f, 0.01f, 100.f);
+
+		ImGui::Separator();
+	}
 }
