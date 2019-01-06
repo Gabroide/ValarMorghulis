@@ -2,8 +2,8 @@
 #define __ComponentMesh_h__
 
 #include <vector>
-#include "assert.h"
 
+#include "assert.h"
 #include "Component.h"
 #include "ModuleTextures.h"
 
@@ -11,42 +11,43 @@
 
 #include "MathGeoLib.h"
 /*
-"Geometry\AABB.h"
-"Math\float3.h"
-"Math\Quat.h"
+#include "Geometry\AABB.h"
+#include "Math\float3.h"
+#include "Math\Quat.h"
 */
 
-#include "Assimp\mesh.h"
-
+#include "assimp\mesh.h"
 
 class ComponentMesh : public Component
 {
 public:
 	ComponentMesh(GameObject* goContainer, aiMesh* mesh);
+	ComponentMesh(ComponentMesh* duplicatedComponent);
 	~ComponentMesh();
 
-	void						ComputeMesh(aiMesh* mesh);
-	void						CleanUp();
-	void						Draw(unsigned shaderProgram, const Texture* texture) const;
-	void						DrawProperties();
-
-	const unsigned				MaterialIndex();
+	void			CleanUp();
+	void			Draw(unsigned shaderProgram, const Texture* textures) const;
+	void			DrawProperties() override;
+	void			ComputeMesh(aiMesh* mesh);
+	
+	const unsigned	MaterialIndex();
 
 public:
-	int							numIndices		= 0;
-	int							materialIndex	= 0;
+	
+	int							numIndices = 0;
+	int							materialIndex = 0;
 	
 	AABB						bbox;
 
 	std::vector<math::float3>	vertices;
 	
 public:
-	const char*					name			= nullptr;
+	const char*					name = nullptr;
 
 private:
-	unsigned					vao				= 0u;
-	unsigned					vbo				= 0u;
-	unsigned					ibo				= 0u;
+	unsigned					vao = 0u;
+	unsigned					vbo = 0u;
+	unsigned					ibo = 0u;
 
 };
 

@@ -2,16 +2,22 @@
 #include "Application.h"
 
 // Constructor
-ComponentMesh::ComponentMesh(GameObject* goContainer, aiMesh* mesh) : Component(goContainer, ComponentType::MESH)
+ComponentMesh::ComponentMesh(GameObject* goContainer, aiMesh* mesh) : Component(goContainer, ComponentType::MESH) 
 {
-	if (mesh != nullptr)
+	if (mesh != nullptr) 
 	{
-		computeMesh(mesh);
+		ComputeMesh(mesh);
 	}
 }
 
+// Constructor
+ComponentMesh::ComponentMesh(ComponentMesh* duplicatedComponent) : Component(duplicatedComponent->goContainer, ComponentType::MESH) 
+{
+
+}
+
 // Destructor
-ComponentMesh::~ComponentMesh()
+ComponentMesh::~ComponentMesh() 
 {
 	CleanUp();
 }
@@ -78,8 +84,6 @@ void ComponentMesh::ComputeMesh(aiMesh* mesh)
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-	name = mesh->mName.C_Str();
-
 	bbox.SetNegativeInfinity();
 	bbox.Enclose((float3*)mesh->mVertices, mesh->mNumVertices);
 
@@ -115,7 +119,7 @@ void ComponentMesh::Draw(unsigned shaderProgram, const Texture* texture) const
 {
 	glActiveTexture(GL_TEXTURE0);
 
-	if (texture != nullptr)
+	if (texture != nullptr) 
 	{
 		glBindTexture(GL_TEXTURE_2D, texture->id);
 	}
@@ -132,10 +136,8 @@ void ComponentMesh::Draw(unsigned shaderProgram, const Texture* texture) const
 void ComponentMesh::DrawProperties() 
 {
 	ImGui::PushID(this);
-	
-	if (ImGui::CollapsingHeader("Mesh")) 
+	if (ImGui::CollapsingHeader("Mesh"))
 	{
-
 		bool removed = Component::DrawComponentState();
 		
 		if (removed) 
