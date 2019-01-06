@@ -13,15 +13,21 @@ GameObject::GameObject()
 
 }
 
-GameObject::GameObject(const char* goName, const aiMatrix4x4& transform)
+GameObject::GameObject(const char* goName, const aiMatrix4x4& transform, const char* fileLocation)
 {
 	if (goName != nullptr)
 	{
-		this->name = goName;
+		std::string cpName(goName);
+		name = cpName.c_str();
 	}
 	else
 	{
-		this->name = "GameObject";
+		name = "GameObject";
+	}
+
+	if (fileLocation != nullptr)
+	{
+		filePath = fileLocation;
 	}
 
 	this->parent = App->scene->root;
@@ -30,11 +36,12 @@ GameObject::GameObject(const char* goName, const aiMatrix4x4& transform)
 	App->scene->root->goChilds.push_back(this);
 }
 
-GameObject::GameObject(const char* goName, const aiMatrix4x4 transform, GameObject* goParent)
+GameObject::GameObject(const char* goName, const aiMatrix4x4 transform, GameObject* goParent, const char* fileLocation)
 {
 	if (goName != nullptr)
 	{
-		this->name = goName;
+		std::string cpName(goName);
+		name = cpName.c_str;
 	}
 	else
 	{
@@ -51,6 +58,11 @@ GameObject::GameObject(const char* goName, const aiMatrix4x4 transform, GameObje
 		this->parent = App->scene->root;
 		App->scene->root->goChilds.push_back;
 
+	}
+
+	if (fileLocation != nullptr)
+	{
+		filePath = fileLocation;
 	}
 }
 
@@ -143,7 +155,7 @@ Component* GameObject::AddComponent(ComponentType type)
 		break;
 
 	case ComponentType::TRANSFORM:
-		Component = new ComponentTransform(this);
+		component = new ComponentTransform(this, ai;atrix4x4());
 		transform = (ComponentTransform*)component;
 		break;
 
@@ -152,7 +164,7 @@ Component* GameObject::AddComponent(ComponentType type)
 		break;
 
 	case ComponentType::;MATERIAL:
-		component = new ComponentMaterial(this, nullptr);
+		component = new ComponentMaterial(this);
 		break;
 
 	case ComponentType::AUDIO:
@@ -175,7 +187,7 @@ void GameObject::RemoveComponent(Component* component)
 {
 	assert(component != nullptr);
 
-	for (std::list<Component*>::interator it = components.begin(); it != components.end(); ++it)
+	for (std::list<Component*>::iterator it = components.begin(); it != components.end(); ++it)
 	{
 		if ((*it) == component)
 		{
