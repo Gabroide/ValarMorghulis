@@ -17,7 +17,8 @@ ModuleEditor::ModuleEditor()
 	docks.push_back(config = new DockConfig());
 	docks.push_back(scene = new DockScene());
 	docks.push_back(about = new DockAbout());
-	docks.push_back(hierarchy = new DockHiearchy);
+	docks.push_back(hierarchy = new DockHierarchy);
+	docks.push_back(inspector = new DockInspector);
 }
 
 // Destructor
