@@ -60,11 +60,12 @@ GameObject::GameObject(GameObject* duplicateGameObject)
 	char* copyName = newchar[strlen(duplicateGameObject->name)];
 	strcpy(copyName, duplicateGameObject->name);
 	name = copyName;
+	
 	for (auto &component : duplicateGameObject->components) 
 	{
 		Component* duplicatedComponent = nullptr;
 		
-		switch (component->componentType) 
+	/*	switch (component->componentType) 
 		{
 		case ComponentType::TRANSFORM:
 			transform = new ComponentTransform((ComponentTransform*)component);
@@ -79,13 +80,20 @@ GameObject::GameObject(GameObject* duplicateGameObject)
 			duplicatedComponent = new ComponentMesh((ComponentMesh*)component);
 			components.push_back(duplicatedComponent);
 			break;
-		}	
+		}*/
+		components.push_back(duplicatedComponent);
+
+		if (duplicatedComponent->componenType == ComponentType::TRANSFORM)
+		{
+			transform = (ComponentTransform*)duplicatedComponent;
+
+		}
 	}
 
 	for (auto& child : duplicateGameObject->goChilds)
 	{
 		GameObject* duplicateChild = new GameObject(child);
-		duplicateChild->parent = duplicateGameObject->parent;
+		duplicateChild->parent = this;
 		goChilds.push_back(duplicateChild);
 	}
 
@@ -98,8 +106,7 @@ GameObject::~GameObject()
 {
 	for (auto &component : components) 
 	{
-		delete component;
-		component = nullptr;
+		RemoveComponent(component);
 	}
 	
 	components.clear();
@@ -110,11 +117,8 @@ GameObject::~GameObject()
 		child = nullptr;
 	}
 
-	delete transform;
 	transform = nullptr;
-	delete parent;
 	parent = nullptr;
-	delete name;
 	name = nullptr;
 }
 

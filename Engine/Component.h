@@ -20,6 +20,7 @@ class Component
 {
 public:
 	Component(GameObject* goContainer, ComponentType type);
+	Component(const Component& duplicateComponent);
 	virtual ~Component();
 
 	virtual void	 Update();

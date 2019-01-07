@@ -51,10 +51,11 @@ public:
 	Component*				GetComponent(ComponentType type) const;
 	
 public:
-	bool					enabled = true;
-	bool					drawGOBBox = false;
-	bool					drawChildsBBox = false;
-	bool					duplicating = false;
+	bool					enabled			= true;
+	bool					drawGOBBox		= false;
+	bool					drawChildsBBox	= false;
+	bool					duplicating		= false;
+	void					toBeDeleted		= false;
 
 	std::vector<Component*>	components;
 	std::list<GameObject*>	goChilds;
