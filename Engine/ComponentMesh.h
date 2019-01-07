@@ -22,7 +22,7 @@ class ComponentMesh : public Component
 {
 public:
 	ComponentMesh(GameObject* goContainer, aiMesh* mesh);
-	ComponentMesh(ComponentMesh* duplicatedComponent);
+	ComponentMesh(const ComponentMesh& duplicatedComponent);
 	~ComponentMesh();
 
 	void			CleanUp();

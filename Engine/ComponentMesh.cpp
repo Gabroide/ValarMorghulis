@@ -11,17 +11,17 @@ ComponentMesh::ComponentMesh(GameObject* goContainer, aiMesh* mesh) : Component(
 }
 
 // Constructor
-ComponentMesh::ComponentMesh(ComponentMesh* duplicatedComponent) : Component(duplicatedComponent->goContainer, ComponentType::MESH) 
+ComponentMesh::ComponentMesh(const ComponentMesh& duplicatedComponent) : Component(duplicatedComponent) 
 {
-	vao = duplicatedComponent->vao;
-	vbo = duplicatedComponent->vbo;
-	ibo = duplicatedComponent->ibo;
-	materialIndex = duplicatedComponent->materialIndex;
-	numIndices = duplicatedComponent->numIndices;
+	vao = duplicatedComponent.vao;
+	vbo = duplicatedComponent.vbo;
+	ibo = duplicatedComponent.ibo;
+	materialIndex = duplicatedComponent.materialIndex;
+	numIndices = duplicatedComponent.numIndices;
 	
-	vertices.reserve(duplicatedComponent->vertices.capacity());
-	vertices = duplicatedComponent->vertices;
-	bbox = duplicatedComponent->bbox;
+	vertices.reserve(duplicatedComponent.vertices.capacity());
+	vertices = duplicatedComponent.vertices;
+	bbox = duplicatedComponent.bbox;
 }
 
 // Destructor
