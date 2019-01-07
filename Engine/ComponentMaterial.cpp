@@ -16,10 +16,10 @@ ComponentMaterial::ComponentMaterial(GameObject* goContainer, const aiMaterial* 
 }
 
 // Constructor
-ComponentMaterial::ComponentMaterial(ComponentMaterial* duplicatedComponent) : Component(duplicatedComponent->goContainer, ComponentType::MATERIAL) 
+ComponentMaterial::ComponentMaterial(const ComponentMaterial& duplicatedComponent) : Component(duplicatedComponent) 
 {
-	shader = duplicatedComponent->shader;
-	texture = duplicatedComponent->GetTexture();
+	shader = duplicatedComponent.shader;
+	texture = duplicatedComponent.texture();
 }
 
 // Destructor
