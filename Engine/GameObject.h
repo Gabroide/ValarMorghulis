@@ -32,7 +32,7 @@ public:
 
 	void					Update() override;
 	void					Draw() const;
-	void					DrawProperties() const;
+	void					DrawProperties();
 	void					DrawHierarchy(GameObject* goSelected);
 	void					DrawBBox() const;
 	void					RemoveComponent(Component* component);

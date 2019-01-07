@@ -57,6 +57,9 @@ GameObject::GameObject(const char* goName, const aiMatrix4x4& transform, GameObj
 // Constructor
 GameObject::GameObject(GameObject* duplicateGameObject) 
 {
+	char* copyName = newchar[strlen(duplicateGameObject->name)];
+	strcpy(copyName, duplicateGameObject->name);
+	name = copyName;
 	for (auto &component : duplicateGameObject->components) 
 	{
 		Component* duplicatedComponent = nullptr;
@@ -64,19 +67,30 @@ GameObject::GameObject(GameObject* duplicateGameObject)
 		switch (component->componentType) 
 		{
 		case ComponentType::TRANSFORM:
-			ComponentTransform* duplicatedComponent = new ComponentTransform((ComponentTransform*)component);
+			transform = new ComponentTransform((ComponentTransform*)component);
 			break;
 
 		case ComponentType::MATERIAL:
-			ComponentMaterial* duplicatedComponent = new ComponentMaterial((ComponentMaterial*)component);
+			duplicatedComponent = new ComponentMaterial((ComponentMaterial*)component);
+			components.push_back(duplicatedComponent);
 			break;
 
 		case ComponentType::MESH:
+			duplicatedComponent = new ComponentMesh((ComponentMesh*)component);
+			components.push_back(duplicatedComponent);
 			break;
-		}
-
-		components.push_back(duplicatedComponent);
+		}	
 	}
+
+	for (auto& child : duplicateGameObject->goChilds)
+	{
+		GameObject* duplicateChild = new GameObject(child);
+		duplicateChild->parent = duplicateGameObject->parent;
+		goChilds.push_back(duplicateChild);
+	}
+
+	filePath = duplicateGameObject->filePath;
+	bbox = duplicateGameObject->bbox;
 }
 
 // Destructor
@@ -106,15 +120,12 @@ GameObject::~GameObject()
 
 void GameObject::Update() 
 {
-	for (const auto &child : goChilds) 
+	if (enabled)
 	{
-		child->Update();
-	}
-
-	if (duplicating) 
-	{
-		duplicating = false;
-		GameObject* duplicatedGO = new GameObject(this);
+		for (const auto &child : goChilds)
+		{
+			child->Update();
+		}
 	}
 }
 
@@ -179,11 +190,13 @@ void GameObject::Draw() const
 }
 
 
-void GameObject::DrawProperties() const 
+void GameObject::DrawProperties() 
 {
 	assert(name != nullptr);
 
 	ImGui::InputText("Name", (char*)name, 30.0f);
+	ImGui::SameLine();
+	ImGui::Checkbox("Enabled", &enabled);
 
 	for (auto &component : components) 
 	{
@@ -227,7 +240,7 @@ void GameObject::DrawHierarchy(GameObject* goSelected)
 		
 		if (ImGui::Selectable("Duplicate")) 
 		{
-			duplicating = true;
+			App->scene->DuplicateGO(App->scene->goSelected);
 		}
 		
 		if (ImGui::Selectable("Remove")) 
