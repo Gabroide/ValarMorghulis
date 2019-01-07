@@ -27,10 +27,12 @@ public:
 
 public:
 	GameObject*		CreateGameObject(const char* goName, GameObject* goParent, const aiMatrix4x4& transform, const char* fileLocation);
+	GameObject*		duplicateGO(GameObject* goToDuplicate);
 
 public:
 	GameObject*		root		= nullptr;
 	GameObject*		goSelected	= nullptr;
+
 };
 
 #endif // __ModuleScene_h__
