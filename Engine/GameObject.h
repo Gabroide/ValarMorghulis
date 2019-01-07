@@ -30,7 +30,8 @@ public:
 	GameObject(GameObject* duplicateGameObject);
 	~GameObject();
 
-	void					Update() override;
+	void					CleanUp();
+	void					Update();
 	void					Draw() const;
 	void					DrawProperties();
 	void					DrawHierarchy(GameObject* goSelected);
@@ -55,7 +56,10 @@ public:
 	bool					drawGOBBox		= false;
 	bool					drawChildsBBox	= false;
 	bool					duplicating		= false;
-	void					toBeDeleted		= false;
+	bool					toBeDeleted		= false;
+	bool					toBeCopied		= false;
+
+	AABB&					bbox			= AABB();
 
 	std::vector<Component*>	components;
 	std::list<GameObject*>	goChilds;
@@ -67,9 +71,6 @@ public:
 	GameObject*				parent = nullptr;
 	
 	ComponentTransform*		transform = nullptr;
-
-public:
-	AABB&					bbox = AABB();
 
 };
 

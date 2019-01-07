@@ -64,23 +64,6 @@ GameObject::GameObject(GameObject* duplicateGameObject)
 	for (auto &component : duplicateGameObject->components) 
 	{
 		Component* duplicatedComponent = nullptr;
-		
-	/*	switch (component->componentType) 
-		{
-		case ComponentType::TRANSFORM:
-			transform = new ComponentTransform((ComponentTransform*)component);
-			break;
-
-		case ComponentType::MATERIAL:
-			duplicatedComponent = new ComponentMaterial((ComponentMaterial*)component);
-			components.push_back(duplicatedComponent);
-			break;
-
-		case ComponentType::MESH:
-			duplicatedComponent = new ComponentMesh((ComponentMesh*)component);
-			components.push_back(duplicatedComponent);
-			break;
-		}*/
 		components.push_back(duplicatedComponent);
 
 		if (duplicatedComponent->componenType == ComponentType::TRANSFORM)
@@ -107,6 +90,7 @@ GameObject::~GameObject()
 	for (auto &component : components) 
 	{
 		RemoveComponent(component);
+		component = nullptr;
 	}
 	
 	components.clear();
@@ -117,6 +101,7 @@ GameObject::~GameObject()
 		child = nullptr;
 	}
 
+	goChilds.clear;
 	transform = nullptr;
 	parent = nullptr;
 	name = nullptr;
@@ -124,11 +109,19 @@ GameObject::~GameObject()
 
 void GameObject::Update() 
 {
-	if (enabled)
+	for (std::list<GameObject*>::iterator itChild = goChilds.begin(); itChild != goChilds.and; ++itChild)
 	{
-		for (const auto &child : goChilds)
+		(*itChild)->Update();
+
+		if((*itChild)->toBeDeleted)
 		{
-			child->Update();
+			(*itChild)->Update() = false;
+			(*itChild)->CleanUp();
+			(*itChild).erase(itChild++)
+		}
+		else
+		{
+			++itChild;
 		}
 	}
 }
@@ -193,6 +186,13 @@ void GameObject::Draw() const
 	glUseProgram(0);
 }
 
+void GameObject::CleanUp()
+{
+	for (auto& child : goChilds)
+	{
+		child.leanUp();
+	}
+}
 
 void GameObject::DrawProperties() 
 {
@@ -249,7 +249,12 @@ void GameObject::DrawHierarchy(GameObject* goSelected)
 		
 		if (ImGui::Selectable("Remove")) 
 		{
-		
+			toBeDeleted = true;
+
+			if (App->scene->goSelected == this)
+			{
+				App->scene->goSelected = nullptr;
+			}
 		}
 	
 		ImGui::EndPopup();
