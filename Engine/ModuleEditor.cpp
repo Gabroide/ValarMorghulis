@@ -66,9 +66,37 @@ update_status ModuleEditor::Update()
 				ImGui::End();
 				ImGui::EndFrame();
 			
-				return UPDATE_ERROR;
+				return UPDATE_STOP	;
 			}
 		
+			ImGui::EndMenu();
+		}
+
+		if (ImGui::BeginMenu("Edit"))
+		{
+			if (ImGui::BeginMenu("Add"))
+			{
+				if (ImGui::BeinMenu("Empty Game Object"))
+				{
+					new GameObject(DEFAULT_GO_NAME, aiMatrix4x4(), nullptr);
+				}
+				if (ImGui::BeginMenu("Sphere"))
+				{
+
+				}
+				if (ImGui::BeginMenu("Cube"))
+				{
+
+				}
+
+				if (ImGui::BeginMenu("Torus"))
+				{
+
+				}
+
+				ImGui::EndMenu();
+			}
+
 			ImGui::EndMenu();
 		}
 
@@ -77,6 +105,16 @@ update_status ModuleEditor::Update()
 			if (ImGui::MenuItem("Scene", NULL, scene->IsEnabled())) 
 			{
 				scene->ToggleEnabled();
+			}
+
+			if (ImGui::BeginMenu("Hierarchy", NULL, hierarchy->IsEnabled()))
+			{
+				hierarchy->ToggleEnabled();
+			}
+
+			if (ImGui::BeginMenu("Time", Null, time->IsEnabled()))
+			{
+				time->ToggleEnabled();
 			}
 
 			if (ImGui::MenuItem("Logs", NULL, console->IsEnabled())) 
