@@ -190,7 +190,9 @@
     <ClCompile Include="ModuleTime.cpp">
       <Filter>Modules\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ModuleResourceManager.cpp" />
+    <ClCompile Include="ModuleResourceManager.cpp">
+      <Filter>Modules\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MathGeoLib\include\Geometry\AABB.h">
@@ -472,7 +474,18 @@
     <ClInclude Include="ModuleTime.h">
       <Filter>Modules\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ModuleResourceManager.h" />
+    <ClInclude Include="debug_draw.hpp">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="debugdraw.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="par_shapes.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="ModuleResourceManager.h">
+      <Filter>Modules\Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="MathGeoLib">
