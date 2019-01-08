@@ -1,29 +1,70 @@
 #ifndef __Timer_h__
 #define __Timer_h__
 
+#include "SDL\include\SDL.h"
+
 class Timer
 {
 public:
-	Timer();
-	~Timer();
+	bool	running		= false;
 
-	// Timer in miliseconds
-	void	Start();
-	void	StartPrecise();
-
-
-	int		Read();
-	int		Stop();
-	int		startTime			= 0;
-	int		timeSpent			= 0;
+private:
+	float	time		= 0.0f;		// Time in milliseconds
 	
-	bool	timerRunning		= false;
-	bool	timerPreciseRunning = false;
+	Uint32	startTicks	= 0;
+	Uint32	skippedTime	= 0;
 
-	double	ReadPrecise();
-	double	StopPrecise();
-	double	startTimePrecise	= 0;
-	double	timeSpentPrecise	= 0;
+public:
+	Timer() 
+	{
+	};
+	
+	~Timer() 
+	{
+	};
+
+	inline void Start() 
+	{
+		startTicks = SDL_GetTicks();
+		running = true;
+	}
+
+	inline float Read() 
+	{
+		if (running)
+		{
+			time = (SDL_GetTicks() - startTicks + skippedTime);
+		}
+		
+		return time;
+	}
+
+	inline float ReadSeconds() 
+	{
+		if (running)
+		{
+			time = (SDL_GetTicks() - startTicks + skippedTime) / 1000.0f;
+		}
+		
+		return time;
+	}
+
+	inline void Pause() 
+	{
+		skippedTime += (SDL_GetTicks() - startTicks);
+		running = false;
+	}
+
+	inline void Stop() 
+	{
+		running = false;
+	}
+
+	inline void Reset() 
+	{
+		startTicks = SDL_GetTicks();
+		skippedTime = 0;
+	}
 
 };
 
