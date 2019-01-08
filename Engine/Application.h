@@ -5,7 +5,6 @@
 
 #include "Globals.h"
 #include "Module.h"
-#include "Timer.h"
 
 class ModuleRender;
 class ModuleWindow;
@@ -30,7 +29,6 @@ public:
 
 	update_status		Update();
 	
-	void				PreUpdate();
 	void				FinishUpdate();
 
 public:
@@ -45,23 +43,7 @@ public:
 	ModuleScene*		scene				= nullptr;
 	ModuleSceneLoader*	loader				= nullptr;
 
-
-public:
-	bool				gamePaused			= false;
-	bool				gameModeEnabled		= false;
-	bool				counting			= false;
-
-	float				deltaTime			= 0.0f;
-	float				gameDeltaTime		= 0.0f;
-
-	int					frameRateCap		= 60;
-	int					gameFrameRateCap	= 60;
-
-	Timer				gameTime;
-
 private:
-	Timer				msTimer;
-	
 	std::list<Module*>	modules;
 
 };
