@@ -10,8 +10,14 @@ public:
 	DockInspector();
 	~DockInspector();
 
-	void Draw() override;
+	void	Draw() override;
+
+public:
+	void	Focus(GameObject* gameobject);
+
+private:
+	bool	focus = false;
 
 };
 
-#end // __DockInspector_h__
+#endif // __DockInspector_h__
