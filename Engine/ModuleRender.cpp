@@ -5,6 +5,7 @@
 #include "ModuleWindow.h"
 #include "ModuleProgram.h"
 #include "ModuleScene.h"
+#include "debugdraw.h"
 
 // Constructor
 ModuleRender::ModuleRender() 
@@ -149,6 +150,14 @@ void ModuleRender::DrawDebugData()
 	if (showGrid)
 	{
 		dd::xzSquareGrid(-100.0f, 100.0f, 0.0f, 1.0f, math::float3(0.65f, 0.65f, 0.65f));
+	}
+}
+
+void ModuleRender::DrawDebugData()
+{
+	if (showGrid)
+	{
+		dd::xzSquareGrid(-10000.0f, 1000.0f, 0.0f, 1.0f, math::float3(0.65f, 0.65f, 0.65f));
 	}
 }
 

@@ -1,5 +1,5 @@
-#ifndef _DEBUGDRAW_H_
-#define _DEBUGDRAW_H_
+#ifndef __DebugDraw_h__
+#define _DebugDraw_h__
 
 #include "MathGeoLib.h"
 
@@ -19,4 +19,4 @@ typedef       ddMat4x4& ddMat4x4_Out;
 
 #include "debug_draw.hpp"
 
-#endif /* _DEBUGDRAW_H_ */
+#endif // __DebugDraw_h__

@@ -46,6 +46,7 @@ public:
 private:
 	void			DrawReferenceDebug();
 	void			CreateFrameBuffer();
+	void			DrawDebugData();
 
 public:
 	bool			vsyncEnabled	= false;
@@ -62,6 +63,10 @@ public:
 public:
 	void*			context			= nullptr;
 	
+protected:
+	bool			showAxis		= true;
+	bool			showGrid		= true;
+
 protected:
 	bool			showAxis		= true;
 	bool			showGrid		= true;
