@@ -28,7 +28,7 @@ public:
 	bool			Init() override;
 	
 	void			DrawGUI();
-	void			CreateComponentTexture();
+	void			LoadDefaultTexture(const char* path);
 
 public:
 	Texture* const   Load(const char* path);
@@ -39,6 +39,9 @@ public:
 	int				filterType			= GL_LINEAR;
 	int				mipMapMode			= GL_NEAREST_MIPMAP_NEAREST;
 	int				wrapMode			= GL_CLAMP;
+
+public:
+	Texture*		defaukTexture		= nullptr;
 
 };
 

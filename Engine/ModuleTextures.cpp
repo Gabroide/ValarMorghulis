@@ -116,9 +116,9 @@ Texture* const ModuleTextures::Load(const char* path)
 	return nullptr;
 }
 
-void ModuleTextures::CreateComponentTexture() 
+void ModuleTextures::LoadDefaultTexture(const char* path) 
 {
-	
+	defaultTexture = Load(path);
 }
 
 void ModuleTextures::DrawGUI() 

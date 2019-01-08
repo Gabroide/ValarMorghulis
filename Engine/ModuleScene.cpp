@@ -1,11 +1,18 @@
+#include "Application.h"
 #include "ModuleScene.h"
+#include "ModuleInput.h"
 
-// Contructor
-ModuleScene::ModuleScene() { }
+#include "SDL/include/SDL_mouse.h"
+
+// Constructor
+ModuleScene::ModuleScene() 
+{
+	
+}
 
 // Destructor
 ModuleScene::~ModuleScene() 
-{ 
+{
 	
 }
 
@@ -19,11 +26,12 @@ bool ModuleScene::Init()
 
 update_status ModuleScene::Update() 
 {
+	update_status ret = UPDATE_CONTINUE;
+
 	root->Update();
 
-	return UPDATE_CONTINUE;
+	return ret;
 }
-
 
 void ModuleScene::Draw() 
 {
@@ -32,13 +40,28 @@ void ModuleScene::Draw()
 
 void ModuleScene::DrawHierarchy() 
 {
-	for (auto& child : this->root->goChilds)
+	if (App->input->GetMouseButtonDown(SDL_BUTTON_RIGHT) == KEY_DOWN) 
+	{
+		ImGui::OpenPopup("Modify_GameObject");
+	}
+
+	if (ImGui::BeginPopup("Modify_GameObject")) 
+	{
+		if (ImGui::Selectable("Add Empty GameObject")) 
+		{
+			App->scene->CreateGameObject();
+		}
+	
+		ImGui::EndPopup();
+	}
+
+	for (auto &child : root->goChilds) 
 	{
 		child->DrawHierarchy(goSelected);
 	}
 }
 
-GameObject* ModuleScene::CreateGameObject(const char* goName, GameObject* goParent, const aiMatrix4x4& transform, const char* fileLocation)
+GameObject* ModuleScene::CreateGameObject(const char* goName, GameObject* goParent, const aiMatrix4x4& transform, const char* fileLocation) 
 {
 	GameObject* gameObject = nullptr;
 
@@ -47,7 +70,8 @@ GameObject* ModuleScene::CreateGameObject(const char* goName, GameObject* goPare
 		char* go_name = new char[strlen(goName)];
 		strcpy(go_name, goName);
 
-		gameObject = new GameObjec(go_name, transform, goParent, fileLocation);
+		gameObject = new GameObject(go_name, transform, goParent, fileLocation);
+
 	}
 	else 
 	{
@@ -56,15 +80,13 @@ GameObject* ModuleScene::CreateGameObject(const char* goName, GameObject* goPare
 			std::string childName = "ChildOf";
 			childName += goParent->name;
 
-			gameObject = new GameObject(childName.c_str, transform, goParent, fileLocation);
+			gameObject = new GameObject(childName.c_str(), transform, goParent, fileLocation);
 		}
 		else 
 		{
-			gameObject = new GameObject(std::string("GameObject").c_str, transform, root, fileLocation);
+			gameObject = new GameObject(DEFAULT_GO_NAME, transform, goParent, fileLocation);
 		}
 	}
 
 	return gameObject;
 }
-
-

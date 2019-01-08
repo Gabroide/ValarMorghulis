@@ -2,10 +2,13 @@
 #include "Application.h"
 #include "ModuleScene.h"
 #include "ModuleProgram.h"
+#include "ModuleInput.h"
 #include "ComponentLight.h"
 #include "ComponentMaterial.h"
 #include "ComponentMesh.h"
 #include "ComponentTransform.h"
+
+#include "SDL\include\SDL.h"
 
 // Constructor
 GameObject::GameObject() 
@@ -55,13 +58,15 @@ GameObject::GameObject(const char* goName, const aiMatrix4x4& transform, GameObj
 }
 
 // Constructor
-GameObject::GameObject(GameObject* duplicateGameObject) 
+GameObject::GameObject(const GameObject& duplicateGameObject) 
 {
-	char* copyName = newchar[strlen(duplicateGameObject->name)];
-	strcpy(copyName, duplicateGameObject->name);
+	char* copyName = new char[strlen(duplicateGameObject.name)];
+	strcpy(copyName, duplicateGameObject.name);
 	name = copyName;
-	
-	for (auto &component : duplicateGameObject->components) 
+	filePath = duplicateGameObject.filePath;
+	bbox = duplicateGameObject.bbox;
+
+	for (const auto& component : duplicateGameObject.components) 
 	{
 		Component* duplicatedComponent = nullptr;
 		components.push_back(duplicatedComponent);
@@ -73,15 +78,12 @@ GameObject::GameObject(GameObject* duplicateGameObject)
 		}
 	}
 
-	for (auto& child : duplicateGameObject->goChilds)
+	for (const auto& child : duplicateGameObject.goChilds)
 	{
-		GameObject* duplicateChild = new GameObject(child);
+		GameObject* duplicateChild = new GameObject(*child);
 		duplicateChild->parent = this;
 		goChilds.push_back(duplicateChild);
 	}
-
-	filePath = duplicateGameObject->filePath;
-	bbox = duplicateGameObject->bbox;
 }
 
 // Destructor
@@ -102,9 +104,6 @@ GameObject::~GameObject()
 	}
 
 	goChilds.clear;
-	transform = nullptr;
-	parent = nullptr;
-	name = nullptr;
 }
 
 void GameObject::Update() 
@@ -113,11 +112,19 @@ void GameObject::Update()
 	{
 		(*itChild)->Update();
 
+		if ((*itChild)->toBeCopied)
+		{
+			(*itChild)->toBeCopied = false;
+			GameObject* goCopied = new GameObject(**itChild);
+			goCopied->parent = this;
+			goChilds.push_back(goCopied)
+		}
+
 		if((*itChild)->toBeDeleted)
 		{
 			(*itChild)->Update() = false;
 			(*itChild)->CleanUp();
-			(*itChild).erase(itChild++)
+			(*itChild).erase(itChild++);
 		}
 		else
 		{
@@ -155,6 +162,11 @@ void GameObject::Draw() const
 	else 
 	{
 		shader = App->program->textureProgram;
+	}
+
+	if (texture == nullptr)
+	{
+		texture = App->textures->defaultTexture;
 	}
 
 	glUseProgram(shader);
@@ -232,22 +244,25 @@ void GameObject::DrawHierarchy(GameObject* goSelected)
 		drawGOBBox = true;
 	}
 
-	if (ImGui::IsMouseClicked(1) & ImGui::IsMouseHoveringWindow()) 
+	if (ImGui::IsMouseClicked() && App->input->GetMouseButtonDown(SDL_BUTTON_RIGHT) == KEY_DOWN) 
 	{
 		ImGui::OpenPopup("Modify_GameObject");
+		App->scene->goSelected = this;
 	}
 
 	if (ImGui::BeginPopup("Modify_GameObject")) 
 	{
-		ImGui::Text("Modify");
-		ImGui::Separator();
-		
-		if (ImGui::Selectable("Duplicate")) 
+		if (ImGui::Selectable("Add empty GameObject")) 
 		{
-			App->scene->DuplicateGO(App->scene->goSelected);
+			App->scene->CreateGameObject("GameObject", this);
 		}
 		
-		if (ImGui::Selectable("Remove")) 
+		if (ImGui::Selectable("Duplicate") && App->scene->goSelected != nullptr)
+		{
+			toBeCopied = true;
+		}
+
+		if (ImGui::Selectable("Remove") && App->scene->goSelected != nullptr) 
 		{
 			toBeDeleted = true;
 
