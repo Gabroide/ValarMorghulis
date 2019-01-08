@@ -9,11 +9,9 @@
 #include "ModuleProgram.h"
 #include "ModuleTextures.h"
 #include "ModuleInput.h"
+#include "ModuleSceneLoader.h"
 #include "ModuleScene.h"
-#include "MouleSceneLoader.h"
-#include "ModuleDebugDraw.h"
 
-// Constructor
 Application::Application() 
 {
 	modules.push_back(window = new ModuleWindow());
@@ -24,10 +22,9 @@ Application::Application()
 	modules.push_back(program = new ModuleProgram());
 	modules.push_back(editor = new ModuleEditor());
 	modules.push_back(scene = new ModuleScene());
-	modules.push_back(loader = new ModuleSceneLoader);
+	modules.push_back(loader = new ModuleSceneLoader());
 }
 
-// Destructor
 Application::~Application() 
 {
 	for (std::list<Module*>::iterator it = modules.begin(); it != modules.end(); ++it) 
@@ -50,47 +47,69 @@ bool Application::Init()
 	msTimer.Start();
 	gameModeEnabled = false;
 	counting = false;
-	gameDeltaTime = 0;
-	
-	//App->model->Load("./Models/BakerHouse/BakerHouse.fbx");
+	gameDeltaTime = 0.0f;
 
 	return ret;
 }
 
-update_status Application::PreUpdate()
+void Application::PreUpdate() 
 {
-	deltaTime = (float)msTimer.Rea() / 1000.f;
+	deltaTime = (float)msTimer.Read() / 1000.0f;
 
-	if (!gameModeEnabled || gamePaused)
+	if (!gameModeEnabled || gamePaused) 
 	{
-		gameDeltaTime = 0;
+		gameDeltaTime = 0.0f;
 	}
-	else
+	else 
 	{
-		gameDeltaTime = deltaTime / ((float)gameFrameRateCap / (float)frameRateCap);
+		gameDeltaTime = deltaTime / ((float)gameframerateCap / (float)framerateCap);
 	}
 
 	msTimer.Start();
 
-	if (gameModeEnabled && !counting)
+	if (gameModeEnabled && !counting) 
 	{
 		counting = true;
 		gameTime.Start();
 	}
 }
 
-update_status Application::Update() 
+void Application::FinishUpdate() 
 {
+	int ms_cap = 1000 / framerateCap;
+	
+	if (msTimer.Read() < ms_cap) 
+	{
+		SDL_Delay(ms_cap - msTimer.Read());
+	}
+
+	App->editor->AddFPSCount(1 / deltaTime, deltaTime * 1000.0f);
+
+	if (!gameModeEnabled || gamePaused) 
+	{
+		App->editor->AddGameFPSCount(0, 0);
+	}
+	else {
+		App->editor->AddGameFPSCount(1 / gameDeltaTime, gameDeltaTime * 1000.0f);
+	}
+
+	if (!gameModeEnabled && counting) {
+		gameTime.Stop();
+		counting = false;
+	}
+
+}
+
+update_status Application::Update() {
+
 	PreUpdate();
 	update_status ret = UPDATE_CONTINUE;
 
-	for (std::list<Module*>::iterator it = modules.begin(); it != modules.end() && ret == UPDATE_CONTINUE; ++it) 
-	{
+	for (std::list<Module*>::iterator it = modules.begin(); it != modules.end() && ret == UPDATE_CONTINUE; ++it) {
 		ret = (*it)->PreUpdate();
 	}
 
-	for (std::list<Module*>::iterator it = modules.begin(); it != modules.end() && ret == UPDATE_CONTINUE; ++it) 
-	{
+	for (std::list<Module*>::iterator it = modules.begin(); it != modules.end() && ret == UPDATE_CONTINUE; ++it) {
 		ret = (*it)->Update();
 	}
 
@@ -102,33 +121,6 @@ update_status Application::Update()
 	FinishUpdate();
 
 	return ret;
-}
-
-void Application::FinishUpdate()
-{
-	int ms_cap = 100 / frameRateCap;
-
-	if (msTimer.Read() < ms_cap)
-	{
-		SDL_Delay(ms_cap - msTimer.Read());
-	}
-
-	App->editor->AddFPSCount(1 / deltaTime, deltaTime * 1000);
-
-	if (!gameModeEnabled || gamePaused)
-	{
-		App->editor->AddFPSCount(0, 0);
-	}
-	else
-	{
-		App->editor->AddFPSCount(1 / gameDeltaTime, gameDeltaTime * 1000);
-	}
-
-	if (!gameModeEnabled && counting)
-	{
-		gameTime.Star();
-		counting = false;
-	}
 }
 
 bool Application::CleanUp() 
@@ -145,6 +137,5 @@ bool Application::CleanUp()
 
 	return ret;
 }
-
 
 #endif // __Application_cpp__

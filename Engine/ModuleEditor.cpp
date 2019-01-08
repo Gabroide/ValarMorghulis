@@ -8,7 +8,7 @@
 
 #include "SDL\include\SDL.h"
 
-#include "glew-2.1.0\include\GL\glew.h
+#include "glew-2.1.0\include\GL\glew.h"
 
 // Constructor
 ModuleEditor::ModuleEditor() 
@@ -17,15 +17,13 @@ ModuleEditor::ModuleEditor()
 	docks.push_back(config = new DockConfig());
 	docks.push_back(scene = new DockScene());
 	docks.push_back(about = new DockAbout());
-	docks.push_back(hierarchy = new DockHierarchy);
-	docks.push_back(inspector = new DockInspector);
+	docks.push_back(hierarchy = new DockHierarchy());
+	docks.push_back(inspector = new DockInspector());
+	docks.push_back(time = new DockTime());
 }
 
 // Destructor
-ModuleEditor::~ModuleEditor() 
-{ 
-	
-}
+ModuleEditor::~ModuleEditor() { }
 
 bool ModuleEditor::Init() 
 {
@@ -74,7 +72,7 @@ update_status ModuleEditor::Update()
 			ImGui::EndMenu();
 		}
 
-		if (ImGui::BeginMenu("Window"))
+		if (ImGui::BeginMenu("Window")) 
 		{
 			if (ImGui::MenuItem("Scene", NULL, scene->IsEnabled())) 
 			{
@@ -95,9 +93,10 @@ update_status ModuleEditor::Update()
 			{
 				about->ToggleEnabled();
 			}
-			
+
 			ImGui::EndMenu();
 		}
+
 		ImGui::EndMainMenuBar();
 	}
 
@@ -124,7 +123,7 @@ void ModuleEditor::RenderGUI()
 
 void ModuleEditor::PrintDocks() 
 {
-	// Print docks like we do with module
+	// Print docks
 	for (std::list<Dock*>::iterator it = docks.begin(); it != docks.end(); ++it)
 	{
 		if ((*it)->IsEnabled())
@@ -143,14 +142,14 @@ void ModuleEditor::CreateDockSpace()
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 
-	ImGuiWindowFlags windowFlags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoTitleBar;
+	ImGuiWindowFlags windowFlags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize;
 	windowFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoMove;
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 	ImGui::Begin("DockSpace", NULL, windowFlags);
 	ImGui::PopStyleVar(3);
 
-	ImGuiID dockspaceId = ImGui::GetID("DockSpace");
+	ImGuiID dockspaceId = ImGui::GetID("MyDockSpace");
 	ImGui::DockSpace(dockspaceId, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
 }
 
@@ -168,4 +167,9 @@ void ModuleEditor::ProcessInputEvent(SDL_Event* event) const
 void ModuleEditor::AddFPSCount(float fps, float ms) const 
 {
 	config->AddFps(fps, ms);
+}
+
+void ModuleEditor::AddGameFPSCount(float fps, float ms) const 
+{
+	config->AddGameFps(fps, ms);
 }

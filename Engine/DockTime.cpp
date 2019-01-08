@@ -14,8 +14,6 @@ DockTime::~DockTime()
 
 void DockTime::Draw() 
 {
-	ImGui::ShowDemoWindow();
-
 	ImGui::Begin("Time", &enabled, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse);
 
 	ImVec2 size = ImGui::GetWindowSize();
@@ -23,23 +21,21 @@ void DockTime::Draw()
 
 	ImGui::BeginMenuBar();
 
-	if (!App->gameModeEnabled)
+	if (!App->gameModeEnabled) 
 	{
-		ImGui::PushStyleColor(ImGuiCol_Button, { 0.95f,0.5f,0.0f,0.7f });
+		ImGui::PushStyleColor(ImGuiCol_Button, { 0.5f, 0.5f, 0.5f, 0.7f });
 	}
-	else
-	{
-		ImGui::PushStyleColor(ImGuiCol_Button, { 0.5f,0.5f,0.95f,0.7f });
+	else {
+
+		ImGui::PushStyleColor(ImGuiCol_Button, { 0.3f, 0.5f, 0.3f, 0.7f });
 	}
 
-	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 1.0f,1.0f,1.0f,0.2f });
-
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 1.0f, 1.0f, 1.0f, 0.2f });
 
 	ImGui::SetCursorPosX((ImGui::GetWindowWidth() - 85) / 2);
 	
-	if (ImGui::ArrowButton("play", ImGuiDir_Right)) 
-	{
-		gameTime = 0;
+	if (ImGui::ArrowButton("Play", ImGuiDir_Right)) {
+		gameTime = 0.0f;
 
 		if (!App->gameModeEnabled) 
 		{
@@ -56,7 +52,8 @@ void DockTime::Draw()
 
 	if (ImGui::Button("||", { 23,19 }) && App->gameModeEnabled) 
 	{
-		if (!App->gamePaused) {
+		if (!App->gamePaused) 
+		{
 			App->gamePaused = true;
 		}
 		else 
@@ -70,14 +67,14 @@ void DockTime::Draw()
 
 	if (!App->gameModeEnabled)
 	{
-		ImGui::PushStyleColor(ImGuiCol_Button, { 1.0f,1.0f,1.0f,0.2f });
+		ImGui::PushStyleColor(ImGuiCol_Button, { 0.5f, 0.5f, 0.5f, 0.7f });
 	}
 	else
 	{
-		ImGui::PushStyleColor(ImGuiCol_Button, { 0.5f,0.5f,0.95f,0.7f });
+		ImGui::PushStyleColor(ImGuiCol_Button, { 0.3f, 0.5f, 0.3f, 0.7f });
 	}
 
-	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 1.0f,1.0f,1.0f,0.2f });
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 1.0f, 1.0f, 1.0f, 0.2f });
 	
 	if (App->gameModeEnabled && !App->gamePaused && step == true) 
 	{

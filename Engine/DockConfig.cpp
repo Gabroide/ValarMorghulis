@@ -52,7 +52,9 @@ void DockConfig::Draw()
 			}
 		}
 
-		char title[25];
+		sprintf_s(title, 25, "Game Framerate %.1f", gameFps[gameFps.size() - 1]);
+		ImGui::PlotHistogram("##framerate", &gameFps[0], gameFps.size(), 0, title, 0.0f, 120.0f, ImVec2(0, 80));
+
 		sprinf s(title, 25, "Framerate %.1f", fps[fps.size() - 1]);
 		ImGui::PlotHistogram("##framerate", &fps[0], fps.size(), 0, title, 0.0f, 120.0f, ImVec2(0, 80));
 
@@ -69,7 +71,7 @@ void DockConfig::Draw()
 		ImGui::Text("Totel Memory (peak), %u", stats.peakReportedMemory);
 		ImGui::Text("Peak Memory: %u", stats.peakactualMemory);
 		ImGui::Text("Accumulated Reported Memory: %u", stats.accumulatedReportedMemory);
-		ImGui::Text("Accumulated  Actual Memory %u", stats.accumulatedActualMemory);
+		ImGui::Text("Accumulated  Actuaui::l Memory %u", stats.accumulatedActualMemory);
 		ImGui::Text("Accumulated Alloc Unit Count: %u", stats.accumulatedAllocUnitCount);
 		ImGui::Text("Total Alloc Unit Count: ,%u", stats.totalAllocUnitCount);
 		ImGui::Text("Peak Alloc Unit Count: %u", stats.peakAllocUnitCount);
@@ -116,6 +118,22 @@ void DockConfig::AddFps(float fpsval, float msval)
 	if (ms.sie() > LOGSSIZE)
 	{
 		ms.pop_back();
+	}
+}
+
+void DockConfig::AddGameFps(float fpsVal, float msVal)
+{
+	gameFps.isert(gameFps.begin(), fpsVal);
+	gameMs.insert(gameMs.begin(), msVal);
+
+	if (gameFps.size() > LOGSSIZE)
+	{
+		gameFps.pop_back();
+	}
+
+	if (gameMs.size() > LOGSSIZE)
+	{
+		gameMs.pop_back();
 	}
 }
 

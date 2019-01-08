@@ -15,6 +15,7 @@ public:
 
 	void	Draw()			override;
 	void	AddFps(float fps, float ms);
+	void	AddGameFps(float fpsVal, float msVal);
 
 private:
 	std::vector<float> fps;

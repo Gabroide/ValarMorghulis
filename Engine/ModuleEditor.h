@@ -1,6 +1,8 @@
 #ifndef __MpduleEditor_h__
 #define __ModuleEditor_h__
 
+#include <vector>
+
 #include "Module.h"
 #include "Globals.h"
 
@@ -13,10 +15,9 @@
 #include "DockHierarchy.h"
 #include "DockInspector.h"
 
-#include "imgui.h"
-#include "imgui_impl_sdl.h"
-#include "imgui_impl_opengl3.h"
-#include <vector>
+#include "IMGUI\imgui.h"
+#include "IMGUI\imgui_impl_sdl.h"
+#include "IMGUI\imgui_impl_opengl3.h"
 
 class Dock;
 class DockConsole;
@@ -44,6 +45,7 @@ public:
 	void				RenderGUI();
 	bool				SceneFocused() const;
 	void				ProcessInputEvent(SDL_Event * event) const;
+	void				AddGameFPSCount(float fps, float ms) const;
 
 public:
 	DockAbout*		about		= nullptr;

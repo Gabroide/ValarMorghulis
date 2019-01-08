@@ -13,16 +13,13 @@ public:
 	DockTime();
 	~DockTime();
 
-	void	Draw()	override;
-
-public:
-	bool	resizedLastFrame	= false;
+	void	Draw() override;
 
 private:
-	bool	gamePaused			= false;
-	bool	step				= false;
+	bool	gamePaused	= false;
+	bool	step		= false;
 
-	float	gameTime			= 0;
+	float	gameTime	= 0.0f;
 
 };
 
