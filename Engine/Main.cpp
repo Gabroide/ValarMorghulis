@@ -89,7 +89,7 @@ int main(int argc, char** argv)
 		}
 	}
 
-	LOG("See ya' later, alig...\n");
+	LOG("Valar Dohaeris \n");
 	delete App;
 
 	return main_return;

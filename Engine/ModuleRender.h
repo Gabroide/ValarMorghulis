@@ -8,6 +8,8 @@
 
 #include "glew-2.1.0\include\GL\glew.h"
 
+#include "MathGeoLib.h"
+
 #include "imgui\imgui.h"
 #include "imgui\imgui_impl_sdl.h"
 

@@ -40,7 +40,7 @@ void DockConsole::Draw()
 		ImGui::SetScrollHereY(1.0f);
 	}
 	
-	scrollToBottom = false;
+	scrollToBottom = true;
 	ImGui::EndChild();
 	
 	ImGui::End();

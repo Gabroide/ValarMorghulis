@@ -56,3 +56,4 @@ public:
 
 };
 
+#endif // __Component_h__

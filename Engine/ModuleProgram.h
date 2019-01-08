@@ -17,10 +17,10 @@ public:
 	unsigned	LoadProgram(const char* vertShaderPath, const char* fragShaderPath);
 
 public:
-	unsigned	basicProgram = 0;
-	unsigned	textureProgram = 0;
-	unsigned	vertShader;
-	unsigned	fragShader;
+	unsigned	basicProgram	= 0u;
+	unsigned	textureProgram	= 0u;
+	unsigned	vertShader		= 0u;
+	unsigned	fragShader		= 0u;
 
 private:
 	bool		CompileShader(unsigned shaderAddress, const char* shaderContent);

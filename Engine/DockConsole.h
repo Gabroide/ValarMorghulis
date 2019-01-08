@@ -19,7 +19,7 @@ public:
 	void Draw()	override;
 
 private:
-	bool                scrollToBottom = false;
+	bool                scrollToBottom = true;
 
 	ImGuiTextBuffer     buf;
 

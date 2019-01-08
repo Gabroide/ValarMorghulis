@@ -12,6 +12,7 @@
 #include "ModuleSceneLoader.h"
 #include "ModuleScene.h"
 #include "ModuleTime.h"
+#include "ModuleResourceManager.h"
 
 // Constructor
 Application::Application() 
@@ -26,6 +27,7 @@ Application::Application()
 	modules.push_back(scene = new ModuleScene());
 	modules.push_back(loader = new ModuleSceneLoader());
 	modules.push_back(time = new ModuleTime());
+	modules.push_back(resource = new ModuleResourceManager());
 }
 
 // Destructor

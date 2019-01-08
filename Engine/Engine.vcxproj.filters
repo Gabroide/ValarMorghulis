@@ -133,9 +133,6 @@
     <ClCompile Include="ModuleScene.cpp">
       <Filter>Modules\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ModuleModelLoader.cpp">
-      <Filter>Modules\Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ModuleProgram.cpp">
       <Filter>Modules\Source Files</Filter>
     </ClCompile>
@@ -151,12 +148,6 @@
     <ClCompile Include="DockConsole.cpp">
       <Filter>Docks\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Mesh.cpp" />
-    <ClCompile Include="Model.cpp" />
-    <ClCompile Include="ModuleModel.cpp">
-      <Filter>Modules\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Timer.cpp" />
     <ClCompile Include="DockScene.cpp">
       <Filter>Docks\Source Files</Filter>
     </ClCompile>
@@ -175,10 +166,31 @@
     <ClCompile Include="ComponentAudio.cpp">
       <Filter>Components\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="DockTime.cpp">
       <Filter>Docks\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>Components\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="DockHierarchy.cpp">
+      <Filter>Docks\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ModuleSceneLoader.cpp">
+      <Filter>Modules\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ModuleDebugDraw.cpp">
+      <Filter>Modules\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DockInspector.cpp">
+      <Filter>Docks\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ComponentLight.cpp">
+      <Filter>Components\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ModuleTime.cpp">
+      <Filter>Modules\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ModuleResourceManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MathGeoLib\include\Geometry\AABB.h">
@@ -397,9 +409,6 @@
     <ClInclude Include="ModuleScene.h">
       <Filter>Modules\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="modulemodelloader.h">
-      <Filter>Modules\Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ModuleProgram.h">
       <Filter>Modules\Header Files</Filter>
     </ClInclude>
@@ -418,12 +427,6 @@
     <ClInclude Include="DockConsole.h">
       <Filter>Docks\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Mesh.h" />
-    <ClInclude Include="Model.h" />
-    <ClInclude Include="ModuleModel.h">
-      <Filter>Modules\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Timer.h" />
     <ClInclude Include="DockScene.h">
       <Filter>Docks\Header Files</Filter>
     </ClInclude>
@@ -442,10 +445,34 @@
     <ClInclude Include="ComponentAudio.h">
       <Filter>Components\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GameObject.h" />
     <ClInclude Include="DockTime.h">
       <Filter>Docks\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GameObject.h">
+      <Filter>Components\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentLight.h">
+      <Filter>Components\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DockHierarchy.h">
+      <Filter>Docks\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ModuleSceneLoader.h">
+      <Filter>Modules\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ModuleDebugDraw.h">
+      <Filter>Modules\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DockInspector.h">
+      <Filter>Docks\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="ModuleTime.h">
+      <Filter>Modules\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ModuleResourceManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="MathGeoLib">
