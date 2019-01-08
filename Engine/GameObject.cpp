@@ -1,4 +1,3 @@
-#include "GameObject.h"
 #include "Application.h"
 #include "ModuleScene.h"
 #include "ModuleProgram.h"
@@ -8,7 +7,7 @@
 #include "ComponentMesh.h"
 #include "ComponentTransform.h"
 
-#include "SDL\include\SDL.h"
+#include "SDL\include\SDL_mouse.h"
 
 // Constructor
 GameObject::GameObject() 
@@ -32,7 +31,6 @@ GameObject::GameObject(const char* goName, const aiMatrix4x4& transform, const c
 	App->scene->root->goChilds.push_back(this);
 }
 
-// Constructor
 GameObject::GameObject(const char* goName, const aiMatrix4x4& transform, GameObject* goParent, const char* fileLocation) 
 {
 	name = goName;
@@ -66,23 +64,22 @@ GameObject::GameObject(const GameObject& duplicateGameObject)
 	filePath = duplicateGameObject.filePath;
 	bbox = duplicateGameObject.bbox;
 
-	for (const auto& component : duplicateGameObject.components) 
+	for (const auto &component : duplicateGameObject.components) 
 	{
-		Component* duplicatedComponent = nullptr;
+		Component* duplicatedComponent = component->Duplicate();
 		components.push_back(duplicatedComponent);
-
-		if (duplicatedComponent->componenType == ComponentType::TRANSFORM)
+		
+		if (duplicatedComponent->componentType == ComponentType::TRANSFORM) 
 		{
 			transform = (ComponentTransform*)duplicatedComponent;
-
 		}
 	}
 
-	for (const auto& child : duplicateGameObject.goChilds)
+	for (const auto &child : duplicateGameObject.goChilds) 
 	{
-		GameObject* duplicateChild = new GameObject(*child);
-		duplicateChild->parent = this;
-		goChilds.push_back(duplicateChild);
+		GameObject* duplicatedChild = new GameObject(*child);
+		duplicatedChild->parent = this;
+		goChilds.push_back(duplicatedChild);
 	}
 }
 
@@ -91,7 +88,7 @@ GameObject::~GameObject()
 {
 	for (auto &component : components) 
 	{
-		RemoveComponent(component);
+		delete component;
 		component = nullptr;
 	}
 	
@@ -103,50 +100,69 @@ GameObject::~GameObject()
 		child = nullptr;
 	}
 
-	goChilds.clear;
+	goChilds.clear();
 }
 
 void GameObject::Update() 
 {
-	for (std::list<GameObject*>::iterator itChild = goChilds.begin(); itChild != goChilds.and; ++itChild)
-	{
-		(*itChild)->Update();
-
-		if ((*itChild)->toBeCopied)
-		{
-			(*itChild)->toBeCopied = false;
-			GameObject* goCopied = new GameObject(**itChild);
-			goCopied->parent = this;
-			goChilds.push_back(goCopied)
-		}
-
-		if((*itChild)->toBeDeleted)
-		{
-			(*itChild)->Update() = false;
-			(*itChild)->CleanUp();
-			(*itChild).erase(itChild++);
-		}
-		else
-		{
-			++itChild;
-		}
-	}
-}
-
-void GameObject::Draw() const 
-{
-	for (const auto &child : goChilds) 
-	{
-		child->Draw();
-	}
-
 	if (!enabled)
 	{
 		return;
 	}
 
+	for (std::list<GameObject*>::iterator itChild = goChilds.begin(); itChild != goChilds.end();) 
+	{
+		(*itChild)->Update();
+
+		if ((*itChild)->moveGOUp) 
+		{
+			(*itChild)->moveGOUp = false;
+		}
+
+		if ((*itChild)->moveGODown) 
+		{
+			(*itChild)->moveGODown = false;
+		}
+
+		if ((*itChild)->toBeCopied) 
+		{
+			(*itChild)->toBeCopied = false;
+			GameObject* goCopied = new GameObject(**itChild);
+			goCopied->parent = this;
+			goChilds.push_back(goCopied);
+			LOG("Duplicated GO: %s", (*itChild)->name);
+		}
+
+		if ((*itChild)->toBeDeleted) 
+		{
+			(*itChild)->toBeDeleted = false;
+			(*itChild)->CleanUp();
+			LOG("Removed GO: %s", (*itChild)->name);
+			delete *itChild;
+			goChilds.erase(itChild++);
+		}
+		else 
+		{
+			++itChild;
+		}
+	}
+
+}
+
+void GameObject::Draw() const 
+{
+	if (!enabled)
+	{
+		return;
+	}
+
+	for (const auto& child : goChilds) 
+	{
+		child->Draw();
+	}
 	if (transform == nullptr)
 	{
+	
 		return;
 	}
 
@@ -164,7 +180,7 @@ void GameObject::Draw() const
 		shader = App->program->textureProgram;
 	}
 
-	if (texture == nullptr)
+	if (texture == nullptr) 
 	{
 		texture = App->textures->defaultTexture;
 	}
@@ -172,14 +188,11 @@ void GameObject::Draw() const
 	glUseProgram(shader);
 	ModelTransform(shader);
 
-	std::vector<Component*> meshes = GetComponents(ComponentType::MESH);
+	Component* mesh = GetComponent(ComponentType::MESH);
 	
-	for (const auto &mesh : meshes) 
+	if (mesh != nullptr && mesh->enabled) 
 	{
-		if (mesh->enabled) 
-		{
-			((ComponentMesh*)mesh)->Draw(shader, texture);
-		}
+		((ComponentMesh*)mesh)->Draw(shader, texture);
 	}
 
 	if (drawGOBBox) 
@@ -189,7 +202,7 @@ void GameObject::Draw() const
 
 	if (drawChildsBBox) 
 	{
-		for (auto &child : goChilds) 
+		for (auto& child : goChilds) 
 		{
 			child->DrawBBox();
 		}
@@ -198,20 +211,20 @@ void GameObject::Draw() const
 	glUseProgram(0);
 }
 
-void GameObject::CleanUp()
+void GameObject::CleanUp() 
 {
-	for (auto& child : goChilds)
+	for (auto& child : goChilds) 
 	{
-		child.leanUp();
+		child->CleanUp();
 	}
+
 }
 
 void GameObject::DrawProperties() 
 {
 	assert(name != nullptr);
 
-	ImGui::InputText("Name", (char*)name, 30.0f);
-	ImGui::SameLine();
+	ImGui::InputText("Name", (char*)name, 30.0f); ImGui::SameLine();
 	ImGui::Checkbox("Enabled", &enabled);
 
 	for (auto &component : components) 
@@ -244,7 +257,7 @@ void GameObject::DrawHierarchy(GameObject* goSelected)
 		drawGOBBox = true;
 	}
 
-	if (ImGui::IsMouseClicked() && App->input->GetMouseButtonDown(SDL_BUTTON_RIGHT) == KEY_DOWN) 
+	if (ImGui::IsItemHovered() && App->input->GetMouseButtonDown(SDL_BUTTON_RIGHT) == KEY_DOWN) 
 	{
 		ImGui::OpenPopup("Modify_GameObject");
 		App->scene->goSelected = this;
@@ -252,26 +265,35 @@ void GameObject::DrawHierarchy(GameObject* goSelected)
 
 	if (ImGui::BeginPopup("Modify_GameObject")) 
 	{
-		if (ImGui::Selectable("Add empty GameObject")) 
+		if (ImGui::Selectable("Add Empty GameObject")) 
 		{
-			App->scene->CreateGameObject("GameObject", this);
+			App->scene->CreateGameObject(DEFAULT_GO_NAME, this);
 		}
-		
-		if (ImGui::Selectable("Duplicate") && App->scene->goSelected != nullptr)
+		if (ImGui::Selectable("Duplicate") && App->scene->goSelected != nullptr) 
 		{
 			toBeCopied = true;
 		}
-
+		
 		if (ImGui::Selectable("Remove") && App->scene->goSelected != nullptr) 
 		{
 			toBeDeleted = true;
-
-			if (App->scene->goSelected == this)
+			
+			if (App->scene->goSelected == this) 
 			{
 				App->scene->goSelected = nullptr;
 			}
 		}
-	
+		
+		if (ImGui::Selectable("Move up") && App->scene->goSelected != nullptr) 
+		{
+			moveGOUp = true;
+		}
+		
+		if (ImGui::Selectable("Move down") && App->scene->goSelected != nullptr) 
+		{
+			moveGODown = true;
+		}
+
 		ImGui::EndPopup();
 	}
 
@@ -296,7 +318,6 @@ std::string GameObject::GetFileFolder() const
 	std::string s(filePath);
 	std::size_t found = s.find_last_of("/\\");
 	s = s.substr(0, found + 1);
-
 	return s;
 }
 
@@ -365,7 +386,6 @@ Component* GameObject::GetComponent(ComponentType type) const
 std::vector<Component*> GameObject::GetComponents(ComponentType type) const 
 {
 	std::vector<Component*> list;
-
 	for (auto &component : components) 
 	{
 		if (component->componentType == type) 
@@ -406,7 +426,7 @@ AABB GameObject::ComputeBBox() const
 {
 	bbox.SetNegativeInfinity();
 
-	// Current GO meshes
+	// Current Game Object meshes
 	for (const auto &mesh : GetComponents(ComponentType::MESH)) 
 	{
 		bbox.Enclose(((ComponentMesh *)mesh)->bbox);
@@ -431,8 +451,7 @@ void GameObject::DrawBBox() const
 {
 	glUseProgram(App->program->basicProgram);
 	AABB bbox = ComputeBBox();
-	GLfloat vertices[] = 
-	{
+	GLfloat vertices[] = {
 		-0.5, -0.5, -0.5, 1.0,
 		0.5, -0.5, -0.5, 1.0,
 		0.5,  0.5, -0.5, 1.0,
@@ -442,20 +461,18 @@ void GameObject::DrawBBox() const
 		0.5,  0.5,  0.5, 1.0,
 		-0.5,  0.5,  0.5, 1.0,
 	};
-	
 	GLuint vbo_vertices;
 	glGenBuffers(1, &vbo_vertices);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo_vertices);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	GLushort elements[] = 
-	{
+	GLushort elements[] = {
 		0, 1, 2, 3,
 		4, 5, 6, 7,
-		0, 4, 1, 5, 2, 6, 3, 7
+		0, 4, 1, 5,
+		2, 6, 3, 7
 	};
-
 	GLuint ibo_elements;
 	glGenBuffers(1, &ibo_elements);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_elements);

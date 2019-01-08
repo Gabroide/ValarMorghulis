@@ -11,14 +11,16 @@
 
 #include "MathGeoLib.h"
 /*
-"Math\float4x4.h"
-"Geometry\AABB.h"
+#include "Math\float4x4.h"
+#include "Geometry\AABB.h"
 */
 
 #include "assimp\matrix4x4.h"
 
+
 class Component;
 class ComponentTransform;
+
 enum class ComponentType;
 
 class GameObject
@@ -30,9 +32,9 @@ public:
 	GameObject(const GameObject& duplicateGameObject);
 	~GameObject();
 
-	void					CleanUp();
 	void					Update();
 	void					Draw() const;
+	void					CleanUp();
 	void					DrawProperties();
 	void					DrawHierarchy(GameObject* goSelected);
 	void					DrawBBox() const;
@@ -42,15 +44,17 @@ public:
 	AABB					ComputeBBox() const;
 
 	std::string				GetFileFolder() const;
-	std::vector<Component*> GetComponents(ComponentType type) const;
 
 	math::float4x4			GetLocalTransform() const;
 	math::float4x4			GetGlobalTransform() const;
 
+
 public:
 	Component*				AddComponent(ComponentType type);
 	Component*				GetComponent(ComponentType type) const;
-	
+
+	std::vector<Component*> GetComponents(ComponentType type) const;
+
 public:
 	bool					enabled			= true;
 	bool					drawGOBBox		= false;
@@ -58,19 +62,22 @@ public:
 	bool					duplicating		= false;
 	bool					toBeDeleted		= false;
 	bool					toBeCopied		= false;
+	bool					moveGOUp		= false;
+	bool					moveGODown		= false;
 
-	AABB&					bbox			= AABB();
+public:
+	const char*				filePath		= nullptr;
+	const char*				name			= DEFAULT_GO_NAME;
 
+	GameObject*				parent			= nullptr;
+	
 	std::vector<Component*>	components;
 	std::list<GameObject*>	goChilds;
 
+	ComponentTransform*		transform		= nullptr;
+
 public:
-	const char*				filePath = nullptr;
-	const char*				name = "GameObject";
-	
-	GameObject*				parent = nullptr;
-	
-	ComponentTransform*		transform = nullptr;
+	AABB&					bbox			= AABB();
 
 };
 
