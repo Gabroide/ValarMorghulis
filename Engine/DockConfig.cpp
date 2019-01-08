@@ -4,17 +4,19 @@
 #include "ModuleRender.h"
 #include "ModuleCamera.h"
 #include "ModuleInput.h"
+#include "ModuleTime.h"
 #include "ModuleTextures.h"
 
 #include "mmgr\mmgr.h"
 
 // Constructor
-DockConfig::DockConfig() : fps(LOGSSIZE), ms(LOGSSIZE), mem(LOGSSIZE), gameFps(LOGSSIZE), gameMs(LOGSSIZE)
+DockConfig::DockConfig() : fps(LOGSSIZE), ms(LOGSSIZE), mem(LOGSSIZE),
+gameFps(LOGSSIZE), gameMs(LOGSSIZE) 
 {
-	
+
 }
 
-// Destructor
+// Destrucor
 DockConfig::~DockConfig() 
 {
 	
@@ -25,56 +27,80 @@ void DockConfig::Draw()
 	if (!ImGui::Begin("Configuration", &enabled, ImGuiWindowFlags_NoFocusOnAppearing)) 
 	{
 		ImGui::End();
-		
+	
 		return;
 	}
 
 	if (ImGui::CollapsingHeader("Application")) 
 	{
 		ImGui::PushItemWidth(200.0f);
-		static int frameRateCap = App->frameRateCap;
-		if (ImGui::SliderInt("MaxFPS", &frameRateCap, 1, 120))
+		static int framerateCap = App->time->maxFps;
+		
+		if (ImGui::SliderInt("MaxFPS", &framerateCap, 1, 120)) 
 		{
-			App->frameRaeCap = frameRateCap;
+			App->time->maxFps = framerateCap;
 		}
 
 		ImGui::PopItemWidth();
 
-		if (ImGui::Checkbox("Vsync", &App->renderer->vsyncEnabled)
+		if (ImGui::Checkbox("Vsync", &App->renderer->vsyncEnabled)) 
 		{
-			if (App->renderer->vsyncEnabled)
+			if (App->renderer->vsyncEnabled) 
 			{
 				SDL_GL_SetSwapInterval(1);
 			}
-			else
+			else 
 			{
 				SDL_GL_SetSwapInterval(0);
 			}
 		}
 
-		sprintf_s(title, 25, "Game Framerate %.1f", gameFps[gameFps.size() - 1]);
-		ImGui::PlotHistogram("##framerate", &gameFps[0], gameFps.size(), 0, title, 0.0f, 120.0f, ImVec2(0, 80));
-
-		sprinf s(title, 25, "Framerate %.1f", fps[fps.size() - 1]);
+		char title[25];
+		sprintf_s(title, 25, "Framerate %.1f", fps[fps.size() - 1]);
 		ImGui::PlotHistogram("##framerate", &fps[0], fps.size(), 0, title, 0.0f, 120.0f, ImVec2(0, 80));
+		sprintf_s(title, 25, "Milliseconds %0.1f", ms[ms.size() - 1]);
+		ImGui::PlotHistogram("##milliseconds", &ms[0], ms.size(), 0, title, 0.0f, 40.0f, ImVec2(0, 80));
 
-		sprinf s(title, 25, "Miliseconds %.1f", ms[ms.size() - 1]);
-		ImGui::PlotHistogram("##miliseconds", &ms[0], ms.size(), 0, title, 0.0f, 40.0f, ImVec2(0, 80));
-
-		SMStats stats = m_getMemoryStatistics();
+		sMStats stats = m_getMemoryStatistics();
 		AddMemory((float)stats.totalReportedMemory);
 
-		ImGui::PlotHistogram("##memory", &mem[0], mem.size(), 0, "Memory Consumption (in Bytes)", 0.0f, (float)stats.peakReportedMemory * 1.2f, ImVec2(0, 80));
+		ImGui::PlotHistogram("##memory", &mem[0], mem.size(), 0, "Memory Consumption (Bytes)", 0.0f, (float)stats.peakReportedMemory * 1.2f, ImVec2(0, 80));
 
-		ImGui::Text("Totel Memory (reported): %u", stats.totalReportedMemory);
-		ImGui::Text("Total Memory (actual): %u", stats.totalActualMemory);
-		ImGui::Text("Totel Memory (peak), %u", stats.peakReportedMemory);
-		ImGui::Text("Peak Memory: %u", stats.peakactualMemory);
-		ImGui::Text("Accumulated Reported Memory: %u", stats.accumulatedReportedMemory);
-		ImGui::Text("Accumulated  Actuaui::l Memory %u", stats.accumulatedActualMemory);
+		ImGui::Text("Total Reported Mem: %u", stats.totalReportedMemory);
+		ImGui::Text("Total Actual Mem: %u", stats.totalActualMemory);
+		ImGui::Text("Peak Reported Mem: %u", stats.peakReportedMemory);
+		ImGui::Text("Peak Actual Mem: %u", stats.peakActualMemory);
+		ImGui::Text("Accumulated Reported Mem: %u", stats.accumulatedReportedMemory);
+		ImGui::Text("Accumulated Actual Mem: %u", stats.accumulatedActualMemory);
 		ImGui::Text("Accumulated Alloc Unit Count: %u", stats.accumulatedAllocUnitCount);
-		ImGui::Text("Total Alloc Unit Count: ,%u", stats.totalAllocUnitCount);
+		ImGui::Text("Total Alloc Unit Count: %u", stats.totalAllocUnitCount);
 		ImGui::Text("Peak Alloc Unit Count: %u", stats.peakAllocUnitCount);
+	}
+
+	if (ImGui::CollapsingHeader("Time")) 
+	{
+		char title[35];
+		sprintf_s(title, 25, "Framerate %0.1f", gameFps[gameFps.size() - 1]);
+		ImGui::PlotLines("##framerate", &gameFps[0], gameFps.size(), 0, title, 0.0f, 200.0f, ImVec2(300, 50));
+		sprintf_s(title, 25, "Milliseconds %0.1f", gameMs[gameMs.size() - 1]);
+		ImGui::PlotLines("##framerate", &gameMs[0], gameMs.size(), 0, title, 0.0f, 40.0f, ImVec2(300, 50));
+
+		ImGui::SliderFloat("Time Scale", &App->time->gameTimeScale, 0.1f, 5.0f, "%0.1f");
+
+		ImGui::Separator();
+		ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "Time since App start: %f seconds", App->time->realTime);
+		ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "Frames since App start: %u", App->time->realFrameCount);
+
+		if (App->time->gameState == GameState::STOP) 
+		{
+			ImGui::TextDisabled("Time since Game start: 0.0000000 seconds");
+			ImGui::TextDisabled("Frames since Game start: 0");
+		}
+		else 
+		{
+			ImGui::TextColored(ImVec4(0.3f, 0.5f, 0.3f, 0.7f), "Time since Game start: %f seconds", App->time->gameTime);
+			ImGui::TextColored(ImVec4(0.3f, 0.5f, 0.3f, 0.7f), "Frames since Game start: %u", App->time->totalFrames);
+		}
 	}
 
 	if (ImGui::CollapsingHeader("Camera")) 
@@ -105,33 +131,33 @@ void DockConfig::Draw()
 	ImGui::End();
 }
 
-void DockConfig::AddFps(float fpsval, float msval) 
+void DockConfig::AddFps(float fpsVal, float msVal) 
 {
-	fps.insert(fps.begin(), fpsval);
-	ms.insert(ms.begin(), msval);
-	
-	if (fps.size() > LOGSSIZE)
+	fps.insert(fps.begin(), fpsVal);
+	ms.insert(ms.begin(), msVal);
+
+	if (fps.size() > LOGSSIZE) 
 	{
 		fps.pop_back();
 	}
-	
-	if (ms.sie() > LOGSSIZE)
+
+	if (ms.size() > LOGSSIZE) 
 	{
 		ms.pop_back();
 	}
 }
 
-void DockConfig::AddGameFps(float fpsVal, float msVal)
+void DockConfig::AddGameFps(float fpsVal, float msVal) 
 {
-	gameFps.isert(gameFps.begin(), fpsVal);
+	gameFps.insert(gameFps.begin(), fpsVal);
 	gameMs.insert(gameMs.begin(), msVal);
 
-	if (gameFps.size() > LOGSSIZE)
+	if (gameFps.size() > LOGSSIZE) 
 	{
 		gameFps.pop_back();
 	}
 
-	if (gameMs.size() > LOGSSIZE)
+	if (gameMs.size() > LOGSSIZE) 
 	{
 		gameMs.pop_back();
 	}
@@ -139,10 +165,10 @@ void DockConfig::AddGameFps(float fpsVal, float msVal)
 
 void DockConfig::AddMemory(float memVal) 
 {
-	for (unsigned i = 0u; i < LOGSSIZE - 1; ++i)
+	for (unsigned i = 0u; i < LOGSSIZE - 1; ++i) 
 	{
 		mem[i] = mem[i + 1];
 	}
-	
+
 	mem[LOGSSIZE - 1] = memVal;
 }
