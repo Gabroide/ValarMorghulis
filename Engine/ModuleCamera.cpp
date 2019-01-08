@@ -1,10 +1,11 @@
-#include "ModuleCamera.h"
 #include "Globals.h"
 #include "Application.h"
 #include "ModuleInput.h"
 #include "ModuleWindow.h"
 #include "ModuleRender.h"
 #include "ModuleEditor.h"
+#include "ModuleCamera.h"
+#include "ModuleTime.h"
 
 // Constructor
 ModuleCamera::ModuleCamera() 
@@ -30,7 +31,6 @@ update_status ModuleCamera::PreUpdate()
 {
 	if (App->editor->SceneFocused()) 
 	{
-
 		if (App->input->GetMouseButtonDown(SDL_BUTTON_RIGHT) == KEY_REPEAT) 
 		{
 			CameraMovementKeyboard();
@@ -92,7 +92,7 @@ bool ModuleCamera::CleanUp()
 
 void ModuleCamera::MoveCamera(CameraMovement cameraSide) 
 {
-	float normMoveSpeed = cameraSpeed * App->deltaTime;
+	float normMoveSpeed = cameraSpeed * App->time->realDeltaTime;
 
 	switch (cameraSide) 
 	{
@@ -119,6 +119,7 @@ void ModuleCamera::MoveCamera(CameraMovement cameraSide)
 	case Backwards:
 		cameraPos -= front * normMoveSpeed;
 		break;
+
 	default:
 		break;
 	}
@@ -176,12 +177,11 @@ void ModuleCamera::Zoom()
 	
 	if (wheelSlide != 0) 
 	{
-		float zoomValue = App->renderer->frustum.verticalFov + -wheelSlide * 20.0f * App->deltaTime;
+		float zoomValue = App->renderer->frustum.verticalFov + -wheelSlide * 20.0f * App->time->realDeltaTime;
 		float newAngleFov = math::Clamp(zoomValue, math::DegToRad(minFov), math::DegToRad(maxFov));
 		App->renderer->frustum.verticalFov = newAngleFov;
 		App->renderer->frustum.horizontalFov = 2.0f * atanf(tanf(newAngleFov * 0.5f) * ((float)App->window->width / (float)App->window->height));
 	}
-
 }
 
 void ModuleCamera::FocusSelectedObject() 
@@ -198,6 +198,7 @@ void ModuleCamera::FocusSelectedObject()
 		{
 			ComponentMesh* meshComponent = (ComponentMesh*)component;
 
+			// Closest point returns the same point if the selected object is inside
 			while (meshComponent->bbox.ClosestPoint(cameraPos).Equals(cameraPos)) 
 			{
 				cameraPos = cameraPos.Mul(2.0f);
@@ -205,7 +206,7 @@ void ModuleCamera::FocusSelectedObject()
 
 			front = (meshComponent->bbox.CenterPoint() - cameraPos).Normalized();
 		}
-		else 
+		else
 		{
 			component = goSelected->GetComponent(ComponentType::TRANSFORM);
 			
@@ -294,6 +295,6 @@ void ModuleCamera::DrawGUI()
 		App->renderer->frustum.horizontalFov = 2.f * atanf(tanf(App->renderer->frustum.verticalFov * 0.5f) * ((float)App->window->width / (float)App->window->height));
 	}
 
-	ImGui::InputFloat("zNear", &App->renderer->frustum.nearPlaneDistance, 1, 10);
-	ImGui::InputFloat("zFar", &App->renderer->frustum.farPlaneDistance, 1, 10);
+	ImGui::InputFloat("zNear", &App->renderer->frustum.nearPlaneDistance, 5, 50);
+	ImGui::InputFloat("zFar", &App->renderer->frustum.farPlaneDistance, 5, 50);
 }
