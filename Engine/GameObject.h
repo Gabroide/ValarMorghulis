@@ -65,6 +65,9 @@ public:
 	bool					moveGOUp		= false;
 	bool					moveGODown		= false;
 
+	std::string				uuid			= "";
+	std::string				parentUuid		= "";
+
 public:
 	const char*				filePath		= nullptr;
 	const char*				name			= DEFAULT_GO_NAME;

@@ -48,6 +48,9 @@ public:
 public:
 	bool			enabled			= true;
 
+	std::string		uuid			= "";
+	std::string		parentUuid		= "";
+
 	ComponentType	componentType	= ComponentType::EMPTY;
 
 public:

@@ -6,18 +6,19 @@
 #include "ComponentMaterial.h"
 #include "ComponentMesh.h"
 #include "ComponentTransform.h"
+#include "ModuleResourceManager.h"
+#include "SDL/include/SDL_mouse.h"
 
-#include "SDL\include\SDL_mouse.h"
-
-// Constructor
+//Constructor
 GameObject::GameObject() 
 {
-	
+	uuid = App->resource->NewGuuid();
 }
 
-// Constructor
+// Construcor
 GameObject::GameObject(const char* goName, const aiMatrix4x4& transform, const char* fileLocation) 
 {
+	uuid = App->resource->NewGuuid();
 	name = goName;
 
 	if (fileLocation != nullptr) 
@@ -25,39 +26,42 @@ GameObject::GameObject(const char* goName, const aiMatrix4x4& transform, const c
 		filePath = fileLocation;
 	}
 
-	this->parent = App->scene->root;
+	parent = App->scene->root;
+	parentUuid = App->scene->root->uuid;
 	this->transform = (ComponentTransform*)AddComponent(ComponentType::TRANSFORM);
 	this->transform->AddTransform(transform);
 	App->scene->root->goChilds.push_back(this);
 }
 
-GameObject::GameObject(const char* goName, const aiMatrix4x4& transform, GameObject* goParent, const char* fileLocation) 
+// Constructor
+GameObject::GameObject(const char* goName, const aiMatrix4x4& transform, GameObject* goParent, const char* fileLocation)
 {
+	uuid = App->resource->NewGuuid();
 	name = goName;
 
-	if (goParent != nullptr) 
-	{
-		this->parent = goParent;
+	if (goParent != nullptr) {
+		parent = goParent;
+		parentUuid = goParent->uuid;
 		goParent->goChilds.push_back(this);
 	}
-	else 
-	{
-		this->parent = App->scene->root;
+	else {
+		parent = App->scene->root;
+		parentUuid = App->scene->root->uuid;
 		App->scene->root->goChilds.push_back(this);
 	}
 
 	this->transform = (ComponentTransform*)AddComponent(ComponentType::TRANSFORM);
 	this->transform->AddTransform(transform);
 
-	if (fileLocation != nullptr) 
-	{
+	if (fileLocation != nullptr) {
 		filePath = fileLocation;
 	}
 }
-
 // Constructor
 GameObject::GameObject(const GameObject& duplicateGameObject) 
 {
+	uuid = App->resource->NewGuuid();
+	parentUuid = duplicateGameObject.parentUuid;
 	char* copyName = new char[strlen(duplicateGameObject.name)];
 	strcpy(copyName, duplicateGameObject.name);
 	name = copyName;
@@ -68,8 +72,10 @@ GameObject::GameObject(const GameObject& duplicateGameObject)
 	{
 		Component* duplicatedComponent = component->Duplicate();
 		components.push_back(duplicatedComponent);
+		duplicatedComponent->goContainer = this;
+		duplicatedComponent->parentUuid = uuid;
 		
-		if (duplicatedComponent->componentType == ComponentType::TRANSFORM) 
+		if (duplicatedComponent->componentType == ComponentType::TRANSFORM)
 		{
 			transform = (ComponentTransform*)duplicatedComponent;
 		}
@@ -79,6 +85,7 @@ GameObject::GameObject(const GameObject& duplicateGameObject)
 	{
 		GameObject* duplicatedChild = new GameObject(*child);
 		duplicatedChild->parent = this;
+		duplicatedChild->parentUuid = uuid;
 		goChilds.push_back(duplicatedChild);
 	}
 }
@@ -117,11 +124,21 @@ void GameObject::Update()
 		if ((*itChild)->moveGOUp) 
 		{
 			(*itChild)->moveGOUp = false;
+			
+			if (std::abs(std::distance(goChilds.begin(), itChild)) != 0) 
+			{
+				LOG("Begin move up");
+			}
 		}
 
 		if ((*itChild)->moveGODown) 
 		{
 			(*itChild)->moveGODown = false;
+		
+			if (std::abs(std::distance(goChilds.begin(), itChild)) != goChilds.size() - 1) 
+			{
+				LOG("Begin move down");
+			}
 		}
 
 		if ((*itChild)->toBeCopied) 
@@ -145,8 +162,8 @@ void GameObject::Update()
 		{
 			++itChild;
 		}
-	}
 
+	}
 }
 
 void GameObject::Draw() const 
@@ -156,13 +173,13 @@ void GameObject::Draw() const
 		return;
 	}
 
-	for (const auto& child : goChilds) 
+	for (const auto &child : goChilds) 
 	{
 		child->Draw();
 	}
+	
 	if (transform == nullptr)
 	{
-	
 		return;
 	}
 
@@ -202,7 +219,7 @@ void GameObject::Draw() const
 
 	if (drawChildsBBox) 
 	{
-		for (auto& child : goChilds) 
+		for (auto &child : goChilds) 
 		{
 			child->DrawBBox();
 		}
@@ -213,19 +230,27 @@ void GameObject::Draw() const
 
 void GameObject::CleanUp() 
 {
-	for (auto& child : goChilds) 
+	for (auto &child : goChilds) 
 	{
 		child->CleanUp();
 	}
-
 }
 
 void GameObject::DrawProperties() 
 {
 	assert(name != nullptr);
 
-	ImGui::InputText("Name", (char*)name, 30.0f); ImGui::SameLine();
+	ImGui::InputText("Name", (char*)name, 30.0f); 
+	ImGui::SameLine();
 	ImGui::Checkbox("Enabled", &enabled);
+
+	if (ImGui::CollapsingHeader("Info")) 
+	{
+		ImGui::Text("UUID: "); ImGui::SameLine();
+		ImGui::TextColored({ 0.4f,0.4f,0.4f,1.0f }, uuid.c_str());
+		ImGui::Text("Parent UUID: "); ImGui::SameLine();
+		ImGui::TextColored({ 0.4f,0.4f,0.4f,1.0f }, parentUuid.c_str());
+	}
 
 	for (auto &component : components) 
 	{
@@ -257,6 +282,63 @@ void GameObject::DrawHierarchy(GameObject* goSelected)
 		drawGOBBox = true;
 	}
 
+	if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None)) 
+	{
+		GameObject* draggedGo = this;
+		ImGui::SetDragDropPayload("DragDropHierarchy", &draggedGo, sizeof(GameObject*), ImGuiCond_Once);
+		ImGui::Text("%s", name);
+		ImGui::EndDragDropSource();
+	}
+
+	if (ImGui::BeginDragDropTarget()) 
+	{
+		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DragDropHierarchy")) 
+		{
+			IM_ASSERT(payload->DataSize == sizeof(GameObject*));
+			GameObject* droppedGo = (GameObject*)*(const int*)payload->Data;
+
+			if (droppedGo->parent != this) 
+			{
+
+				bool droppedIntoChild = false;
+				GameObject* inheritedTrasnform = this;
+				
+				while (inheritedTrasnform->parent != nullptr) 
+				{
+					if (inheritedTrasnform->parent == droppedGo) 
+					{
+						droppedIntoChild = true;
+					}
+				
+					inheritedTrasnform = inheritedTrasnform->parent;
+				}
+				
+				inheritedTrasnform = nullptr;
+
+				if (!droppedIntoChild) 
+				{
+					goChilds.push_back(droppedGo);
+
+					if (droppedGo->transform != nullptr) 
+					{
+						droppedGo->transform->SetLocalToWorld(droppedGo->GetGlobalTransform());
+					}
+					
+					droppedGo->parent->goChilds.remove(droppedGo);
+					droppedGo->parent = this;
+					droppedGo->parentUuid = uuid;
+					
+					if (droppedGo->transform != nullptr) 
+					{
+						droppedGo->transform->SetWorldToLocal(droppedGo->parent->GetGlobalTransform());
+					}
+				}
+			}
+		}
+	
+		ImGui::EndDragDropTarget();
+	}
+
 	if (ImGui::IsItemHovered() && App->input->GetMouseButtonDown(SDL_BUTTON_RIGHT) == KEY_DOWN) 
 	{
 		ImGui::OpenPopup("Modify_GameObject");
@@ -269,6 +351,7 @@ void GameObject::DrawHierarchy(GameObject* goSelected)
 		{
 			App->scene->CreateGameObject(DEFAULT_GO_NAME, this);
 		}
+		
 		if (ImGui::Selectable("Duplicate") && App->scene->goSelected != nullptr) 
 		{
 			toBeCopied = true;
@@ -318,6 +401,7 @@ std::string GameObject::GetFileFolder() const
 	std::string s(filePath);
 	std::size_t found = s.find_last_of("/\\");
 	s = s.substr(0, found + 1);
+
 	return s;
 }
 
@@ -336,14 +420,15 @@ Component* GameObject::AddComponent(ComponentType type)
 		break;
 
 	case  ComponentType::MESH:
-		if (GetComponent(ComponentType::MESH) != nullptr)
+		if (GetComponent(ComponentType::MESH) != nullptr) 
 		{
-			LOG("CAUTION: The Game Object already has a mesh");
+			LOG("This GO already have a MESH");
 		}
-		else
+		else 
 		{
 			component = new ComponentMesh(this, nullptr);
 		}
+
 		break;
 
 	case ComponentType::MATERIAL:
@@ -383,6 +468,7 @@ Component* GameObject::GetComponent(ComponentType type) const
 	{
 		if (component->componentType == type) 
 		{
+		
 			return component;
 		}
 	}
@@ -393,6 +479,7 @@ Component* GameObject::GetComponent(ComponentType type) const
 std::vector<Component*> GameObject::GetComponents(ComponentType type) const 
 {
 	std::vector<Component*> list;
+	
 	for (auto &component : components) 
 	{
 		if (component->componentType == type) 
@@ -408,6 +495,7 @@ math::float4x4 GameObject::GetLocalTransform() const
 {
 	if (transform == nullptr) 
 	{
+	
 		return float4x4::identity;
 	}
 
@@ -418,6 +506,7 @@ math::float4x4 GameObject::GetGlobalTransform() const
 {
 	if (parent != nullptr) 
 	{
+	
 		return parent->GetGlobalTransform() * GetLocalTransform();
 	}
 
@@ -433,25 +522,20 @@ AABB GameObject::ComputeBBox() const
 {
 	bbox.SetNegativeInfinity();
 
-	// Current Game Object meshes
-	for (const auto &mesh : GetComponents(ComponentType::MESH)) 
+	ComponentMesh* mesh = (ComponentMesh*)GetComponent(ComponentType::MESH);
+	
+	if (mesh != nullptr)
 	{
-		bbox.Enclose(((ComponentMesh *)mesh)->bbox);
-		ComponentMesh* mesh = (ComponentMesh*)GetComponent(ComponentType::MESH);
-		
-		if (mesh != nullptr)
-		{
-			bbox.Enclose(mesh)->bbox;
-		}
+		bbox.Enclose((mesh)->bbox);
 	}
 
-	// Apply transformation of our Game Object
+	// Apply transformation
 	bbox.TransformAsAABB(GetGlobalTransform());
 
 	// Child meshes
 	for (const auto &child : goChilds) 
 	{
-		if (child->GetComponents(ComponentType::MESH)) 
+		if (child->GetComponent(ComponentType::MESH) != nullptr) 
 		{
 			bbox.Enclose(child->ComputeBBox());
 		}

@@ -1,14 +1,19 @@
 #include "Component.h"
+#include "Application.h"
+#include "ModuleResourceManager.h"
 
 // Constructor
 Component::Component(GameObject* gameObject, ComponentType type)
 {
+	uuid = App->resource->NewGuuid();
 	goContainer = gameObject;
 	componentType = type;
 }
 
 Component::Component(const Component& duplicateComponent) 
 {
+	uuid = App->resource->NewGuuid();
+	parentUuid = duplicateComponent.parentUuid;
 	goContainer = duplicateComponent.goContainer;
 	componentType = duplicateComponent.componentType;
 	enabled = duplicateComponent.enabled;
@@ -40,6 +45,10 @@ bool Component::DrawComponentState()
 	{
 		Remove();
 	}
+
+	ImGui::Text("UUID:");
+	ImGui::SameLine();
+	ImGui::TextColored({ 0.4f, 0.4f, 0.4f, 1.0f }, uuid.c_str());
 
 	ImGui::PopStyleColor(3);
 	
