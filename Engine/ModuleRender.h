@@ -36,6 +36,7 @@ public:
 	void			SetViewMatrix(ComponentCamera* camera) const;
 	void			SetProjectionMatrix(ComponentCamera* camera) const;
 	void			DrawDebugData();
+	void			DrawReferenceDebug();
 	
 public:
 	bool			vsyncEnabled	= false;

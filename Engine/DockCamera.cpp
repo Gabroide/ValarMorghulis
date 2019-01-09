@@ -24,8 +24,14 @@ void DockCamera::Draw()
 
 	if (App->camera->selectedCamera != nullptr) 
 	{
-		ImGui::Image((ImTextureID)App->camera->selectedCamera->renderTexture, { (float)App->camera->selectedCamera->screenWidth, (float)App->camera->selectedCamera->screenHeight }, { 0,1 }, { 1,0 });
+		ImGui::Image((ImTextureID)App->camera->selectedCamera->renderTexture, { (float)App->window->width, (float)App->window->height }, { 0,1 }, { 1,0 });
 	}
+	else
+	{
+		ImGui::Image((ImTextureID)App->textures->noCametaSelectedTexture->id, { (float)App->window->width, (float)App->window->height }, { 0,1 }, { 1,0 });
+	}
+
+	ImGui::End();
 }
 
 bool DockCamera::IsFocused() const 

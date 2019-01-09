@@ -22,7 +22,7 @@ ModuleSceneLoader::~ModuleSceneLoader()
 
 bool ModuleSceneLoader::Init() 
 {
-	App->textures->LoadDefaultTexture("checkersTexture.jpg");
+	App->textures->LoadDefaultTexture();
 	LoadFile("Models/BakerHouse.fbx");
 
 	return true;

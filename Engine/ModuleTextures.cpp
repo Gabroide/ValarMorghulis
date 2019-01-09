@@ -116,9 +116,10 @@ Texture* const ModuleTextures::Load(const char* path)
 	return nullptr;
 }
 
-void ModuleTextures::LoadDefaultTexture(const char* path) 
+void ModuleTextures::LoadDefaultTexture() 
 {
-	defaultTexture = Load(path);
+	defaultTexture = Load("checkers.jpg");
+	noCameraSelected = Load("nocamselected.jpg");
 }
 
 void ModuleTextures::DrawGUI() 

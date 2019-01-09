@@ -2,6 +2,9 @@
 #include "ModuleScene.h"
 #include "ModuleProgram.h"
 #include "ModuleInput.h"
+#include "ModuleCamera.h"
+#include "ModuleProgram.h"
+#include "ComponentCamera.h"
 #include "ComponentLight.h"
 #include "ComponentMaterial.h"
 #include "ComponentMesh.h"
@@ -413,6 +416,12 @@ Component* GameObject::AddComponent(ComponentType type)
 	switch (type) 
 	{
 	case ComponentType::CAMERA:
+		component = new ComponentCamera(this);
+
+		if (App->camera->selectedCamera == nullptr)
+		{
+			App->camera->selectedCamera == (ComponentCamera*)component;
+		}
 		break;
 
 	case ComponentType::TRANSFORM:

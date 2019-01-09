@@ -108,6 +108,11 @@ update_status ModuleEditor::Update()
 				scene->ToggleEnabled();
 			}
 
+			if (ImGui::MenuItem("Game", NULL, camera->IsEnabled()))
+			{
+				camera->ToggleEnabled();
+			}
+
 			if (ImGui::BeginMenu("Hierarchy", NULL, hierarchy->IsEnabled()))
 			{
 				hierarchy->ToggleEnabled();

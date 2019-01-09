@@ -46,12 +46,21 @@ void DockInspector::Draw()
 			ImGui::Text("Components");
 			ImGui::Separator();
 
-			for (int i = 0; i < IM_ARRAYSIZE(components); i++) 
+			if (ImGui::Selectable("Camera"))
 			{
-				if (ImGui::Selectable(components[i])) 
-				{
-					App->scene->goSelected->AddComponent((ComponentType)i);
-				}
+				App->scene->goSelected->AddComponent(ComponentType::CAMERA);
+			}
+
+			ImGui::Separator();
+
+			if(ImGui::Selectable("Mesh"))
+			{
+				App->scene->goSelected->AddComponent(ComponentType::MESH);
+			}
+
+			if (ImGui::Selectable("Material"))
+			{
+				App->scene->goSelected->AddComponent(ComponentType::MATERIAL);
 			}
 
 			ImGui::EndPopup();

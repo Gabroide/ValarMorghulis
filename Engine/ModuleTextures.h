@@ -28,7 +28,7 @@ public:
 	bool			Init() override;
 	
 	void			DrawGUI();
-	void			LoadDefaultTexture(const char* path);
+	void			LoadDefaultTexture();
 
 public:
 	Texture* const   Load(const char* path);
@@ -41,8 +41,8 @@ public:
 	int				wrapMode			= GL_CLAMP;
 
 public:
-	Texture*		defaukTexture		= nullptr;
-
+	Texture*		defaultTexture		= nullptr;
+	Teture*			noCameraSelected	= nullptr;
 };
 
 #endif // __ModueTextures_h__

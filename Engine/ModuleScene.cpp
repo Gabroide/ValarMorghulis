@@ -81,3 +81,13 @@ GameObject* ModuleScene::CreateGameObject(const char* goName, GameObject* goPare
 
 	return gameObject;
 }
+
+GameObject* ModuleScene::CreateCamera(GameObject* goParent, const math::float4x4& transform)
+{
+	GameObject* gameObject = nullptr;
+
+	gameObject = new GameObject("Camera", transform, goParent, nullptr);
+	gameObject->AddComponent(ComponentType::CAMERA);
+
+	return gameObject;
+}

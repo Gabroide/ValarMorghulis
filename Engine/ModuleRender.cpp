@@ -65,6 +65,19 @@ update_status ModuleRender::Update()
 	SetProjeciontMatrix(App->camera->sceneCamera);
 	SetViewMatric(App->camera->sceneCamera);
 
+	App->scene->Draw();
+
+	DrawReferenceDebug();
+
+	if (App->camera->selectedCamera != nullptr)
+	{
+		glBindBuffer(GL_FRAMEBUFFER, App->camera->selectedCamera->fbo);
+		glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
+
+		SetProjectionMatrix(App->camera->selectedCamera);
+		SetViewMatrix(App->camera->selectedCamera);
+	}
+
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	return UPDATE_CONTINUE;
