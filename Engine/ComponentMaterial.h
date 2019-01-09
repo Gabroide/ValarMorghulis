@@ -22,7 +22,8 @@ public:
 	void		DrawProperties() override;
 	void		ComputeMaterial(const aiMaterial* material);
 	void		DeleteTexture();
-	
+	void		SetTexture(Texture* newTexture);
+
 	unsigned	GetShader() const;
 
 public:

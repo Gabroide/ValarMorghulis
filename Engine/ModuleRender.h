@@ -58,8 +58,6 @@ public:
 	unsigned		ubo				= 0u;
 	unsigned		renderTexture	= 0u;
 
-	Frustum			frustum;
-	
 public:
 	void*			context			= nullptr;
 	

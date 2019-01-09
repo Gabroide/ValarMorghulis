@@ -1,5 +1,14 @@
-#include "Application.h"
 #include "ModuleScene.h"
+#include "Application.h"
+#include "ComponentMaterial.h"
+#include "ComponentMesh.h"
+
+#include "par_shapes.h"
+
+#pragma warning(pop)
+
+#define PAR_SHAPES_IMPLEMENTATIONS
+
 
 // Constructor
 ModuleScene::ModuleScene() 
@@ -43,7 +52,7 @@ void ModuleScene::DrawHierarchy()
 	}
 }
 
-GameObject* ModuleScene::CreateGameObject(const char* goName, GameObject* goParent, const aiMatrix4x4& transform, const char* fileLocation) 
+GameObject* ModuleScene::CreateGameObject(const char* goName, GameObject* goParent, const math::float4x4& transform, const char* fileLocation) 
 {
 	GameObject* gameObject = nullptr;
 

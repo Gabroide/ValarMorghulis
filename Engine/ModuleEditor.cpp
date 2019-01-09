@@ -1,10 +1,11 @@
-﻿#include "Globals.h"
+﻿#include "ModuleEditor.h"
+#include "Globals.h"
 #include "Application.h"
 #include "ModuleRender.h"
 #include "ModuleWindow.h"
 #include "ModuleCamera.h"
 #include "ModuleTextures.h"
-#include "ModuleEditor.h"
+#include "ModuleScene.h"
 
 #include "SDL\include\SDL.h"
 
@@ -76,9 +77,9 @@ update_status ModuleEditor::Update()
 		{
 			if (ImGui::BeginMenu("Add"))
 			{
-				if (ImGui::BeinMenu("Empty Game Object"))
+				if (ImGui::BeginMenu("Empty Game Object"))
 				{
-					new GameObject(DEFAULT_GO_NAME, aiMatrix4x4(), nullptr);
+					new GameObject(DEFAULT_GO_NAME, math::float4x4(), nullptr);
 				}
 				if (ImGui::BeginMenu("Sphere"))
 				{

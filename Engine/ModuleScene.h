@@ -6,7 +6,12 @@
 #include "Module.h"
 #include "GameObject.h"
 
-#include "assimp\matrix4x4.h"
+#include "MathGeoLib.h"
+/*
+#include "math\float4x4.h"
+#include "math\float3.h"
+#include "math\Quat.h"
+*/
 
 class GameObject;
 enum class ComponentType;
@@ -24,7 +29,7 @@ public:
 	update_status	Update()	override;
 
 public:
-	GameObject*		CreateGameObject(const char* goName = nullptr, GameObject* goParent = nullptr, const aiMatrix4x4& transform = aiMatrix4x4(), const char* fileLocation = nullptr);
+	GameObject*		CreateGameObject(const char* goName = nullptr, GameObject* goParent = nullptr, const math::float4x4& transform = aiMatrix4x4(), const char* fileLocation = nullptr);
 
 public:
 	GameObject*		root		= nullptr;

@@ -6,6 +6,7 @@
 #include "assert.h"
 #include "Component.h"
 #include "ModuleTextures.h"
+#include "par_shapes.h"
 
 #include "glew-2.1.0\include\GL\glew.h"
 
@@ -29,7 +30,8 @@ public:
 	void			Draw(unsigned shaderProgram, const Texture* textures) const;
 	void			DrawProperties() override;
 	void			ComputeMesh(aiMesh* mesh);
-	
+	void			ComputeMesh(par_shapes_mesh_s* mesh);
+
 	const unsigned	MaterialIndex();
 
 public:

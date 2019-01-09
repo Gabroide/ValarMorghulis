@@ -41,7 +41,7 @@ void ComponentMaterial::ComputeMaterial(const aiMaterial* material)
 	}
 	else 
 	{
-		texturePath = "checkersTexture.jpg";
+		texture = App->textures->defaukTexture;
 	}
 
 	DeleteTexture();
@@ -52,6 +52,11 @@ Texture* ComponentMaterial::GetTexture() const
 {
 
 	return texture;
+}
+
+void ComponentMaterial::SetTexture(Texture* newTexture)
+{
+	texture = newTexture;
 }
 
 unsigned ComponentMaterial::GetShader() const 
