@@ -221,14 +221,6 @@ void GameObject::Draw() const
 		DrawBBox();
 	}
 
-	if (drawChildsBBox) 
-	{
-		for (auto &child : goChilds) 
-		{
-			child->DrawBBox();
-		}
-	}
-
 	glUseProgram(0);
 }
 
@@ -422,6 +414,7 @@ Component* GameObject::AddComponent(ComponentType type)
 		{
 			App->camera->selectedCamera == (ComponentCamera*)component;
 		}
+		App->camera->gameCameras.push_back((ComponentCamera*)component);
 		break;
 
 	case ComponentType::TRANSFORM:
@@ -531,16 +524,6 @@ void GameObject::ModelTransform(unsigned shader) const
 AABB GameObject::ComputeBBox() const 
 {
 	bbox.SetNegativeInfinity();
-
-	ComponentMesh* mesh = (ComponentMesh*)GetComponent(ComponentType::MESH);
-	
-	if (mesh != nullptr)
-	{
-		bbox.Enclose((mesh)->bbox);
-	}
-
-	// Apply transformation
-	bbox.TransformAsAABB(GetGlobalTransform());
 
 	// Child meshes
 	for (const auto &child : goChilds) 
