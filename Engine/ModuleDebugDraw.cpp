@@ -589,6 +589,7 @@ bool ModuleDebugDraw::Init()
 {
 	implementation = new DDRenderInterfaceCoreGL;
 	dd::initialize(implementation);
+
 	return true;
 }
 
@@ -608,7 +609,7 @@ update_status  ModuleDebugDraw::Update()
 	return UPDATE_CONTINUE;
 }
 
-void ModuleDebugDraw::Draw(Camera* camera, unsigned fbo, unsigned fb_width, unsigned fb_height)
+void ModuleDebugDraw::Draw(ComponentCamera* camera, unsigned fbo, unsigned fb_width, unsigned fb_height)
 {
 	math::float4x4 view = App->renderer->frustum.ViewMatrix();
 	math::float4x4 proj = App->renderer->frustum.ProjectionMatrix();
