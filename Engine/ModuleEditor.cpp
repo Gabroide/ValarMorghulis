@@ -73,26 +73,48 @@ update_status ModuleEditor::Update()
 			ImGui::EndMenu();
 		}
 
-		if (ImGui::BeginMenu("Edit"))
+		if (ImGui::BeginMenu("Scene"))
 		{
-			if (ImGui::BeginMenu("Add"))
+			if (ImGui::BeginMenu("Select camera"))
 			{
-				if (ImGui::BeginMenu("Empty Game Object"))
+				if (App->camera->gameCameras.size() == 0)
 				{
-					new GameObject(DEFAULT_GO_NAME, math::float4x4(), nullptr);
+					ImGui::Text("No cameras available!");
 				}
-				if (ImGui::BeginMenu("Sphere"))
+				else
 				{
-
+					for (auto& camera : App->gameCameras)
+					{
+						if (ImGui::MenuItem(camera->goContainer->name))
+						{
+							App->camera->selectedCamera = camera:
+						}
+					}
 				}
-				if (ImGui::BeginMenu("Cube"))
+
+				ImGui::EndMenu();
+
+				if(ImGui::BeginMenu("Add Menu))
 				{
+					if (ImGui::BeginMenu("Empty Game Object"))
+					{
+						new GameObject(DEFAULT_GO_NAME, math::float4x4(), nullptr);
+					}
 
-				}
+					if (ImGui::BeginMenu("Sphere"))
+					{
 
-				if (ImGui::BeginMenu("Torus"))
-				{
+					}
 
+					if (ImGui::BeginMenu("Cube"))
+					{
+
+					}
+
+					if (ImGui::BeginMenu("Torus"))
+					{
+
+					}
 				}
 
 				ImGui::EndMenu();

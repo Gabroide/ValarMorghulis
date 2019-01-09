@@ -71,6 +71,16 @@ update_status ModuleCamera::PreUpdate()
 	return UPDATE_CONTINUE;
 }
 
+update_status ModuleCamera::Update()
+{
+	if (selectedCamera != nullptr)
+	{
+		selectedCamera->Update();
+	}
+
+	return UPCATE_CONTINUE;
+}
+
 // Called before quitting
 bool ModuleCamera::CleanUp() 
 {

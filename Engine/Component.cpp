@@ -30,7 +30,10 @@ void Component::Update()
 	
 }
 
-void Component::Update() { }
+void Component::Update() 
+{
+
+}
 
 bool Component::DrawComponentState() 
 {
@@ -46,9 +49,12 @@ bool Component::DrawComponentState()
 		Remove();
 	}
 
-	ImGui::Text("UUID:");
-	ImGui::SameLine();
-	ImGui::TextColored({ 0.4f, 0.4f, 0.4f, 1.0f }, uuid.c_str());
+	if (ImGui::CollapsingHeader("UUID") && removed)
+	{
+		ImGui::Text("UUID:");
+		ImGui::SameLine();
+		ImGui::TextColored({ 0.4f, 0.4f, 0.4f, 1.0f }, uuid.c_str());
+	}
 
 	ImGui::PopStyleColor(3);
 	

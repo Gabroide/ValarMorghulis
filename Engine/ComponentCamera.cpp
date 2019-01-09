@@ -1,8 +1,9 @@
 #include "Application.h"
 #include "ModuleScene.h"
 #include "ModuleWindow.h"
-#include "ComponentCamera.h"
 #include "ModuleScene.h"
+#include "ModuleCamera.h"
+#include "ComponentCamera.h"
 
 // Constructor
 ComponentCamera::ComponentCamera(GameObject* goParent) : Component(goParent, ComponentType::CAMERA) 
@@ -68,13 +69,22 @@ void ComponentCamera::SetVerticalFOV(float fovYDegrees)
 	frustum.horizontalFov = 2.f * atanf(tanf(frustum.verticalFov * 0.5f) * ((float)screenWidth / (float)screenHeight));
 }
 
-void ComponentCamera::DrawProperties() 
+void ComponentCamera::DrawProperties()
 {
-	if (ImGui::CollapsingHeader("Camera properties")) 
+	if (ImGui::CollapsingHeader("Camera properties"))
 	{
-		ImGui::Text("UUID:");
-		ImGui::SameLine();
-		ImGui::TextColored({ 0.4f, 0.4f, 0.4f, 1.0f }, uuid.c_str());
+		bool removed = Component::DrawComponentState();
+		if (removed)
+		{
+			ImGui::PopID();
+
+			return;
+		}
+
+		if (ImGui::Button("Select camera", ImVec2(ImGui::GetWindowWidth(), 25)))
+		{
+			App->camera->selectedCamera = this;
+		}
 
 		float camPos[3] = { cameraPosition.x, cameraPosition.y, cameraPosition.z };
 		ImGui::InputFloat3("Position", camPos, "%.2f");
@@ -86,8 +96,8 @@ void ComponentCamera::DrawProperties()
 		ImGui::Separator();
 		ImGui::Text("Pitch: %.2f", pitch, ImGuiInputTextFlags_ReadOnly); ImGui::SameLine();
 		ImGui::Text("Yaw: %.2f", yaw, ImGuiInputTextFlags_ReadOnly);
-		
-		if (ImGui::SliderFloat("FOV", &fovY, 40, 120)) 
+
+		if (ImGui::SliderFloat("FOV", &fovY, 40, 120))
 		{
 			SetVerticalFOV(fovY);
 		}

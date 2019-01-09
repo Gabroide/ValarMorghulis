@@ -26,6 +26,8 @@ enum update_status
 #define BORDERLESS false
 #define FULLSCREEN_DESKTOP false
 #define VSYNC true
+#define DEFAULT_GO_NAME "GameObject"
+#define DEFAULT_CAMERA_NAME "Camera"
 #define TITLE "Valar Morghulis engine"
 #define AUTHOR "Gabriel Cambronero"
 #define DESCRIPTION "C++/C engine for game development"

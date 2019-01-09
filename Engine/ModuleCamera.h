@@ -37,7 +37,8 @@ public:
 	bool				CleanUp()	override;
 
 	update_status		PreUpdate()	override;
-	
+	update_status		Update()	override;
+
 	void				DrawGUI();
 	void				Move();
 	void				MovementSpeed();
