@@ -27,8 +27,8 @@ class GameObject
 {
 public:
 	GameObject();
-	GameObject(const char* goName, const aiMatrix4x4& transform, const char* fileLocation);
-	GameObject(const char* goName, const aiMatrix4x4& transform, GameObject* goParent, const char* fileLocation);
+	GameObject(const char* goName, const math::float4x4& transform, const char* fileLocation);
+	GameObject(const char* goName, const math::float4x4& transform, GameObject* goParent, const char* fileLocation);
 	GameObject(const GameObject& duplicateGameObject);
 	~GameObject();
 

@@ -4,6 +4,7 @@
 #include "ModuleWindow.h"
 #include "ModuleRender.h"
 #include "ModuleEditor.h"
+#include "ModuleScene.h"
 #include "ModuleCamera.h"
 #include "ModuleTime.h"
 
@@ -19,10 +20,15 @@ ModuleCamera::~ModuleCamera()
 	
 }
 
-bool ModuleCamera::Init() 
+bool ModuleCamera::Init()
 {
-	UpdatePitchYaw();
-	App->renderer->LookAt(cameraPos, (cameraPos + front));
+	sceneCamera = new ComponentCamera(App->scene->root);
+	selectedCamera = sceneCamera;
+
+	selectedCamera->cameraPosition = math::float3(0.0f, 3.0f, 40.0f);
+	selectedCamera->InitFrustum(nullptr);
+	sceneCamera->UpdatePitchYaw();
+	sceneCamera->LookAt(sceneCamera->cameraPosition, (sceneCamera->cameraPosition + sceneCamera->cameraFront));
 
 	return true;
 }
@@ -92,39 +98,39 @@ bool ModuleCamera::CleanUp()
 
 void ModuleCamera::MoveCamera(CameraMovement cameraSide) 
 {
-	float normMoveSpeed = cameraSpeed * App->time->realDeltaTime;
+	float normMoveSpeed = sceneCamera->cameraSpeed * App->time->realDeltaTime;
 
 	switch (cameraSide) 
 	{
 	case Upwards:
-		cameraPos += up * normMoveSpeed;
+		sceneCamera->cameraPosition += sceneCamera->cameraUp * normMoveSpeed;
 		break;
-
+	
 	case Downwards:
-		cameraPos -= up * normMoveSpeed;
+		sceneCamera->cameraPosition -= sceneCamera->cameraUp * normMoveSpeed;
 		break;
-
+	
 	case Left:
-		cameraPos += up.Cross(front) * normMoveSpeed;
+		sceneCamera->cameraPosition += sceneCamera->cameraUp.Cross(sceneCamera->cameraFront) * normMoveSpeed;
 		break;
-
+	
 	case Right:
-		cameraPos -= up.Cross(front) * normMoveSpeed;
+		sceneCamera->cameraPosition -= sceneCamera->cameraUp.Cross(sceneCamera->cameraFront) * normMoveSpeed;
 		break;
-
+	
 	case Forward:
-		cameraPos += front * normMoveSpeed;
+		sceneCamera->cameraPosition += sceneCamera->cameraFront * normMoveSpeed;
 		break;
-
+	
 	case Backwards:
-		cameraPos -= front * normMoveSpeed;
+		sceneCamera->cameraPosition -= sceneCamera->cameraFront * normMoveSpeed;
 		break;
-
+	
 	default:
 		break;
 	}
 
-	App->renderer->LookAt(cameraPos, (cameraPos + front));
+	sceneCamera->LookAt(sceneCamera->cameraPosition, (sceneCamera->cameraPosition + sceneCamera->cameraFront));
 }
 
 void ModuleCamera::RotateCamera(const fPoint& mousePosition, bool orbit) 
@@ -144,31 +150,31 @@ void ModuleCamera::RotateCamera(const fPoint& mousePosition, bool orbit)
 	xoffset *= mouseSensitivity;
 	yoffset *= mouseSensitivity;
 
-	yaw += xoffset;
-	pitch += yoffset;
+	sceneCamera->yaw += xoffset;
+	sceneCamera->pitch += yoffset;
 
-	pitch = math::Clamp(pitch, -80.0f, 80.0f);
+	sceneCamera->pitch = math::Clamp(sceneCamera->pitch, -80.0f, 80.0f);
 
 	if (orbit) 
 	{
-		math::float3 cameraTarget(cameraPos + front * 5);
+		math::float3 cameraTarget(sceneCamera->cameraPosition + sceneCamera->cameraFront * 5);
 		float distanceToOrbit = cameraTarget.Length();
 
-		cameraPos.x = sin(math::DegToRad(yaw)) * cos(math::DegToRad(pitch)) * distanceToOrbit;
-		cameraPos.y = sin(math::DegToRad(pitch)) * distanceToOrbit;
-		cameraPos.z = -cos(math::DegToRad(yaw)) * cos(math::DegToRad(pitch)) * distanceToOrbit;
-		front = (cameraTarget - cameraPos).Normalized();
+		sceneCamera->cameraPosition.x = sin(math::DegToRad(sceneCamera->yaw)) * cos(math::DegToRad(sceneCamera->pitch)) * distanceToOrbit;
+		sceneCamera->cameraPosition.y = sin(math::DegToRad(sceneCamera->pitch)) * distanceToOrbit;
+		sceneCamera->cameraPosition.z = -cos(math::DegToRad(sceneCamera->yaw)) * cos(math::DegToRad(sceneCamera->pitch)) * distanceToOrbit;
+		sceneCamera->cameraFront = (cameraTarget - sceneCamera->cameraPosition).Normalized();
 	}
 	else 
 	{
 		math::float3 rotation;
-		rotation.x = sin(math::DegToRad(yaw)) * cos(math::DegToRad(pitch));
-		rotation.y = sin(math::DegToRad(pitch)) * cos(math::DegToRad(pitch));
-		rotation.z = -cos(math::DegToRad(yaw)) * cos(math::DegToRad(pitch));
-		front = rotation.Normalized();
+		rotation.x = sin(math::DegToRad(sceneCamera->yaw)) * cos(math::DegToRad(sceneCamera->pitch));
+		rotation.y = sin(math::DegToRad(sceneCamera->pitch)) * cos(math::DegToRad(sceneCamera->pitch));
+		rotation.z = -cos(math::DegToRad(sceneCamera->yaw)) * cos(math::DegToRad(sceneCamera->pitch));
+		sceneCamera->cameraFront = rotation.Normalized();
 	}
 
-	App->renderer->LookAt(cameraPos, (cameraPos + front));
+	sceneCamera->LookAt(sceneCamera->cameraPosition, (sceneCamera->cameraPosition + sceneCamera->cameraFront));
 }
 
 void ModuleCamera::Zoom() 
@@ -177,18 +183,24 @@ void ModuleCamera::Zoom()
 	
 	if (wheelSlide != 0) 
 	{
-		float zoomValue = App->renderer->frustum.verticalFov + -wheelSlide * 20.0f * App->time->realDeltaTime;
-		float newAngleFov = math::Clamp(zoomValue, math::DegToRad(minFov), math::DegToRad(maxFov));
-		App->renderer->frustum.verticalFov = newAngleFov;
-		App->renderer->frustum.horizontalFov = 2.0f * atanf(tanf(newAngleFov * 0.5f) * ((float)App->window->width / (float)App->window->height));
+		float zoomValue = sceneCamera->frustum.verticalFov + -wheelSlide * 20.0f * App->time->realDeltaTime;
+		float newAngleFov = math::Clamp(zoomValue, math::DegToRad(sceneCamera->minFov), math::DegToRad(sceneCamera->maxFov));
+		sceneCamera->frustum.verticalFov = newAngleFov;
+		sceneCamera->frustum.horizontalFov = 2.0f * atanf(tanf(newAngleFov * 0.5f) * ((float)App->window->width / (float)App->window->height));
 	}
+
+}
+
+void ModuleCamera::SetScreenNewScreenSize(unsigned newWidth, unsigned newHeight) 
+{
+	selectedCamera->SetScreenNewScreenSize(newWidth, newHeight);
 }
 
 void ModuleCamera::FocusSelectedObject() 
 {
 	if (goSelected == nullptr) 
 	{
-		front = (cameraPos - math::float3(0.0f, 0.0f, 0.0f)).Normalized();
+		sceneCamera->cameraFront = (sceneCamera->cameraPosition - math::float3(0.0f, 0.0f, 0.0f)).Normalized();
 	}
 	else 
 	{
@@ -198,44 +210,27 @@ void ModuleCamera::FocusSelectedObject()
 		{
 			ComponentMesh* meshComponent = (ComponentMesh*)component;
 
-			// Closest point returns the same point if the selected object is inside
-			while (meshComponent->bbox.ClosestPoint(cameraPos).Equals(cameraPos)) 
+			while (meshComponent->bbox.ClosestPoint(sceneCamera->cameraPosition).Equals(sceneCamera->cameraPosition)) 
 			{
-				cameraPos = cameraPos.Mul(2.0f);
+				sceneCamera->cameraPosition = sceneCamera->cameraPosition.Mul(2.0f);
 			}
 
-			front = (meshComponent->bbox.CenterPoint() - cameraPos).Normalized();
+			sceneCamera->cameraFront = (meshComponent->bbox.CenterPoint() - sceneCamera->cameraPosition).Normalized();
 		}
-		else
+		else 
 		{
 			component = goSelected->GetComponent(ComponentType::TRANSFORM);
 			
 			if (component != nullptr) 
 			{
 				ComponentTransform* transformComponent = (ComponentTransform*)component;
-				front = (transformComponent->position - cameraPos).Normalized();
+				sceneCamera->cameraFront = (transformComponent->position - sceneCamera->cameraPosition).Normalized();
 			}
 		}
 	}
 
-	App->renderer->LookAt(cameraPos, (cameraPos + front));
-	UpdatePitchYaw();
-}
-
-void ModuleCamera::UpdatePitchYaw() 
-{
-	pitch = -math::RadToDeg(sinf(-front.y));
-	yaw = math::RadToDeg(atan2f(front.z, front.x)) + 90.0f;
-
-	if (math::IsNan(pitch))
-	{
-		pitch = 0.0f;
-	}
-
-	if (math::IsNan(yaw))
-	{
-		yaw = 0.0f;
-	}
+	sceneCamera->LookAt(sceneCamera->cameraPosition, (sceneCamera->cameraPosition + sceneCamera->cameraFront));
+	sceneCamera->UpdatePitchYaw();
 }
 
 void ModuleCamera::CameraMovementKeyboard() 
@@ -269,32 +264,32 @@ void ModuleCamera::CameraMovementKeyboard()
 void ModuleCamera::DrawGUI() 
 {
 	ImGui::Text("Position "); ImGui::SameLine();
-	ImGui::Text("X: %.2f", cameraPos.x, ImGuiInputTextFlags_ReadOnly); ImGui::SameLine();
-	ImGui::Text("Y: %.2f", cameraPos.y, ImGuiInputTextFlags_ReadOnly); ImGui::SameLine();
-	ImGui::Text("Z: %.2f", cameraPos.z, ImGuiInputTextFlags_ReadOnly);
+	ImGui::Text("X: %.2f", sceneCamera->cameraPosition.x, ImGuiInputTextFlags_ReadOnly); ImGui::SameLine();
+	ImGui::Text("Y: %.2f", sceneCamera->cameraPosition.y, ImGuiInputTextFlags_ReadOnly); ImGui::SameLine();
+	ImGui::Text("Z: %.2f", sceneCamera->cameraPosition.z, ImGuiInputTextFlags_ReadOnly);
 
 	ImGui::Text("Forward "); ImGui::SameLine();
-	ImGui::Text("X: %.2f", front.x, ImGuiInputTextFlags_ReadOnly); ImGui::SameLine();
-	ImGui::Text("Y: %.2f", front.y, ImGuiInputTextFlags_ReadOnly); ImGui::SameLine();
-	ImGui::Text("Z: %.2f", front.z, ImGuiInputTextFlags_ReadOnly);
+	ImGui::Text("X: %.2f", sceneCamera->cameraFront.x, ImGuiInputTextFlags_ReadOnly); ImGui::SameLine();
+	ImGui::Text("Y: %.2f", sceneCamera->cameraFront.y, ImGuiInputTextFlags_ReadOnly); ImGui::SameLine();
+	ImGui::Text("Z: %.2f", sceneCamera->cameraFront.z, ImGuiInputTextFlags_ReadOnly);
 
 	ImGui::Text("Rotation "); ImGui::SameLine();
-	ImGui::Text("Pitch: %.2f", pitch, ImGuiInputTextFlags_ReadOnly); ImGui::SameLine();
-	ImGui::Text("Yaw: %.2f", yaw, ImGuiInputTextFlags_ReadOnly); ImGui::SameLine();
+	ImGui::Text("Pitch: %.2f", sceneCamera->pitch, ImGuiInputTextFlags_ReadOnly); ImGui::SameLine();
+	ImGui::Text("Yaw: %.2f", sceneCamera->yaw, ImGuiInputTextFlags_ReadOnly); ImGui::SameLine();
 
 	ImGui::Separator();
-	ImGui::InputFloat("Movement Speed", &cameraSpeed, 1.0f, 100.0f);
-	ImGui::InputFloat("Rotation Speed", &rotationSpeed, 1.0f, 100.0f);
+	ImGui::InputFloat("Movement Speed", &sceneCamera->cameraSpeed, 1.0f, 100.0f);
+	ImGui::InputFloat("Rotation Speed", &sceneCamera->rotationSpeed, 1.0f, 100.0f);
 	ImGui::InputFloat("Mouse sensitivity", &mouseSensitivity, 1.0f, 100.0f);
 
-	float fov = math::RadToDeg(App->renderer->frustum.verticalFov);
+	float fov = math::RadToDeg(sceneCamera->frustum.verticalFov);
 	
 	if (ImGui::SliderFloat("FOV", &fov, 40, 120)) 
 	{
-		App->renderer->frustum.verticalFov = math::DegToRad(fov);
-		App->renderer->frustum.horizontalFov = 2.f * atanf(tanf(App->renderer->frustum.verticalFov * 0.5f) * ((float)App->window->width / (float)App->window->height));
+		sceneCamera->frustum.verticalFov = math::DegToRad(fov);
+		sceneCamera->frustum.horizontalFov = 2.f * atanf(tanf(sceneCamera->frustum.verticalFov * 0.5f) * ((float)App->window->width / (float)App->window->height));
 	}
 
-	ImGui::InputFloat("zNear", &App->renderer->frustum.nearPlaneDistance, 5, 50);
-	ImGui::InputFloat("zFar", &App->renderer->frustum.farPlaneDistance, 5, 50);
+	ImGui::InputFloat("zNear", &sceneCamera->frustum.nearPlaneDistance, 5, 50);
+	ImGui::InputFloat("zFar", &sceneCamera->frustum.farPlaneDistance, 5, 50);
 }

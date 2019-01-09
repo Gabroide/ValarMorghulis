@@ -7,7 +7,8 @@
 #include "ComponentMesh.h"
 #include "ComponentTransform.h"
 #include "ModuleResourceManager.h"
-#include "SDL/include/SDL_mouse.h"
+
+#include "SDL\include\SDL_mouse.h"
 
 //Constructor
 GameObject::GameObject() 
@@ -16,7 +17,7 @@ GameObject::GameObject()
 }
 
 // Construcor
-GameObject::GameObject(const char* goName, const aiMatrix4x4& transform, const char* fileLocation) 
+GameObject::GameObject(const char* goName, const math::float4x4& transform, const char* fileLocation) 
 {
 	uuid = App->resource->NewGuuid();
 	name = goName;
@@ -34,7 +35,7 @@ GameObject::GameObject(const char* goName, const aiMatrix4x4& transform, const c
 }
 
 // Constructor
-GameObject::GameObject(const char* goName, const aiMatrix4x4& transform, GameObject* goParent, const char* fileLocation)
+GameObject::GameObject(const char* goName, const math::float4x4& transform, GameObject* goParent, const char* fileLocation)
 {
 	uuid = App->resource->NewGuuid();
 	name = goName;
