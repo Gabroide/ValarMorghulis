@@ -1,6 +1,8 @@
-#include "ComponentCamera.h"
 #include "Application.h"
+#include "ModuleScene.h"
 #include "ModuleWindow.h"
+#include "ComponentCamera.h"
+#include "ModuleScene.h"
 
 // Constructor
 ComponentCamera::ComponentCamera(GameObject* goParent) : Component(goParent, ComponentType::CAMERA) 
@@ -25,12 +27,13 @@ ComponentCamera::~ComponentCamera()
 void ComponentCamera::InitFrustum() 
 {
 	frustum.type = FrustumType::PerspectiveFrustum;
-	frustum.pos = float3::zero;
-	frustum.front = -float3::unitZ;
+	frustum.pos = cameraPosition;
+	frustum.front = cameraFront;
 	frustum.up = float3::unitY;
 	frustum.nearPlaneDistance = 0.1f;
 	frustum.farPlaneDistance = 1000.0f;
-	SetVerticalFOV(fovY);
+	frustum.verticalFov = math::pi / 2.0f;
+	frustum.horizontalFov = 2.f * atanf(tanf(frustum.verticalFov * 0.5f) * ((float)App->window->width / (float)App->window->height));
 }
 
 void ComponentCamera::Update() 
@@ -79,7 +82,7 @@ void ComponentCamera::DrawProperties()
 		ImGui::Separator();
 		ImGui::Text("Pitch: %.2f", pitch, ImGuiInputTextFlags_ReadOnly); ImGui::SameLine();
 		ImGui::Text("Yaw: %.2f", yaw, ImGuiInputTextFlags_ReadOnly);
-
+		
 		if (ImGui::SliderFloat("FOV", &fovY, 40, 120)) 
 		{
 			SetVerticalFOV(fovY);
@@ -94,12 +97,6 @@ Component* ComponentCamera::Duplicate()
 {
 
 	return new ComponentCamera(*this);
-}
-
-math::float4x4 ComponentCamera::ProjectionMatrix() 
-{
-
-	return frustum.ProjectionMatrix();
 }
 
 void ComponentCamera::LookAt(math::float3 target) 
@@ -119,6 +116,7 @@ math::float4x4 ComponentCamera::GetViewMatrix()
 
 math::float4x4 ComponentCamera::GetProjectionMatrix() 
 {
+
 	return frustum.ProjectionMatrix().Transposed();
 }
 
@@ -133,20 +131,57 @@ void ComponentCamera::SetScreenNewScreenSize(unsigned width, unsigned height)
 	CreateFrameBuffer();
 }
 
-void ComponentCamera::UpdatePitchYaw() 
+void ComponentCamera::Rotate(float dx, float dy) 
 {
-	pitch = -math::RadToDeg(sinf(-cameraFront.y));
-	yaw = math::RadToDeg(atan2f(cameraFront.z, cameraFront.x)) + 90.0f;
-
-	if (math::IsNan(pitch)) 
+	if (dx != 0) 
 	{
-		pitch = 0.0f;
+		math::Quat rotation = math::Quat::RotateY(math::DegToRad(-dx)).Normalized();
+		frustum.front = rotation.Mul(frustum.front).Normalized();
+		frustum.up = rotation.Mul(frustum.up).Normalized();
+	}
+	
+	if (dy != 0) 
+	{
+		math::Quat rotation = math::Quat::RotateAxisAngle(frustum.WorldRight(), math::DegToRad(-dy)).Normalized();
+		math::float3 validUp = rotation.Mul(frustum.up).Normalized();
+		
+		// Avoiding gimbal lock
+		if (validUp.y > 0.0f) 
+		{
+			frustum.up = validUp;
+			frustum.front = rotation.Mul(frustum.front).Normalized();
+		}
+	}
+}
+
+void ComponentCamera::Orbit(float dx, float dy) 
+{
+	if (App->scene->goSelected == nullptr)
+	{
+		return;
 	}
 
-	if (math::IsNan(yaw)) 
+	AABB& bbox = App->scene->goSelected->bbox;
+	math::float3 center = bbox.CenterPoint();
+
+	if (dx != 0) 
 	{
-		yaw = 0.0f;
+		math::Quat rotation = math::Quat::RotateY(math::DegToRad(-dx)).Normalized();
+		frustum.pos = rotation.Mul(frustum.pos);
 	}
+	
+	if (dy != 0) 
+	{
+		math::Quat rotation = math::Quat::RotateAxisAngle(frustum.WorldRight(), math::DegToRad(-dy)).Normalized();
+		math::float3 new_pos = rotation.Mul(frustum.pos);
+		
+		if (!(abs(new_pos.x - center.x) < 0.5f && abs(new_pos.z - center.z) < 0.5f)) 
+		{
+			frustum.pos = new_pos;
+		}
+	}
+
+	LookAt(center);
 }
 
 void ComponentCamera::CreateFrameBuffer() 

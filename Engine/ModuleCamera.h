@@ -39,9 +39,8 @@ public:
 	update_status		PreUpdate()	override;
 	
 	void				DrawGUI();
-	void				CameraMovementKeyboard();
-	void				RotateCamera(const fPoint& mousePosition, bool orbit = false);
-	void				MoveCamera(CameraMovement cameraSide);
+	void				Move();
+	void				MovementSpeed();
 	void				FocusSelectedObject();
 	void				Zoom();
 	void				SetScreenNewScreenSize(unsigned newWidth, unsigned newHeight);

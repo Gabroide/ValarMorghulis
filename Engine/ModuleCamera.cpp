@@ -1,3 +1,4 @@
+#include "ModuleCamera.h"
 #include "Globals.h"
 #include "Application.h"
 #include "ModuleInput.h"
@@ -5,30 +6,28 @@
 #include "ModuleRender.h"
 #include "ModuleEditor.h"
 #include "ModuleScene.h"
-#include "ModuleCamera.h"
 #include "ModuleTime.h"
 
 // Constructor
 ModuleCamera::ModuleCamera() 
 {
-	
+
 }
 
 // Destructor
 ModuleCamera::~ModuleCamera() 
 {
-	
+
 }
 
-bool ModuleCamera::Init()
+bool ModuleCamera::Init() 
 {
 	sceneCamera = new ComponentCamera(App->scene->root);
 	selectedCamera = sceneCamera;
 
-	selectedCamera->cameraPosition = math::float3(0.0f, 3.0f, 40.0f);
+	selectedCamera->cameraPosition = math::float3(0.0f, 15.0f, 40.0f);
 	selectedCamera->InitFrustum();
-	sceneCamera->UpdatePitchYaw();
-	
+
 	return true;
 }
 
@@ -36,34 +35,31 @@ update_status ModuleCamera::PreUpdate()
 {
 	if (App->editor->SceneFocused()) 
 	{
+		MovementSpeed();
+
 		if (App->input->GetMouseButtonDown(SDL_BUTTON_RIGHT) == KEY_REPEAT) 
 		{
-			CameraMovementKeyboard();
+			Move();
 			SDL_ShowCursor(SDL_DISABLE);
-			RotateCamera(App->input->GetMousePosition());
+			sceneCamera->Rotate(sceneCamera->rotationSpeed * App->input->GetMouseMotion().x, sceneCamera->rotationSpeed * App->input->GetMouseMotion().y);
 		}
 		else if (App->input->GetMouseButtonDown(SDL_BUTTON_RIGHT) == KEY_UP) 
 		{
 			SDL_ShowCursor(SDL_ENABLE);
-			firstMouse = true;
 		}
 
-		if (App->input->GetKey(SDL_SCANCODE_F) == KEY_DOWN) 
-		{
-			FocusSelectedObject();
-		}
+		FocusSelectedObject();
 
 		if (App->input->GetKey(SDL_SCANCODE_LALT) == KEY_REPEAT) 
 		{
 			if (App->input->GetMouseButtonDown(SDL_BUTTON_LEFT) == KEY_REPEAT) 
 			{
 				SDL_ShowCursor(SDL_DISABLE);
-				RotateCamera(App->input->GetMousePosition(), true);
+				sceneCamera->Orbit(sceneCamera->rotationSpeed * App->input->GetMouseMotion().x, sceneCamera->rotationSpeed * App->input->GetMouseMotion().y);
 			}
 			else if (App->input->GetMouseButtonDown(SDL_BUTTON_LEFT) == KEY_REPEAT) 
 			{
 				SDL_ShowCursor(SDL_ENABLE);
-				firstMouse = true;
 			}
 		}
 		else if (App->input->GetKey(SDL_SCANCODE_LALT) == KEY_UP) 
@@ -72,17 +68,6 @@ update_status ModuleCamera::PreUpdate()
 		}
 
 		Zoom();
-
-		if (App->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_DOWN) 
-		{
-			cameraSpeed = cameraSpeed * 2;
-			rotationSpeed = rotationSpeed * 2;
-		}
-		else if (App->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_UP) 
-		{
-			cameraSpeed = cameraSpeed * 0.5f;
-			rotationSpeed = rotationSpeed * 0.5f;
-		}
 	}
 
 	return UPDATE_CONTINUE;
@@ -93,87 +78,6 @@ bool ModuleCamera::CleanUp()
 {
 
 	return true;
-}
-
-void ModuleCamera::MoveCamera(CameraMovement cameraSide) 
-{
-	float normMoveSpeed = sceneCamera->cameraSpeed * App->time->realDeltaTime;
-
-	switch (cameraSide) 
-	{
-	case Upwards:
-		sceneCamera->cameraPosition += sceneCamera->cameraUp * normMoveSpeed;
-		break;
-	
-	case Downwards:
-		sceneCamera->cameraPosition -= sceneCamera->cameraUp * normMoveSpeed;
-		break;
-	
-	case Left:
-		sceneCamera->cameraPosition += sceneCamera->cameraUp.Cross(sceneCamera->cameraFront) * normMoveSpeed;
-		break;
-	
-	case Right:
-		sceneCamera->cameraPosition -= sceneCamera->cameraUp.Cross(sceneCamera->cameraFront) * normMoveSpeed;
-		break;
-	
-	case Forward:
-		sceneCamera->cameraPosition += sceneCamera->cameraFront * normMoveSpeed;
-		break;
-	
-	case Backwards:
-		sceneCamera->cameraPosition -= sceneCamera->cameraFront * normMoveSpeed;
-		break;
-	
-	default:
-		break;
-	}
-
-	sceneCamera->LookAt(sceneCamera->cameraPosition, (sceneCamera->cameraPosition + sceneCamera->cameraFront));
-}
-
-void ModuleCamera::RotateCamera(const fPoint& mousePosition, bool orbit) 
-{
-	if (firstMouse) 
-	{
-		lastX = mousePosition.x;
-		lastY = mousePosition.y;
-		firstMouse = false;
-	}
-
-	float xoffset = mousePosition.x - lastX;
-	float yoffset = lastY - mousePosition.y;
-	lastX = mousePosition.x;
-	lastY = mousePosition.y;
-
-	xoffset *= mouseSensitivity;
-	yoffset *= mouseSensitivity;
-
-	sceneCamera->yaw += xoffset;
-	sceneCamera->pitch += yoffset;
-
-	sceneCamera->pitch = math::Clamp(sceneCamera->pitch, -80.0f, 80.0f);
-
-	if (orbit) 
-	{
-		math::float3 cameraTarget(sceneCamera->cameraPosition + sceneCamera->cameraFront * 5);
-		float distanceToOrbit = cameraTarget.Length();
-
-		sceneCamera->cameraPosition.x = sin(math::DegToRad(sceneCamera->yaw)) * cos(math::DegToRad(sceneCamera->pitch)) * distanceToOrbit;
-		sceneCamera->cameraPosition.y = sin(math::DegToRad(sceneCamera->pitch)) * distanceToOrbit;
-		sceneCamera->cameraPosition.z = -cos(math::DegToRad(sceneCamera->yaw)) * cos(math::DegToRad(sceneCamera->pitch)) * distanceToOrbit;
-		sceneCamera->cameraFront = (cameraTarget - sceneCamera->cameraPosition).Normalized();
-	}
-	else 
-	{
-		math::float3 rotation;
-		rotation.x = sin(math::DegToRad(sceneCamera->yaw)) * cos(math::DegToRad(sceneCamera->pitch));
-		rotation.y = sin(math::DegToRad(sceneCamera->pitch)) * cos(math::DegToRad(sceneCamera->pitch));
-		rotation.z = -cos(math::DegToRad(sceneCamera->yaw)) * cos(math::DegToRad(sceneCamera->pitch));
-		sceneCamera->cameraFront = rotation.Normalized();
-	}
-
-	sceneCamera->LookAt(sceneCamera->cameraPosition, (sceneCamera->cameraPosition + sceneCamera->cameraFront));
 }
 
 void ModuleCamera::Zoom() 
@@ -187,7 +91,6 @@ void ModuleCamera::Zoom()
 		sceneCamera->frustum.verticalFov = newAngleFov;
 		sceneCamera->frustum.horizontalFov = 2.0f * atanf(tanf(newAngleFov * 0.5f) * ((float)App->window->width / (float)App->window->height));
 	}
-
 }
 
 void ModuleCamera::SetScreenNewScreenSize(unsigned newWidth, unsigned newHeight) 
@@ -197,67 +100,77 @@ void ModuleCamera::SetScreenNewScreenSize(unsigned newWidth, unsigned newHeight)
 
 void ModuleCamera::FocusSelectedObject() 
 {
-	if (goSelected == nullptr) 
+	if (App->input->GetKey(SDL_SCANCODE_F) == KEY_DOWN && App->scene->goSelected != nullptr) 
 	{
-		sceneCamera->cameraFront = (sceneCamera->cameraPosition - math::float3(0.0f, 0.0f, 0.0f)).Normalized();
+		math::AABB& bbox = App->scene->goSelected->bbox;
+		math::float3 HalfSize = bbox.HalfSize();
+		float distX = HalfSize.x / tanf(sceneCamera->frustum.horizontalFov*0.5f);
+		float distY = HalfSize.y / tanf(sceneCamera->frustum.verticalFov*0.5f);
+		float camDist = MAX(distX, distY) + HalfSize.z; //camera distance from model
+
+		math::float3 center = bbox.FaceCenterPoint(5);
+		sceneCamera->frustum.pos = center + math::float3(0, 0, camDist);
+
+		sceneCamera->frustum.front = -math::float3::unitZ;
+		sceneCamera->frustum.up = math::float3::unitY;
 	}
-	else 
-	{
-		Component* component = goSelected->GetComponent(ComponentType::MESH);
-		
-		if (component != nullptr) 
-		{
-			ComponentMesh* meshComponent = (ComponentMesh*)component;
-
-			while (meshComponent->bbox.ClosestPoint(sceneCamera->cameraPosition).Equals(sceneCamera->cameraPosition)) 
-			{
-				sceneCamera->cameraPosition = sceneCamera->cameraPosition.Mul(2.0f);
-			}
-
-			sceneCamera->cameraFront = (meshComponent->bbox.CenterPoint() - sceneCamera->cameraPosition).Normalized();
-		}
-		else 
-		{
-			component = goSelected->GetComponent(ComponentType::TRANSFORM);
-			
-			if (component != nullptr) 
-			{
-				ComponentTransform* transformComponent = (ComponentTransform*)component;
-				sceneCamera->cameraFront = (transformComponent->position - sceneCamera->cameraPosition).Normalized();
-			}
-		}
-	}
-
-	sceneCamera->LookAt(sceneCamera->cameraPosition, (sceneCamera->cameraPosition + sceneCamera->cameraFront));
-	sceneCamera->UpdatePitchYaw();
 }
 
-void ModuleCamera::CameraMovementKeyboard() 
+void ModuleCamera::MovementSpeed() 
 {
-	if (App->input->GetKey(SDL_SCANCODE_Q) == KEY_REPEAT) 
+	if (App->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_DOWN) 
 	{
-		MoveCamera(Upwards);
+		sceneCamera->cameraSpeed = sceneCamera->cameraSpeed * 2;
+		sceneCamera->rotationSpeed = sceneCamera->rotationSpeed * 2;
 	}
-	else if (App->input->GetKey(SDL_SCANCODE_E) == KEY_REPEAT) 
+	else if (App->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_UP) 
 	{
-		MoveCamera(Downwards);
+		sceneCamera->cameraSpeed = sceneCamera->cameraSpeed * 0.5f;
+		sceneCamera->rotationSpeed = sceneCamera->rotationSpeed * 0.5f;
 	}
-	else if (App->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) 
+}
+
+void ModuleCamera::Move() 
+{
+	float distance = 5.0f * App->time->realDeltaTime;
+	float3 movement = float3::zero;
+	
+	if (App->input->GetKey(SDL_SCANCODE_LSHIFT)) 
 	{
-		MoveCamera(Left);
+		distance *= 2;
 	}
-	else if (App->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) 
+	
+	if (App->input->GetKey(SDL_SCANCODE_Q)) 
 	{
-		MoveCamera(Right);
+		movement += math::float3::unitY*distance;
 	}
-	else if (App->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT) 
+	
+	if (App->input->GetKey(SDL_SCANCODE_E)) 
 	{
-		MoveCamera(Forward);
+		movement -= math::float3::unitY*distance;
 	}
-	else if (App->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT) 
+	
+	if (App->input->GetKey(SDL_SCANCODE_S)) 
 	{
-		MoveCamera(Backwards);
+		movement -= sceneCamera->frustum.front*distance;
 	}
+	
+	if (App->input->GetKey(SDL_SCANCODE_W)) 
+	{
+		movement += sceneCamera->frustum.front*distance;
+	}
+	
+	if (App->input->GetKey(SDL_SCANCODE_A)) 
+	{
+		movement -= sceneCamera->frustum.WorldRight()*distance;
+	}
+	
+	if (App->input->GetKey(SDL_SCANCODE_D)) 
+	{
+		movement += sceneCamera->frustum.WorldRight()*distance;
+	}
+
+	sceneCamera->frustum.Translate(movement);
 }
 
 void ModuleCamera::DrawGUI() 

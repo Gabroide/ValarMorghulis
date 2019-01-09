@@ -10,10 +10,10 @@
 #include "glew-2.1.0\include\GL\glew.h"
 
 #include "MathGeoLib.h"
-#include "Math\float4x4.h"
+/*#include "Math\float4x4.h"
 #include "Math\float3.h"
 #include "Geometry\Frustum.h"
-
+*/
 class ComponentCamera : public Component
 {
 public:
@@ -21,16 +21,16 @@ public:
 	~ComponentCamera();
 
 	void			DrawProperties() override;
-	void			LookAt(math::float3 target);
 	void			Update();
-	void			SetScreenNewScreenSize(unsigned newWidth, unsigned newHeight);
 	void			InitFrustum();
 	void			SetHorizontalFOV(float fovXDegrees);
 	void			SetVerticalFOV(float fovYDegrees);
-	void			UpdatePitchYaw();
 	void			CreateFrameBuffer();
+	void			LookAt(math::float3 target);
+	void			Rotate(float dx, float dy);
+	void			Orbit(float dx, float dy);
+	void			SetScreenNewScreenSize(unsigned newWidth, unsigned newHeight);
 
-	math::float4x4	ProjectionMatrix();
 	math::float4x4	GetViewMatrix();
 	math::float4x4	GetProjectionMatrix();
 
@@ -38,8 +38,6 @@ public:
 	Component*		Duplicate();
 
 public:
-	bool			firstMouse			= true;
-
 	float			maxFov				= 100.0f;
 	float			minFov				= 10.0f;
 	float			pitch				= 0.0f;
@@ -57,9 +55,6 @@ public:
 	unsigned		fbo					= 0u;
 	unsigned		rbo					= 0u;
 	unsigned		renderTexture		= 0u;
-
-	int				lastX				= 0;
-	int				lastY				= 0;
 
 	math::Frustum	frustum;
 
