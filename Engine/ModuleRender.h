@@ -31,33 +31,19 @@ public:
 	update_status	Update()		override;
 	update_status	PostUpdate()	override;
 	
-	void			DrawGUI();
-	void			InitFrustum();
 	void			InitSDL();
-	void			InitOpenGL();
-	void			ViewMatrix();
-	void			ProjectionMatrix();
-	void			SetScreenNewScreenSize();
+	void			InitOpenGL() const;
+	void			SetViewMatrix(ComponentCamera* camera) const;
+	void			SetProjectionMatrix(ComponentCamera* camera) const;
 	void			DrawDebugData();
-	void			CreateUniformBlocks();
-
-	math::float4x4	LookAt(math::float3& cameraPos, math::float3& target);
-
-private:
-	void			DrawReferenceDebug();
-	void			CreateFrameBuffer();
-	void			DrawDebugData();
-
+	
 public:
 	bool			vsyncEnabled	= false;
 
 	float			bgColor[4]		= { 0.0f, 0.0f, 0.0f, 1.0f };
 	
-	unsigned		fbo				= 0u;
-	unsigned		rbo				= 0u;
 	unsigned		ubo				= 0u;
-	unsigned		renderTexture	= 0u;
-
+	
 public:
 	void*			context			= nullptr;
 	

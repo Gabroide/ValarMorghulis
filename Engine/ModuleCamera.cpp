@@ -26,10 +26,9 @@ bool ModuleCamera::Init()
 	selectedCamera = sceneCamera;
 
 	selectedCamera->cameraPosition = math::float3(0.0f, 3.0f, 40.0f);
-	selectedCamera->InitFrustum(nullptr);
+	selectedCamera->InitFrustum();
 	sceneCamera->UpdatePitchYaw();
-	sceneCamera->LookAt(sceneCamera->cameraPosition, (sceneCamera->cameraPosition + sceneCamera->cameraFront));
-
+	
 	return true;
 }
 

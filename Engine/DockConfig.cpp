@@ -120,7 +120,7 @@ void DockConfig::Draw()
 
 	if (ImGui::CollapsingHeader("Renderer")) 
 	{
-		App->renderer->DrawGUI();
+	
 	}
 
 	if (ImGui::CollapsingHeader("Window")) 

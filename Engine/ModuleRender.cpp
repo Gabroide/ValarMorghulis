@@ -6,6 +6,7 @@
 #include "ModuleProgram.h"
 #include "ModuleScene.h"
 #include "ModuleDebugDraw.h"
+#include "ComponentCamera.h"
 
 #include "debugdraw.h"
 
@@ -36,10 +37,7 @@ bool ModuleRender::Init()
 	}
 
 	App->program->LoadPrograms();
-	CreateFrameBuffer();
-
-	CreateUniformBloks();
-
+	
 	return true;
 }
 
@@ -53,18 +51,27 @@ update_status ModuleRender::PreUpdate()
 // Called every draw update
 update_status ModuleRender::Update() 
 {
-	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-	glClearColor(bgColor[0], bgColor[1], bgColor[2], bgColor[3]);
+	glBindFramebuffer(GL_FRAMEBUFFER, App->->sceneCamera->fbo);
+	glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	DrawReferenceDebug();
-
-	ProjectionMatrix();
-	ViewMatrix();
+	SetProjectMatrix(App->camera->sceneCamera);
+	SetViewMatric(App->camera->sceneCamera);
 
 	App->scene->Draw();
 
-	glUseProgram(0);
+	if (App->camera->selectedCamera != nullptr)
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, App->camera->selectedCamera->fbo);
+		glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		SetProjectionMatrix(App->camera->selectedCamera);
+		SetViewMatric(App->camera->selectedCamera);
+
+		App->scene->Draw();
+	}
+
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	return UPDATE_CONTINUE;
@@ -167,72 +174,17 @@ void ModuleRender::DrawDebugData()
 	}
 }
 
-void ModuleRender::CreateFrameBuffer() 
+void ModuleRender::SetViewMatrix(ComponentCamera* camera) const 
 {
-	glDeleteFramebuffers(1, &fbo);
-	glDeleteRenderbuffers(1, &rbo);
-
-	glGenFramebuffers(1, &fbo);
-	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-
-	glGenTextures(1, &renderTexture);
-	glBindTexture(GL_TEXTURE_2D, renderTexture);
-
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, App->window->width, App->window->height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, renderTexture, 0);
-
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	glGenRenderbuffers(1, &rbo);
-	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, App->window->width, App->window->height);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
-
-	glBindRenderbuffer(GL_RENDERBUFFER, 0);
-
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) 
-	{
-		LOG("Error: Framebuffer issue");
-	}
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-void ModuleRender::CreateUniformBlocks() 
-{
-	unsigned int uniformBlockIndexDefault = glGetUniformBlockIndex(App->program->basicProgram, "Matrices");
-	unsigned int uniformBlockIndexTexture = glGetUniformBlockIndex(App->program->textureProgram, "Matrices");
-
-	glUniformBlockBinding(App->program->basicProgram, uniformBlockIndexDefault, 0);
-	glUniformBlockBinding(App->program->textureProgram, uniformBlockIndexTexture, 0);
-
-	glGenBuffers(1, &ubo);
 	glBindBuffer(GL_UNIFORM_BUFFER, ubo);
-	glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(float4x4), NULL, GL_STATIC_DRAW);
-	glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-	glBindBufferRange(GL_UNIFORM_BUFFER, 0, ubo, 0, 2 * sizeof(float4x4));
-}
-
-void ModuleRender::ViewMatrix() 
-{
-	math::float4x4 viewMatrix = App->camera->sceneCamera->frustum.ViewMatrix();
-	viewMatrix.Transpose();
-	glBindBuffer(GL_UNIFORM_BUFFER, ubo);
-	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(float4x4), sizeof(float4x4), &viewMatrix[0][0]);
+	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(math::float4x4), sizeof(math::float4x4), &camera->GetViewMatrix()[0][0]);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
-void ModuleRender::ProjectionMatrix() 
+void ModuleRender::SetProjectionMatrix(ComponentCamera* camera) const
 {
-	float4x4 projection = App->camera->sceneCamera->frustum.ProjectionMatrix();
-	projection.Transpose();
 	glBindBuffer(GL_UNIFORM_BUFFER, ubo);
-	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(float4x4), &projection[0][0]);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(math::float4x4), &camera->GetProjectionMatrix()[0][0]);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
@@ -250,7 +202,7 @@ void ModuleRender::InitSDL()
 	SDL_GetWindowSize(App->window->window, &App->window->width, &App->window->height);
 }
 
-void ModuleRender::InitOpenGL() 
+void ModuleRender::InitOpenGL() const
 {
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -260,22 +212,14 @@ void ModuleRender::InitOpenGL()
 	glEnable(GL_TEXTURE_2D);
 
 	glClearDepth(1.0f);
-	glClearColor(bgColor[0], bgColor[1], bgColor[2], bgColor[3]);
+	glClearColor(0.3f,0.3f, 0.3f, 1.0f);
 	glViewport(0, 0, App->window->width, App->window->height);
 }
 
 bool ModuleRender::CleanUp() 
 {
 	LOG("Destroying renderer");
-	glDeleteFramebuffers(1, &fbo);
-	glDeleteRenderbuffers(1, &rbo);
 	glDeleteBuffers(1, &ubo);
 
 	return true;
-}
-
-void ModuleRender::DrawGUI() 
-{
-	ImGui::SliderFloat3("Background color", App->renderer->bgColor, 0.0f, 1.0f);
-
 }
