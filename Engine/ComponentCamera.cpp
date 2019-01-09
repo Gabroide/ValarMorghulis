@@ -1,27 +1,54 @@
 #include "ComponentCamera.h"
+#include "Application.h"
+#include "ModuleWindow.h"
 
 // Constructor
 ComponentCamera::ComponentCamera(GameObject* goParent) : Component(goParent, ComponentType::CAMERA) 
 {
-	InitFrustum(goParent);
+	InitFrustum();
+	CreateFrameBuffer();
+	
+	if (goParent != nullptr) 
+	{
+		frustum.pos = goParent->bbox.CenterPoint();
+	}
 }
 
 // Destructor
 ComponentCamera::~ComponentCamera() 
 {
-	
+	glDeleteFramebuffers(1, &fbo);
+	glDeleteRenderbuffers(1, &rbo);
+	glDeleteTextures(1, &renderTexture);
 }
 
-void ComponentCamera::InitFrustum(GameObject* goParent) 
+void ComponentCamera::InitFrustum() 
 {
 	frustum.type = FrustumType::PerspectiveFrustum;
 	frustum.pos = float3::zero;
 	frustum.front = -float3::unitZ;
 	frustum.up = float3::unitY;
 	frustum.nearPlaneDistance = 0.1f;
-	frustum.farPlaneDistance = goParent != nullptr ? 100.0f : 1000.0f;
-
+	frustum.farPlaneDistance = 1000.0f;
 	SetVerticalFOV(fovY);
+}
+
+void ComponentCamera::Update() 
+{
+	if (goContainer == nullptr)
+	{
+		return;
+	}
+
+	if (goContainer->transform == nullptr)
+	{
+		return;
+	}
+
+	math::float4x4 transform = goContainer->GetGlobalTransform();
+	frustum.pos = transform.TranslatePart();
+	frustum.front = transform.RotatePart().Mul(math::float3::unitZ).Normalized();
+	frustum.up = transform.RotatePart().Mul(math::float3::unitY).Normalized();
 }
 
 void ComponentCamera::SetHorizontalFOV(float fovXDegrees) 
@@ -43,22 +70,23 @@ void ComponentCamera::DrawProperties()
 	if (ImGui::CollapsingHeader("Camera properties")) 
 	{
 		float camPos[3] = { cameraPosition.x, cameraPosition.y, cameraPosition.z };
-		ImGui::InputFloat3("Camera position", camPos, "%.3f");
+		ImGui::InputFloat3("Position", camPos, "%.2f");
 		cameraPosition = math::float3(camPos[0], camPos[1], camPos[2]);
 		float vectorFront[3] = { cameraFront.x, cameraFront.y, cameraFront.z };
-		ImGui::InputFloat3("Vector front", vectorFront, "%.3f");
+		ImGui::InputFloat3("Front", vectorFront, "%.2f");
 		cameraFront = math::float3(vectorFront[0], vectorFront[1], vectorFront[2]);
-		float vectorUp[3] = { cameraUp.x, cameraUp.y, cameraUp.z };
-		ImGui::InputFloat3("Vector up", vectorUp, "%.3f", ImGuiInputTextFlags_ReadOnly);
-		ImGui::Separator();
-		ImGui::InputFloat("Pitch", &pitch, 0, 0, 0);
-		ImGui::InputFloat("Yaw", &yaw, 0, 0, 0);
-	}
 
-	if (ImGui::CollapsingHeader("Camera configurations")) 
-	{
-		ImGui::SliderFloat("Near Plane", &frustum.nearPlaneDistance, 0.1f, frustum.farPlaneDistance);
-		ImGui::SliderFloat("Far Plane", &frustum.farPlaneDistance, 0.1f, 1000.0f);
+		ImGui::Separator();
+		ImGui::Text("Pitch: %.2f", pitch, ImGuiInputTextFlags_ReadOnly); ImGui::SameLine();
+		ImGui::Text("Yaw: %.2f", yaw, ImGuiInputTextFlags_ReadOnly);
+
+		if (ImGui::SliderFloat("FOV", &fovY, 40, 120)) 
+		{
+			SetVerticalFOV(fovY);
+		}
+
+		ImGui::InputFloat("zNear", &frustum.nearPlaneDistance, 5, 50);
+		ImGui::InputFloat("zFar", &frustum.farPlaneDistance, 5, 50);
 	}
 }
 
@@ -74,34 +102,24 @@ math::float4x4 ComponentCamera::ProjectionMatrix()
 	return frustum.ProjectionMatrix();
 }
 
-math::float4x4 ComponentCamera::LookAt(math::float3& cameraPosition, math::float3& cameraFront, math::float3& cameraUp) 
+void ComponentCamera::LookAt(math::float3 target) 
 {
-	cameraFront.Normalize();
-	math::float3 cameraSide = cameraFront.Cross(cameraUp); cameraSide.Normalize();
-	math::float3 auxCameraUp = cameraSide.Cross(cameraFront);
-
-	frustum.pos = cameraPosition;
-	frustum.front = cameraFront;
-	frustum.up = auxCameraUp;
-
-	return frustum.ViewMatrix();
+	math::float3 dir = (target - frustum.pos).Normalized();
+	math::float3x3 look = math::float3x3::LookAt(frustum.front, dir, frustum.up, math::float3::unitY);
+	frustum.front = look.Mul(frustum.front).Normalized();
+	frustum.up = look.Mul(frustum.up).Normalized();
 }
 
-math::float4x4 ComponentCamera::LookAt(math::float3& cameraPos, math::float3& target) 
+math::float4x4 ComponentCamera::GetViewMatrix() 
 {
-	math::float3 front(target - cameraPos); front.Normalize();
+	math::float4x4 view = frustum.ViewMatrix();
 
-	math::float3 side(cameraFront.Cross(cameraUp)); side.Normalize();
-	math::float3 up(side.Cross(front));
+	return view.Transposed();
+}
 
-	math::float4x4 viewMatrix(math::float4x4::zero);
-	viewMatrix[0][0] = side.x; viewMatrix[0][1] = side.y; viewMatrix[0][2] = side.z;
-	viewMatrix[1][0] = up.x; viewMatrix[1][1] = up.y; viewMatrix[1][2] = up.z;
-	viewMatrix[2][0] = -front.x; viewMatrix[2][1] = -front.y; viewMatrix[2][2] = -front.z;
-	viewMatrix[0][3] = -side.Dot(cameraPos); viewMatrix[1][3] = -up.Dot(cameraPos); viewMatrix[2][3] = front.Dot(cameraPos);
-	viewMatrix[3][0] = 0.0f; viewMatrix[3][1] = 0.0f; viewMatrix[3][2] = 0.0f; viewMatrix[3][3] = 1.0f;
-
-	return viewMatrix;
+math::float4x4 ComponentCamera::GetProjectionMatrix() 
+{
+	return frustum.ProjectionMatrix().Transposed();
 }
 
 void ComponentCamera::SetScreenNewScreenSize(unsigned width, unsigned height) 
@@ -112,6 +130,7 @@ void ComponentCamera::SetScreenNewScreenSize(unsigned width, unsigned height)
 
 	SetHorizontalFOV(fovX);
 	SetVerticalFOV(fovY);
+	CreateFrameBuffer();
 }
 
 void ComponentCamera::UpdatePitchYaw() 
@@ -128,4 +147,39 @@ void ComponentCamera::UpdatePitchYaw()
 	{
 		yaw = 0.0f;
 	}
+}
+
+void ComponentCamera::CreateFrameBuffer() 
+{
+	glDeleteFramebuffers(1, &fbo);
+	glDeleteRenderbuffers(1, &rbo);
+
+	glGenFramebuffers(1, &fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
+	glGenTextures(1, &renderTexture);
+	glBindTexture(GL_TEXTURE_2D, renderTexture);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, App->window->width, App->window->height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, renderTexture, 0);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	glGenRenderbuffers(1, &rbo);
+	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, App->window->width, App->window->height);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) 
+	{
+		LOG("Error: Framebuffer issue");
+	}
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
