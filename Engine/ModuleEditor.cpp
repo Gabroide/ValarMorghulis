@@ -108,17 +108,12 @@ update_status ModuleEditor::Update()
 				
 				if (ImGui::MenuItem("Sphere")) 
 				{
-					App->scene->GenerateSphere(App->scene->goSelected, 20, 20, ath::float3::zero, math::Quat::identity, 1.0f, math::float4(0.3f, 0.7f, 0.2f,1.0f);
+					App->scene->GenerateSphere(App->scene->goSelected, 20, 20, ath::float3::zero, math::Quat::identity, 1.0f, math::float4(50.0f, 100.0f, 0.0f,1.0f);
 				}
-				
-				if (ImGui::MenuItem("Cube")) 
-				{
-				
-				}
-				
+
 				if (ImGui::MenuItem("Torus")) 
 				{
-				
+					App->scene->GenerateTorus(App->scene->goSelected, math::float3::zero, math::Quat::identity, 0.5f, 0.67f, 30, 30, math::float4(50.0f, 100.0f, 0.0f, 1.0f));
 				}
 			
 				ImGui::EndMenu();

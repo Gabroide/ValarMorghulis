@@ -25,7 +25,8 @@ public:
 	GameObject*		CreateGameObject(const char* goName = nullptr, GameObject* goParent = nullptr, const math::float4x4& transform = math::float4x4().identity, const char* fileLocation = nullptr);
 	GameObject*		CreateCamera(GameObject* goParent = nullptr, const math::float4x4& transform = math::float4x4().identity);
 	GameObject*		GenerateSphere(GameObject* goParent, int slices, int stacks, const math::float3& pos, const math::Quat& rot, const float size, const math::float4& color);
-					
+	GameObject*		GenerateTorus(GameObject* goParent, const math::float3& pos, const math::Quat& rot, float innerRadius, float outterRadius, unsigned slices, unsigned stacks, math::float4& color);
+
 public:
 	GameObject*		root		= nullptr;
 	GameObject*		goSelected	= nullptr;

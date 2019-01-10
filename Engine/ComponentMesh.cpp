@@ -211,9 +211,13 @@ void ComponentMesh::Draw(unsigned shaderProgram, const Texture* texture) const
 	if (texture != nullptr) 
 	{
 		glBindTexture(GL_TEXTURE_2D, texture->id);
+		glUniform1i(glGetUniformLocation(shaderProgram, "texture0"), 0);
 	}
-
-	glUniform1i(glGetUniformLocation(shaderProgram, "texture0"), 0);
+	else 
+	{
+		glUniform1i(glGetUniformLocation(shaderProgram, "vColor"), 0);
+	}
+	
 
 	glBindVertexArray(vao);
 	glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_INT, 0);

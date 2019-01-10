@@ -24,7 +24,9 @@ GameObject::GameObject()
 GameObject::GameObject(const char* goName, const math::float4x4& transform, const char* fileLocation) 
 {
 	uuid = App->resource->NewGuuid();
-	name = goName;
+	char* copyName = new char[strlen(goName)];
+	strcpy(copyName, goName);
+	name = copyName;
 
 	if (fileLocation != nullptr) 
 	{
@@ -42,7 +44,9 @@ GameObject::GameObject(const char* goName, const math::float4x4& transform, cons
 GameObject::GameObject(const char* goName, const math::float4x4& transform, GameObject* goParent, const char* fileLocation) 
 {
 	uuid = App->resource->NewGuuid();
-	name = goName;
+	char* copyName = new char[strlen(goName)];
+	strcpy(copyName, goName);
+	name = copyName;
 
 	if (goParent != nullptr) 
 	{
@@ -205,14 +209,14 @@ void GameObject::Draw() const
 		shader = App->program->textureProgram;
 	}
 
+	glUseProgram(shader);
+	ModelTransform(shader);
+
 	if (texture == nullptr && material != nullptr) 
 	{
 		shader = App->program->basicProgram;
-		glUniform4fv(glGetUniformLocation(shader, "Vcolor"), 1, (GLfloat*)&material->color);
+		glUniform4fv(glGetUniformLocation(shader, "vColor"), 1, (GLfloat*)&material->color);
 	}
-
-	glUseProgram(shader);
-	ModelTransform(shader);
 
 	Component* mesh = GetComponent(ComponentType::MESH);
 	

@@ -7,6 +7,8 @@
 #include "ComponentMesh.h"
 #include "ComponentTransform.h"
 
+#include "Math\MathConstants.h"
+
 #include "par_shapes.h"
 
 #pragma warning(pop)
@@ -107,9 +109,6 @@ GameObject* ModuleScene::CreateCamera(GameObject* goParent, const math::float4x4
 
 GameObject* ModuleScene::GenerateSphere(GameObject* goParent, int slices, int stacks, const math::float3& pos, const math::Quat& rot, const float size, const math::float4& color) 
 {
-	assert(slices >= 1);
-	assert(stacks >= 1);
-
 	par_shapes_mesh* mesh = par_shapes_create_parametric_sphere(slices, stacks);
 
 	if (mesh)
@@ -135,6 +134,34 @@ GameObject* ModuleScene::GenerateSphere(GameObject* goParent, int slices, int st
 	}
 
 	LOG("ERROR: Sphere cannot be created because of par_shape error");
+
+	return nullptr;
+}
+
+GameObject* ModuleScene:GenerateTorus(GameObject* goParent, const math::float3& pos, const math::Quat& rot, float innerRadius, float outerRadius, unsigned slices, unsigned stacks, const math::float4& color)
+{
+	par_shapes_mesh* mesh = par_shapes_create_torus(slices, stacks, innerRadius);
+
+	if (mesh)
+	{
+		GameObject* torus = new GameObject* ("Torus", math::float4x4::identity, goParent, nullptr);
+		torus->transform->SetRotation(rot);
+		torus->transform->SetPosition(pos);
+
+		par_shapes_scale(, esh, outterRadius, outterRadius, outterRadius);
+		CòmponentMesh* torusMesh = (ComponentMesh*)torus->AddComponent(ComponentType::MESH);
+		torusMesh->ComputeMesh(mesh);
+
+		par_shapes_free_mesh(mesh);
+
+		ComponentMaterial* torusMaterial = (ComponentMaterial*)torus->AddComponent(ComponentType::MATERIAL);
+		torusMaterial->shader = App->program->basicProgram;
+		torusMaterial->color = color;
+
+		return torus;
+	}
+
+	LOG("ERROR: Torus cannot be created because of par_shape error");
 
 	return nullptr;
 }
