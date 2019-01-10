@@ -197,17 +197,18 @@ void GameObject::Draw() const
 
 	if (material != nullptr && material->enabled) 
 	{
-		shader = material->GetShader();
-		texture = material->GetTexture();
+		shader = material->shader;
+		texture = material->texture;
 	}
 	else 
 	{
 		shader = App->program->textureProgram;
 	}
 
-	if (texture == nullptr) 
+	if (texture == nullptr && material != nullptr) 
 	{
-		texture = App->textures->defaultTexture;
+		shader = App->program->basicProgram;
+		glUniform4fv(glGetUniformLocation(shader, "Vcolor"), 1, (GLfloat*)&material->color);
 	}
 
 	glUseProgram(shader);

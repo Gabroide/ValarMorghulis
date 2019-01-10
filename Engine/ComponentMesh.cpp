@@ -1,5 +1,9 @@
+#include "assert.h"
+
 #include "ComponentMesh.h"
 #include "Application.h"
+
+#include "par_shapes.h"
 
 // Constructor
 ComponentMesh::ComponentMesh(GameObject* goContainer, aiMesh* mesh) : Component(goContainer, ComponentType::MESH) 

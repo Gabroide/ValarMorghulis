@@ -3,21 +3,16 @@
 
 #include <vector>
 
-#include "assert.h"
 #include "Component.h"
 #include "ModuleTextures.h"
-#include "par_shapes.h"
 
-#include "glew-2.1.0\include\GL\glew.h"
-
-#include "MathGeoLib.h"
-/*
 #include "Geometry\AABB.h"
 #include "Math\float3.h"
 #include "Math\Quat.h"
-*/
 
 #include "assimp\mesh.h"
+
+struct par_shapes_mesh_s;
 
 class ComponentMesh : public Component
 {
