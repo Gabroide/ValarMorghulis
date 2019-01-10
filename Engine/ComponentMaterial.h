@@ -7,6 +7,8 @@
 
 #include "glew-2.1.0\include\GL\glew.h"
 
+#include "Math\float4.h"
+
 #include "IMGUI\imgui.h"
 
 #include "assimp\material.h"
@@ -19,21 +21,20 @@ public:
 	ComponentMaterial(const ComponentMaterial& duplicatedComponent);
 	~ComponentMaterial();
 
-	void		DrawProperties() override;
-	void		ComputeMaterial(const aiMaterial* material);
-	void		DeleteTexture();
-	void		SetTexture(Texture* newTexture);
-
-	unsigned	GetShader() const;
+	void			DrawProperties() override;
+	void			ComputeMaterial(const aiMaterial* material);
+	void			DeleteTexture();
 
 public:
-	Texture*	GetTexture() const;
+	Component*		Duplicate();
 	
-private:
-	unsigned	shader = 0u;
+public:
+	unsigned		shader	= 0u;
 	
-private:
-	Texture*	texture = nullptr;
+	math::float4	color	= math::float4::one;
+
+public:
+	Texture*		texture	= nullptr;
 
 };
 

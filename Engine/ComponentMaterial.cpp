@@ -28,6 +28,12 @@ ComponentMaterial::~ComponentMaterial()
 	DeleteTexture();
 }
 
+Component* ComponentMaterial::Duplicate() 
+{
+
+	return new ComponentMaterial(*this);
+}
+
 void ComponentMaterial::ComputeMaterial(const aiMaterial* material) 
 {
 	std::string texturePath;
@@ -46,23 +52,6 @@ void ComponentMaterial::ComputeMaterial(const aiMaterial* material)
 
 	DeleteTexture();
 	texture = App->textures->Load(texturePath.c_str());
-}
-
-Texture* ComponentMaterial::GetTexture() const 
-{
-
-	return texture;
-}
-
-void ComponentMaterial::SetTexture(Texture* newTexture)
-{
-	texture = newTexture;
-}
-
-unsigned ComponentMaterial::GetShader() const 
-{
-
-	return shader;
 }
 
 void ComponentMaterial::DeleteTexture() 
