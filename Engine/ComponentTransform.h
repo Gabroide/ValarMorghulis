@@ -30,6 +30,8 @@ public:
 	void			SetWorldToLocal(const math::float4x4 parentTrans);
 
 public:
+	bool			edited			= false;
+
 	math::float3	position		= math::float3::zero;
 	math::float3	eulerRotation	= math::float3::zero;
 	math::float3	scale			= math::float3::zero;

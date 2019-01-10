@@ -118,11 +118,6 @@ void DockConfig::Draw()
 		App->textures->DrawGUI();
 	}
 
-	if (ImGui::CollapsingHeader("Renderer")) 
-	{
-	
-	}
-
 	if (ImGui::CollapsingHeader("Window")) 
 	{
 		App->window->DrawGUI();

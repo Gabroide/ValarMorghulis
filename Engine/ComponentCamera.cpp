@@ -1,18 +1,15 @@
-#include "ModuleCamera.h"
 #include "Application.h"
+#include "ModuleCamera.h"
+#include "ModuleRender.h"
 #include "ModuleScene.h"
 #include "ModuleWindow.h"
 #include "ComponentCamera.h"
 
 // Constructor
-ComponentCamera::ComponentCamera(GameObject* goParent) : Component(goParent, ComponentType::CAMERA) {
+ComponentCamera::ComponentCamera(GameObject* goParent) : Component(goParent, ComponentType::CAMERA) 
+{
 	InitFrustum();
 	CreateFrameBuffer();
-	
-	if (goParent != nullptr) 
-	{
-		frustum.pos = goParent->bbox.CenterPoint();
-	}
 }
 
 // Destructor
@@ -97,8 +94,8 @@ void ComponentCamera::DrawProperties()
 			return;
 		}
 
-		ImGui::ShowDemoWindow();
 		ImGui::Checkbox("Debug", &debugDraw);
+		ImGui::Checkbox("Frustum culling", App->renderer->cullingFrustumFromGameCamera);
 
 		if (debugDraw)
 		{
@@ -207,8 +204,7 @@ void ComponentCamera::Orbit(float dx, float dy)
 		return;
 	}
 
-	AABB& bbox = App->scene->goSelected->bbox;
-	math::float3 center = bbox.CenterPoint();
+	math::float3 center = App->scene->goSelected->transform->position;
 
 	if (dx != 0) 
 	{

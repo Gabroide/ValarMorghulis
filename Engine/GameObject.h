@@ -9,16 +9,15 @@
 
 #include "IMGUI\imgui.h"
 
-#include "MathGeoLib.h"
-/*
-#include "Math\float4x4.h"
-#include "Geometry\AABB.h"
-*/
+#include "MathGeoLib\include\Math\float4x4.h"
+#include "MathGeoLib\include\Geometry\AABB.h"
 
 #include "assimp\matrix4x4.h"
 
 
 class Component;
+class ComponentMesh;
+class ComponentMaterial;
 class ComponentTransform;
 
 enum class ComponentType;
@@ -33,7 +32,7 @@ public:
 	~GameObject();
 
 	void					Update();
-	void					Draw() const;
+	void					Draw(const Frustum& frustum) const;
 	void					CleanUp();
 	void					DrawProperties();
 	void					DrawHierarchy(GameObject* goSelected);
@@ -41,7 +40,7 @@ public:
 	void					RemoveComponent(Component* component);
 	void					ModelTransform(unsigned shader) const;
 
-	AABB					ComputeBBox() const;
+	AABB					ComputeBBox();
 
 	std::string				GetFileFolder() const;
 
@@ -68,19 +67,23 @@ public:
 	std::string				uuid			= "";
 	std::string				parentUuid		= "";
 
+	math::AABB				bbox;
+
 public:
 	const char*				filePath		= nullptr;
 	const char*				name			= DEFAULT_GO_NAME;
 
 	GameObject*				parent			= nullptr;
 	
-	std::vector<Component*>	components;
+	ComponentMesh*			mesh			= nullptr;
+
+	ComponentMaterial*		material		= nullptr;
+
 	std::list<GameObject*>	goChilds;
 
-	ComponentTransform*		transform		= nullptr;
+	std::vector<Component*>	components;
 
-public:
-	AABB&					bbox			= AABB();
+	ComponentTransform*		transform		= nullptr;
 
 };
 

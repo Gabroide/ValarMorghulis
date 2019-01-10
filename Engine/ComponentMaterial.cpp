@@ -42,16 +42,22 @@ void ComponentMaterial::ComputeMaterial(const aiMaterial* material)
 	{
 		aiTextureMapping mapping = aiTextureMapping_UV;
 		aiString file;
-		material->GetTexture(aiTextureType_DIFFUSE, 0, &file, &mapping, 0);
-		texturePath = goContainer->GetFileFolder() + file.C_Str();
+		unsigned uvindex = 0u;
+
+		if (material->GetTexture(aiTextureType_DIFFUSE, 0, &file, &mapping&uvindex) == AI_SUCCESS)
+		{
+			texturePath = goContainer->GetFileFolder() + file.C_Str();
+			texture = App->textures->Load(texturePath.c_str());
+		}
+		else
+		{
+			texture = App->textures->defaultTexture;
+		}
 	}
 	else 
 	{
 		texture = App->textures->defaukTexture;
 	}
-
-	DeleteTexture();
-	texture = App->textures->Load(texturePath.c_str());
 }
 
 void ComponentMaterial::DeleteTexture() 

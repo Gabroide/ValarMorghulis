@@ -35,7 +35,7 @@ public:
 	int							numIndices = 0;
 	int							materialIndex = 0;
 	
-	AABB						bbox;
+	math::AABB						bbox;
 
 	std::vector<math::float3>	vertices;
 	

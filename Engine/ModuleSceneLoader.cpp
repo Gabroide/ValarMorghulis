@@ -33,7 +33,7 @@ void ModuleSceneLoader::LoadFile(const char* path)
 {
 	assert(path != nullptr);
 
-	const aiScene* scene = aiImportFile(path, aiProcess_Triangulate);
+	const aiScene* scene = aiImportFile(path, aiProcessPreset_TargetRealtime_MaxQuality);
 
 	if (scene != NULL) 
 	{
