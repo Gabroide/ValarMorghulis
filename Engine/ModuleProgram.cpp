@@ -14,10 +14,11 @@ ModuleProgram::~ModuleProgram()
 
 bool ModuleProgram::LoadPrograms() 
 {
-	basicProgram = LoadProgram("./default.vs", "./default.fs");
-	textureProgram = LoadProgram("./texture.vs", "./texture.fs");
+	basicProgram = LoadProgram("./Shaders/default.vs", "./Shaders/default.fs");
+	textureProgram = LoadProgram("./Shaders/texture.vs", "./Shaders/texture.fs");
+	blinnProgram = LoadProgram("./Shaders/blinn.vs", "./Shaders/blinn.fs");
 
-	return (basicProgram != 0 && textureProgram != 0);
+	return (basicProgram != 0 && textureProgram != 0 && blinnProgram != 0);
 }
 
 unsigned ModuleProgram::LoadProgram(const char* vertShaderPath, const char* fragShaderPath) 

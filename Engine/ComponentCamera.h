@@ -5,15 +5,16 @@
 #include "Component.h"
 #include "GameObject.h"
 
-#include "glew-2.1.0\include\GL\glew.h"
-
 #include "SDL\include\SDL.h"
 
-#include "MathGeoLib/include/Math/Quat.h"
-#include "MathGeoLib/include/Math/float3.h"
-#include "MathGeoLib/include/Math/float4x4.h"
-#include "MathGeoLib/include/Math/MathFunc.h"
-#include "MathGeoLib/include/Geometry/Frustum.h"
+#include "glew-2.1.0\include\GL\glew.h"
+
+
+#include "MathGeoLib\include\Math\Quat.h"
+#include "MathGeoLib\include\Math\float3.h"
+#include "MathGeoLib\include\Math\float4x4.h"
+#include "MathGeoLib\include/Math\MathFunc.h"
+#include "MathGeoLib\include\Geometry\Frustum.h"
 
 class ComponentCamera : public Component
 {
@@ -40,7 +41,9 @@ public:
 
 
 public:
-	bool			debugDraw			= false;
+	bool			debugDraw			= true;
+
+	int				wireFrame			= GL_FILL;
 
 	float			maxFov				= 100.0f;
 	float			minFov				= 10.0f;

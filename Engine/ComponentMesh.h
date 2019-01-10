@@ -14,6 +14,7 @@
 
 struct par_shapes_mesh_s;
 
+class ComponentMaterial;
 class ComponentMesh : public Component
 {
 public:
@@ -22,7 +23,7 @@ public:
 	~ComponentMesh();
 
 	void			CleanUp();
-	void			Draw(unsigned shaderProgram, const Texture* textures) const;
+	void			Draw(unsigned shaderProgram, ComponentMaterial* material) const;
 	void			DrawProperties() override;
 	void			ComputeMesh(aiMesh* mesh);
 	void			ComputeMesh(par_shapes_mesh_s* mesh);

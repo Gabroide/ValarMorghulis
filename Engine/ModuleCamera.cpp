@@ -104,7 +104,12 @@ void ModuleCamera::Zoom()
 
 void ModuleCamera::SetScreenNewScreenSize(unsigned newWidth, unsigned newHeight) 
 {
-	selectedCamera->SetScreenNewScreenSize(newWidth, newHeight);
+	for (auto& camera : gameCameras)
+	{
+		camera->SetScreenNewScreenSize(newWidth, newHeight);
+	}
+
+	sceneCamera->SetScreenNewScreenSize(newWidth, newHeight);
 }
 
 void ModuleCamera::FocusSelectedObject() 

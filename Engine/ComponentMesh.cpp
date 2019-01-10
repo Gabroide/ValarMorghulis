@@ -1,7 +1,10 @@
 #include "assert.h"
 
-#include "ComponentMesh.h"
 #include "Application.h"
+#include "ModuleScene.h"
+#include "ComponentLight.h"
+#include "ComponentMesh.h"
+#include "ComponentMaterial.h"
 
 #include "par_shapes.h"
 
@@ -204,20 +207,37 @@ void ComponentMesh::CleanUp()
 	}
 }
 
-void ComponentMesh::Draw(unsigned shaderProgram, const Texture* texture) const 
+void ComponentMesh::Draw(unsigned shaderProgram, const ComponentMaterial* material) const 
 {
 	glActiveTexture(GL_TEXTURE0);
 
-	if (texture != nullptr) 
+	switch (shaderProgram)
 	{
-		glBindTexture(GL_TEXTURE_2D, texture->id);
-		glUniform1i(glGetUniformLocation(shaderProgram, "texture0"), 0);
+	case 3:
+		break;
+
+	case 6:
+		if (material != nullptr && material->texture != nullptr)
+		{
+			glBindTexture(GL_TEXTURE_2D, material->texture->id);
+			glUniform1i(glGetUniformLocation(shaderProgram, "texture0"), 0);
+		}
+		else
+		{
+			glUniform1i(glGetUniformLocation(shaderProgram, "vColor"), 0);
+		}
+		break;
+
+	case 9:
+		glUniform3fv(glGetUniformLocation(shaderProgram, "light_pos"), 1, (float*)&App->scene->lightPosition);
+		glUniform1f(glGetUniformLocation(shaderProgram, "ambient"), App->scene->ambientLight);
+		glUniform1f(glGetUniformLocation(shaderProgram, "shininess"), App->scene->shininess);
+		glUniform1f(glGetUniformLocation(shaderProgram, "k_ambient"), App->scene->ambientk);
+		glUniform1f(glGetUniformLocation(shaderProgram, "k_diffuse"), App->scene->diffusek);
+		glUniform1f(glGetUniformLocation(shaderProgram, "k_specular"), App->scene->speculark);
+		glUniform1f(glGetUniformLocation(shaderProgram, "newColor"), (float*)&material->color);
+		break;
 	}
-	else 
-	{
-		glUniform1i(glGetUniformLocation(shaderProgram, "vColor"), 0);
-	}
-	
 
 	glBindVertexArray(vao);
 	glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_INT, 0);

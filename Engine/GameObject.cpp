@@ -206,23 +206,17 @@ void GameObject::Draw() const
 	}
 	else 
 	{
-		shader = App->program->textureProgram;
+		shader = App->program->basicProgram;
 	}
 
 	glUseProgram(shader);
 	ModelTransform(shader);
 
-	if (texture == nullptr && material != nullptr) 
-	{
-		shader = App->program->basicProgram;
-		glUniform4fv(glGetUniformLocation(shader, "vColor"), 1, (GLfloat*)&material->color);
-	}
-
 	Component* mesh = GetComponent(ComponentType::MESH);
 	
 	if (mesh != nullptr && mesh->enabled) 
 	{
-		((ComponentMesh*)mesh)->Draw(shader, texture);
+		((ComponentMesh*)mesh)->Draw(shader, material);
 	}
 
 	if (App->scene->goSelected == this) 

@@ -1,22 +1,21 @@
 #include <list>
 
-#include "ModuleScene.h"
 #include "Application.h"
-#include "ModuleProgram.h"
-#include "ComponentMaterial.h"
+#include "ModuleScene.h"
 #include "ComponentMesh.h"
+#include "ModuleProgram.h"
+#include "ComponentLight.h"
+#include "ComponentCamera.h"
+#include "ComponentMaterial.h"
 #include "ComponentTransform.h"
-
-#include "Math\MathConstants.h"
 
 #include "par_shapes.h"
 
+#define PAR_SHAPES_IMPLEMENTATION
+
 #pragma warning(pop)
 
-#define PAR_SHAPES_IMPLEMENTATIONS
-
-
-// Constructor
+// onstructor
 ModuleScene::ModuleScene() 
 {
 	
@@ -52,7 +51,7 @@ void ModuleScene::Draw()
 
 void ModuleScene::DrawHierarchy() 
 {
-	for (auto& child : root->goChilds) 
+	for (auto &child : root->goChilds) 
 	{
 		child->DrawHierarchy(goSelected);
 	}
@@ -64,44 +63,35 @@ GameObject* ModuleScene::CreateGameObject(const char* goName, GameObject* goPare
 
 	if (goName != nullptr) 
 	{
-		char* go_name = new char[strlen(goName)];
-		strcpy(go_name, goName);
-
-		gameObject = new GameObject(go_name, transform, goParent, fileLocation);
-
+		gameObject = new GameObject(goName, transform, goParent, fileLocation);
 	}
-	else 
+	else
 	{
+
 		if (goParent != nullptr) 
 		{
-			std::string childName = "ChildOf";
 			std::string childNameStr = "ChildOf";
 			childNameStr += goParent->name;
-			char* childName = new char[strlen(childNameStr.c_str())];
-			strcpy(childName, childNameStr.c_str());
 
-			gameObject = new GameObject(childName, transform, goParent, fileLocation);
+			gameObject = new GameObject(childNameStr.c_str(), transform, goParent, fileLocation);
 		}
 		else 
 		{
-			char* goName = new char[strlen(DEFAULT_GO_NAME)];
-			strcpy(goName, DEFAULT_GO_NAME);
-
-			gameObject = new GameObject(goName, transform, goParent, fileLocation);
+			gameObject = new GameObject(DEFAULT_GO_NAME, transform, goParent, fileLocation);
 		}
+
 	}
 
 	return gameObject;
 }
 
-GameObject* ModuleScene::CreateCamera(GameObject* goParent, const math::float4x4& transform)
+GameObject* ModuleScene::CreateCamera(GameObject* goParent, const math::float4x4& transform) 
 {
 	GameObject* gameObject = nullptr;
 
-	char* cameraName = new char[strlen(DEFAULT_CAMERA_NAME)];
-	strcpy(cameraName, DEFAULT_CAMERA_NAME);
-
-	gameObject = new GameObject(cameraName, transform, goParent, nullptr);
+	gameObject = new GameObject(DEFAULT_CAMERA_NAME, transform, goParent, nullptr);
+	ComponentTransform* goTrans = (ComponentTransform*)gameObject->GetComponent(ComponentType::TRANSFORM);
+	goTrans->SetPosition(math::float3(0.0f, 2.5f, 10.0f));
 	gameObject->AddComponent(ComponentType::CAMERA);
 
 	return gameObject;
@@ -111,9 +101,9 @@ GameObject* ModuleScene::GenerateSphere(GameObject* goParent, int slices, int st
 {
 	par_shapes_mesh* mesh = par_shapes_create_parametric_sphere(slices, stacks);
 
-	if (mesh)
+	if (mesh) 
 	{
-		GameObject* sphere = new GameObject("Sphere", math::float4x4::identity, nullptr);
+		GameObject* sphere = new GameObject("Sphere", math::float4x4::identity, goParent, nullptr);
 		sphere->transform->SetRotation(rot);
 		sphere->transform->SetPosition(pos);
 
@@ -125,7 +115,7 @@ GameObject* ModuleScene::GenerateSphere(GameObject* goParent, int slices, int st
 		par_shapes_free_mesh(mesh);
 
 		ComponentMaterial* sphereMaterial = (ComponentMaterial*)sphere->AddComponent(ComponentType::MATERIAL);
-		sphereMaterial->shader = App->program->basicProgram;
+		sphereMaterial->shader = App->program->blinnProgram;
 		sphereMaterial->color = color;
 
 		goSelected = sphere;
@@ -133,23 +123,24 @@ GameObject* ModuleScene::GenerateSphere(GameObject* goParent, int slices, int st
 		return sphere;
 	}
 
-	LOG("ERROR: Sphere cannot be created because of par_shape error");
+	LOG("Error: Sphere cannot be created, par_shape error");
 
 	return nullptr;
 }
 
-GameObject* ModuleScene:GenerateTorus(GameObject* goParent, const math::float3& pos, const math::Quat& rot, float innerRadius, float outerRadius, unsigned slices, unsigned stacks, const math::float4& color)
+GameObject* ModuleScene::GenerateTorus(GameObject* goParent, const math::float3& pos, const math::Quat& rot, float innerRad, float outerRad, unsigned slices, unsigned stacks, const math::float4& color) 
 {
-	par_shapes_mesh* mesh = par_shapes_create_torus(slices, stacks, innerRadius);
+	par_shapes_mesh* mesh = par_shapes_create_torus(slices, stacks, innerRad);
 
-	if (mesh)
+	if (mesh) 
 	{
-		GameObject* torus = new GameObject* ("Torus", math::float4x4::identity, goParent, nullptr);
+		GameObject* torus = new GameObject("Torus", math::float4x4::identity, goParent, nullptr);
 		torus->transform->SetRotation(rot);
 		torus->transform->SetPosition(pos);
 
-		par_shapes_scale(, esh, outterRadius, outterRadius, outterRadius);
-		CòmponentMesh* torusMesh = (ComponentMesh*)torus->AddComponent(ComponentType::MESH);
+		par_shapes_scale(mesh, outerRad, outerRad, outerRad);
+
+		ComponentMesh* torusMesh = (ComponentMesh*)torus->AddComponent(ComponentType::MESH);
 		torusMesh->ComputeMesh(mesh);
 
 		par_shapes_free_mesh(mesh);
@@ -161,7 +152,7 @@ GameObject* ModuleScene:GenerateTorus(GameObject* goParent, const math::float3& 
 		return torus;
 	}
 
-	LOG("ERROR: Torus cannot be created because of par_shape error");
+	LOG("Error: Torus cannot be created; par_shapes error");
 
 	return nullptr;
 }

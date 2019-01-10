@@ -45,7 +45,7 @@ void ComponentCamera::InitFrustum()
 	frustum.front = cameraFront;
 	frustum.up = float3::unitY;
 	frustum.nearPlaneDistance = 0.1f;
-	frustum.farPlaneDistance = 1000.0f;
+	frustum.farPlaneDistance = 400.0f;
 	frustum.verticalFov = math::pi / 2.0f;
 	frustum.horizontalFov = 2.f * atanf(tanf(frustum.verticalFov * 0.5f) * ((float)App->window->width / (float)App->window->height));
 }
@@ -97,7 +97,15 @@ void ComponentCamera::DrawProperties()
 			return;
 		}
 
+		ImGui::ShowDemoWindow();
 		ImGui::Checkbox("Debug", &debugDraw);
+
+		if (debugDraw)
+		{
+			ImGui::RadioButton("Wireframe", &wireFrame, GL_LINE);
+			ImGui::SameLine();
+			ImGui::RadioButton("Fill", &wireFrame, GL_FILL);
+		}
 
 		ImGui::Separator();
 		ImGui::Text("Pitch: %.2f", pitch, ImGuiInputTextFlags_ReadOnly); ImGui::SameLine();

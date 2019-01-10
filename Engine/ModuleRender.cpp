@@ -1,10 +1,10 @@
 #include "Globals.h"
 #include "Application.h"
+#include "ModuleScene.h"
 #include "ModuleRender.h"
 #include "ModuleEditor.h"
 #include "ModuleCamera.h"
 #include "ModuleWindow.h"
-#include "ModuleScene.h"
 #include "ModuleProgram.h"
 #include "ModuleDebugDraw.h"
 #include "ComponentCamera.h"
@@ -13,20 +13,20 @@
 
 #include "glew-2.1.0\include\GL\glew.h"
 
-#include "Math\float4x4.h"
+#include "MathGeoLib\include\Math\float4x4.h"
 
 #include "debugdraw.h"
 
 // Constructor
 ModuleRender::ModuleRender() 
 {
-
+	
 }
 
 // Destructor
 ModuleRender::~ModuleRender() 
 {
-
+	
 }
 
 // Called before render is available
@@ -63,6 +63,8 @@ update_status ModuleRender::Update()
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	glPolygonMode(GL_FRONT_AND_BACK, App->camera->sceneCamera->wireFrame);
+
 	SetProjectionMatrix(App->camera->sceneCamera);
 	SetViewMatrix(App->camera->sceneCamera);
 
@@ -75,6 +77,8 @@ update_status ModuleRender::Update()
 		glBindFramebuffer(GL_FRAMEBUFFER, App->camera->selectedCamera->fbo);
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		glPolygonMode(GL_FRONT_AND_BACK, App->camera->selectedCamera->wireFrame);
 
 		SetProjectionMatrix(App->camera->selectedCamera);
 		SetViewMatrix(App->camera->selectedCamera);
@@ -102,6 +106,11 @@ void ModuleRender::DrawDebugData(ComponentCamera* camera) const
 	if (camera->debugDraw == false)
 	{
 		return;
+	}
+
+	if (App->camera->selectedCamera != nullptr) 
+	{
+		dd::frustum((App->camera->selectedCamera->frustum.ProjectionMatrix() * App->camera->selectedCamera->frustum.ViewMatrix()).Inverted(), dd::colors::Crimson);
 	}
 
 	if (showGrid) 
@@ -135,9 +144,11 @@ void ModuleRender::GenerateBlockUniforms()
 {
 	unsigned uniformBlockIndexDefault = glGetUniformBlockIndex(App->program->basicProgram, "Matrices");
 	unsigned uniformBlockIndexTexture = glGetUniformBlockIndex(App->program->textureProgram, "Matrices");
+	unsigned uniformBlockIndexBlinn = glGetUniformBlockIndex(App->program->blinnProgram, "Matrices");
 
 	glUniformBlockBinding(App->program->basicProgram, uniformBlockIndexDefault, 0);
 	glUniformBlockBinding(App->program->textureProgram, uniformBlockIndexTexture, 0);
+	glUniformBlockBinding(App->program->blinnProgram, uniformBlockIndexBlinn, 0);
 
 	glGenBuffers(1, &ubo);
 	glBindBuffer(GL_UNIFORM_BUFFER, ubo);
@@ -178,5 +189,6 @@ void ModuleRender::InitOpenGL() const
 bool ModuleRender::CleanUp() 
 {
 	glDeleteBuffers(1, &ubo);
+
 	return true;
 }
