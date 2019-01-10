@@ -31,16 +31,17 @@ private:
 	void			DrawDebugData(ComponentCamera* camera) const;
 
 public:
-	bool			vsyncEnabled	= false;
-	
-	unsigned		ubo				= 0u;
+	bool			vsyncEnabled				= false;
+	bool			cullingFrustumGameCamera	= true;
+
+	unsigned		ubo							= 0u;
 
 public:
-	void*			context			= nullptr;
+	void*			context						= nullptr;
 
 protected:
-	bool   showAxis					= true;
-	bool   showGrid					= true;
+	bool   showAxis								= true;
+	bool   showGrid								= true;
 
 };
 

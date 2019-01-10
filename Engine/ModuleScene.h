@@ -18,7 +18,7 @@ public:
 	
 	update_status	Update()	override;
 	
-	void			Draw();
+	void			Draw(const math::Frustum& frustum) const;
 	void			DrawHierarchy();
 
 public:

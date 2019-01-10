@@ -1,12 +1,12 @@
 #include "Globals.h"
 #include "Application.h"
-#include "ModuleScene.h"
-#include "ModuleRender.h"
-#include "ModuleEditor.h"
 #include "ModuleCamera.h"
-#include "ModuleWindow.h"
-#include "ModuleProgram.h"
 #include "ModuleDebugDraw.h"
+#include "ModuleEditor.h"
+#include "ModuleProgram.h"
+#include "ModuleRender.h"
+#include "ModuleScene.h"
+#include "ModuleWindow.h"
 #include "ComponentCamera.h"
 
 #include "SDL\include\SDL.h"
@@ -68,7 +68,14 @@ update_status ModuleRender::Update()
 	SetProjectionMatrix(App->camera->sceneCamera);
 	SetViewMatrix(App->camera->sceneCamera);
 
-	App->scene->Draw();
+	if (cullingFromGameCamera && App->camera->selectedCamera != nullptr)
+	{
+		App->scene->Draw(App->camera->selectedCamera->frustum);
+	}
+	else
+	{
+		App->scene->Draw(App->camera->sceneCamera->frustum);
+	}
 
 	DrawDebugData(App->camera->sceneCamera);
 
@@ -83,7 +90,7 @@ update_status ModuleRender::Update()
 		SetProjectionMatrix(App->camera->selectedCamera);
 		SetViewMatrix(App->camera->selectedCamera);
 
-		App->scene->Draw();
+		App->scene->Draw(App->camera->selectedCamera->frustum);
 
 		DrawDebugData(App->camera->selectedCamera);
 	}
