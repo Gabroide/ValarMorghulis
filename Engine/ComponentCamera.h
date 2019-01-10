@@ -5,15 +5,16 @@
 #include "Component.h"
 #include "GameObject.h"
 
-#include "SDL\include\SDL.h"
-
 #include "glew-2.1.0\include\GL\glew.h"
 
-#include "MathGeoLib.h"
-/*#include "Math\float4x4.h"
-#include "Math\float3.h"
-#include "Geometry\Frustum.h"
-*/
+#include "SDL\include\SDL.h"
+
+#include "MathGeoLib/include/Math/Quat.h"
+#include "MathGeoLib/include/Math/float3.h"
+#include "MathGeoLib/include/Math/float4x4.h"
+#include "MathGeoLib/include/Math/MathFunc.h"
+#include "MathGeoLib/include/Geometry/Frustum.h"
+
 class ComponentCamera : public Component
 {
 public:
@@ -23,13 +24,13 @@ public:
 	void			DrawProperties() override;
 	void			Update();
 	void			InitFrustum();
-	void			SetHorizontalFOV(float fovXDegrees);
-	void			SetVerticalFOV(float fovYDegrees);
-	void			CreateFrameBuffer();
 	void			LookAt(math::float3 target);
 	void			Rotate(float dx, float dy);
 	void			Orbit(float dx, float dy);
 	void			SetScreenNewScreenSize(unsigned newWidth, unsigned newHeight);
+	void			SetHorizontalFOV(float fovXDegrees);
+	void			SetVerticalFOV(float fovYDegrees);
+	void			CreateFrameBuffer();
 
 	math::float4x4	GetViewMatrix();
 	math::float4x4	GetProjectionMatrix();
@@ -37,7 +38,10 @@ public:
 public:
 	Component*		Duplicate();
 
+
 public:
+	bool			debugDraw			= false;
+
 	float			maxFov				= 100.0f;
 	float			minFov				= 10.0f;
 	float			pitch				= 0.0f;
@@ -49,6 +53,7 @@ public:
 	float			fovY				= 45.0f;
 	float			fovX				= 45.0f;
 	float			zoomValue			= 0.0f;
+	
 
 	unsigned		screenWidth			= SCREEN_WIDTH;
 	unsigned		screenHeight		= SCREEN_HEIGHT;

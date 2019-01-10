@@ -1,10 +1,10 @@
-﻿#include "ModuleEditor.h"
-#include "Globals.h"
+﻿#include "Globals.h"
 #include "Application.h"
 #include "ModuleRender.h"
 #include "ModuleWindow.h"
 #include "ModuleCamera.h"
 #include "ModuleTextures.h"
+#include "ModuleEditor.h"
 #include "ModuleScene.h"
 
 #include "SDL\include\SDL.h"
@@ -21,10 +21,14 @@ ModuleEditor::ModuleEditor()
 	docks.push_back(hierarchy = new DockHierarchy());
 	docks.push_back(inspector = new DockInspector());
 	docks.push_back(time = new DockTime());
+	docks.push_back(camera = new DockCamera());
 }
 
 // Destructor
-ModuleEditor::~ModuleEditor() { }
+ModuleEditor::~ModuleEditor() 
+{
+	
+}
 
 bool ModuleEditor::Init() 
 {
@@ -58,7 +62,7 @@ update_status ModuleEditor::Update()
 {
 	if (ImGui::BeginMainMenuBar()) 
 	{
-		if (ImGui::BeginMenu("File")) 
+		if (ImGui::BeginMenu("App")) 
 		{
 			if (ImGui::MenuItem("Exit")) 
 			{
@@ -67,59 +71,59 @@ update_status ModuleEditor::Update()
 				ImGui::End();
 				ImGui::EndFrame();
 			
-				return UPDATE_STOP	;
+				return UPDATE_STOP;
 			}
 		
 			ImGui::EndMenu();
 		}
 
-		if (ImGui::BeginMenu("Scene"))
+		if (ImGui::BeginMenu("Scene")) 
 		{
-			if (ImGui::BeginMenu("Select camera"))
+			if (ImGui::BeginMenu("Select camera in")) 
 			{
-				if (App->camera->gameCameras.size() == 0)
+				if (App->camera->gameCameras.size() == 0) 
 				{
-					ImGui::Text("No cameras available!");
+					ImGui::Text("No game cameras availables");
 				}
 				else
 				{
-					for (auto& camera : App->gameCameras)
+					for (auto& camera : App->camera->gameCameras) 
 					{
-						if (ImGui::MenuItem(camera->goContainer->name))
+						if (ImGui::MenuItem(camera->goContainer->name, NULL, App->camera->selectedCamera == camera)) 
 						{
-							App->camera->selectedCamera = camera:
+							App->camera->selectedCamera = camera;
 						}
 					}
 				}
-
-				ImGui::EndMenu();
-
-				if(ImGui::BeginMenu("Add Menu))
-				{
-					if (ImGui::BeginMenu("Empty Game Object"))
-					{
-						new GameObject(DEFAULT_GO_NAME, math::float4x4(), nullptr);
-					}
-
-					if (ImGui::BeginMenu("Sphere"))
-					{
-
-					}
-
-					if (ImGui::BeginMenu("Cube"))
-					{
-
-					}
-
-					if (ImGui::BeginMenu("Torus"))
-					{
-
-					}
-				}
-
+			
 				ImGui::EndMenu();
 			}
 
+			if (ImGui::BeginMenu("Add new")) 
+			{
+				if (ImGui::MenuItem("Empty GameObject")) 
+				{
+					new GameObject(DEFAULT_GO_NAME, math::float4x4().identity, nullptr, nullptr);
+				}
+				
+				if (ImGui::MenuItem("Sphere")) 
+				{
+				
+				}
+				
+				if (ImGui::MenuItem("Cube")) 
+				{
+				
+				}
+				
+				if (ImGui::MenuItem("Torus")) 
+				{
+				
+				}
+			
+				ImGui::EndMenu();
+			}
+		
 			ImGui::EndMenu();
 		}
 
@@ -130,17 +134,17 @@ update_status ModuleEditor::Update()
 				scene->ToggleEnabled();
 			}
 
-			if (ImGui::MenuItem("Game", NULL, camera->IsEnabled()))
+			if (ImGui::MenuItem("Game", NULL, camera->IsEnabled())) 
 			{
 				camera->ToggleEnabled();
 			}
 
-			if (ImGui::BeginMenu("Hierarchy", NULL, hierarchy->IsEnabled()))
+			if (ImGui::MenuItem("Hierarchy", NULL, hierarchy->IsEnabled())) 
 			{
 				hierarchy->ToggleEnabled();
 			}
 
-			if (ImGui::BeginMenu("Time", Null, time->IsEnabled()))
+			if (ImGui::MenuItem("Time", NULL, time->IsEnabled())) 
 			{
 				time->ToggleEnabled();
 			}
@@ -155,8 +159,7 @@ update_status ModuleEditor::Update()
 		
 		if (ImGui::BeginMenu("Help")) 
 		{
-			if (ImGui::MenuItem("About")) 
-			{
+			if (ImGui::MenuItem("About")) {
 				about->ToggleEnabled();
 			}
 
@@ -189,7 +192,6 @@ void ModuleEditor::RenderGUI()
 
 void ModuleEditor::PrintDocks() 
 {
-	// Print docks
 	for (std::list<Dock*>::iterator it = docks.begin(); it != docks.end(); ++it)
 	{
 		if ((*it)->IsEnabled())

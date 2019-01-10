@@ -1,13 +1,11 @@
+#include "ModuleCamera.h"
 #include "Application.h"
 #include "ModuleScene.h"
 #include "ModuleWindow.h"
-#include "ModuleScene.h"
-#include "ModuleCamera.h"
 #include "ComponentCamera.h"
 
 // Constructor
-ComponentCamera::ComponentCamera(GameObject* goParent) : Component(goParent, ComponentType::CAMERA) 
-{
+ComponentCamera::ComponentCamera(GameObject* goParent) : Component(goParent, ComponentType::CAMERA) {
 	InitFrustum();
 	CreateFrameBuffer();
 	
@@ -23,6 +21,21 @@ ComponentCamera::~ComponentCamera()
 	glDeleteFramebuffers(1, &fbo);
 	glDeleteRenderbuffers(1, &rbo);
 	glDeleteTextures(1, &renderTexture);
+
+	for (std::vector<ComponentCamera*>::iterator it = App->camera->gameCameras.begin(); it != App->camera->gameCameras.end(); ++it) 
+	{
+		if ((*it) == this) 
+		{
+			if (App->camera->selectedCamera == this) 
+			{
+				App->camera->selectedCamera = nullptr;
+			}
+			
+			App->camera->gameCameras.erase(it);
+	
+			return;
+		}
+	}
 }
 
 void ComponentCamera::InitFrustum() 
@@ -69,42 +82,53 @@ void ComponentCamera::SetVerticalFOV(float fovYDegrees)
 	frustum.horizontalFov = 2.f * atanf(tanf(frustum.verticalFov * 0.5f) * ((float)screenWidth / (float)screenHeight));
 }
 
-void ComponentCamera::DrawProperties()
+void ComponentCamera::DrawProperties() 
 {
-	if (ImGui::CollapsingHeader("Camera properties"))
+	ImGui::PushID(this);
+	
+	if (ImGui::CollapsingHeader("Camera properties")) 
 	{
 		bool removed = Component::DrawComponentState();
-		if (removed)
+		
+		if (removed) 
 		{
 			ImGui::PopID();
-
+		
 			return;
 		}
 
-		if (ImGui::Button("Select camera", ImVec2(ImGui::GetWindowWidth(), 25)))
-		{
-			App->camera->selectedCamera = this;
-		}
-
-		float camPos[3] = { cameraPosition.x, cameraPosition.y, cameraPosition.z };
-		ImGui::InputFloat3("Position", camPos, "%.2f");
-		cameraPosition = math::float3(camPos[0], camPos[1], camPos[2]);
-		float vectorFront[3] = { cameraFront.x, cameraFront.y, cameraFront.z };
-		ImGui::InputFloat3("Front", vectorFront, "%.2f");
-		cameraFront = math::float3(vectorFront[0], vectorFront[1], vectorFront[2]);
+		ImGui::Checkbox("Debug", &debugDraw);
 
 		ImGui::Separator();
 		ImGui::Text("Pitch: %.2f", pitch, ImGuiInputTextFlags_ReadOnly); ImGui::SameLine();
 		ImGui::Text("Yaw: %.2f", yaw, ImGuiInputTextFlags_ReadOnly);
 
-		if (ImGui::SliderFloat("FOV", &fovY, 40, 120))
+		if (ImGui::SliderFloat("FOV", &fovY, 40, 120)) 
 		{
 			SetVerticalFOV(fovY);
 		}
 
 		ImGui::InputFloat("zNear", &frustum.nearPlaneDistance, 5, 50);
 		ImGui::InputFloat("zFar", &frustum.farPlaneDistance, 5, 50);
+
+		if (App->camera->selectedCamera == this) 
+		{
+			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+			ImGui::Button("Current camera");
+			ImGui::PopStyleVar();
+		}
+		else 
+		{
+			if (ImGui::Button("Set camera")) 
+			{
+				App->camera->selectedCamera = this;
+			}
+		}
+		ImGui
+			::Separator();
 	}
+
+	ImGui::PopID();
 }
 
 Component* ComponentCamera::Duplicate() 
@@ -188,9 +212,7 @@ void ComponentCamera::Orbit(float dx, float dy)
 	{
 		math::Quat rotation = math::Quat::RotateAxisAngle(frustum.WorldRight(), math::DegToRad(-dy)).Normalized();
 		math::float3 new_pos = rotation.Mul(frustum.pos);
-		
-		if (!(abs(new_pos.x - center.x) < 0.5f && abs(new_pos.z - center.z) < 0.5f)) 
-		{
+		if (!(abs(new_pos.x - center.x) < 0.5f && abs(new_pos.z - center.z) < 0.5f)) {
 			frustum.pos = new_pos;
 		}
 	}

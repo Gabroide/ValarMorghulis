@@ -2,12 +2,11 @@
 #include "ModuleDebugDraw.h"
 #include "Application.h"
 #include "ModuleRender.h"
-#include "ModuleRender.h"
 
 #define DEBUG_DRAW_IMPLEMENTATION
 #include "DebugDraw.h"     // Debug Draw API. Notice that we need the DEBUG_DRAW_IMPLEMENTATION macro here!
 
-#include "glew-2.1.0\include\GL\glew.h
+#include "GL/glew.h"
 #include <assert.h>
 
 class DDRenderInterfaceCoreGL final : public dd::RenderInterface
@@ -574,18 +573,18 @@ const char * DDRenderInterfaceCoreGL::textFragShaderSrc = "\n"
 DDRenderInterfaceCoreGL* ModuleDebugDraw::implementation = 0;
 
 // Constructor
-ModuleDebugDraw::ModuleDebugDraw()
+ModuleDebugDraw::ModuleDebugDraw() 
 {
-
+	
 }
 
 // Destructor
-ModuleDebugDraw::~ModuleDebugDraw()
+ModuleDebugDraw::~ModuleDebugDraw() 
 {
-
+	
 }
 
-bool ModuleDebugDraw::Init()
+bool ModuleDebugDraw::Init() 
 {
 	implementation = new DDRenderInterfaceCoreGL;
 	dd::initialize(implementation);
@@ -593,8 +592,7 @@ bool ModuleDebugDraw::Init()
 	return true;
 }
 
-
-bool ModuleDebugDraw::CleanUp()
+bool ModuleDebugDraw::CleanUp() 
 {
 	dd::shutdown();
 
@@ -604,15 +602,16 @@ bool ModuleDebugDraw::CleanUp()
 	return true;
 }
 
-update_status  ModuleDebugDraw::Update()
+update_status  ModuleDebugDraw::Update() 
 {
+
 	return UPDATE_CONTINUE;
 }
 
-void ModuleDebugDraw::Draw(ComponentCamera* camera, unsigned fbo, unsigned fb_width, unsigned fb_height)
+void ModuleDebugDraw::Draw(ComponentCamera* camera, unsigned fbo, unsigned fb_width, unsigned fb_height) 
 {
-	math::float4x4 view = App->renderer->frustum.ViewMatrix();
-	math::float4x4 proj = App->renderer->frustum.ProjectionMatrix();
+	math::float4x4 view = camera->frustum.ViewMatrix();
+	math::float4x4 proj = camera->frustum.ProjectionMatrix();
 
 	implementation->width = fb_width;
 	implementation->height = fb_height;
@@ -622,5 +621,3 @@ void ModuleDebugDraw::Draw(ComponentCamera* camera, unsigned fbo, unsigned fb_wi
 	dd::flush();
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
-
-

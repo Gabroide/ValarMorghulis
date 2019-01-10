@@ -1,4 +1,3 @@
-#include "ModuleCamera.h"
 #include "Globals.h"
 #include "Application.h"
 #include "ModuleInput.h"
@@ -6,26 +5,28 @@
 #include "ModuleRender.h"
 #include "ModuleEditor.h"
 #include "ModuleScene.h"
+#include "ModuleCamera.h"
 #include "ModuleTime.h"
 
 // Constructor
 ModuleCamera::ModuleCamera() 
 {
-
+	
 }
 
 // Destructor
 ModuleCamera::~ModuleCamera() 
 {
-
+	
 }
 
 bool ModuleCamera::Init() 
 {
 	sceneCamera = new ComponentCamera(App->scene->root);
-	sceneCamera->cameraPosition =, math::cloat3(0.0f, 20.0f, 30.0f);
+	sceneCamera->cameraPosition = math::float3(0.0f, 20.0f, 30.0f);
 	sceneCamera->InitFrustum();
-	
+	sceneCamera->debugDraw = true;
+
 	return true;
 }
 
@@ -71,14 +72,14 @@ update_status ModuleCamera::PreUpdate()
 	return UPDATE_CONTINUE;
 }
 
-update_status ModuleCamera::Update()
+update_status ModuleCamera::Update() 
 {
-	if (selectedCamera != nullptr)
+	if (selectedCamera != nullptr && selectedCamera->enabled) 
 	{
 		selectedCamera->Update();
 	}
 
-	return UPCATE_CONTINUE;
+	return UPDATE_CONTINUE;
 }
 
 // Called before quitting
@@ -118,7 +119,6 @@ void ModuleCamera::FocusSelectedObject()
 
 		math::float3 center = bbox.FaceCenterPoint(5);
 		sceneCamera->frustum.pos = center + math::float3(0, 0, camDist);
-
 		sceneCamera->frustum.front = -math::float3::unitZ;
 		sceneCamera->frustum.up = math::float3::unitY;
 	}
@@ -183,6 +183,8 @@ void ModuleCamera::Move()
 
 void ModuleCamera::DrawGUI() 
 {
+	ImGui::Checkbox("Debug", &sceneCamera->debugDraw);
+
 	ImGui::Text("Position "); ImGui::SameLine();
 	ImGui::Text("X: %.2f", sceneCamera->cameraPosition.x, ImGuiInputTextFlags_ReadOnly); ImGui::SameLine();
 	ImGui::Text("Y: %.2f", sceneCamera->cameraPosition.y, ImGuiInputTextFlags_ReadOnly); ImGui::SameLine();
@@ -195,7 +197,7 @@ void ModuleCamera::DrawGUI()
 
 	ImGui::Text("Rotation "); ImGui::SameLine();
 	ImGui::Text("Pitch: %.2f", sceneCamera->pitch, ImGuiInputTextFlags_ReadOnly); ImGui::SameLine();
-	ImGui::Text("Yaw: %.2f", sceneCamera->yaw, ImGuiInputTextFlags_ReadOnly); ImGui::SameLine();
+	ImGui::Text("Yaw: %.2f", sceneCamera->yaw, ImGuiInputTextFlags_ReadOnly);
 
 	float fov = math::RadToDeg(sceneCamera->frustum.verticalFov);
 	
