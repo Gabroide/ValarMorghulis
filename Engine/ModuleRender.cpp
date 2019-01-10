@@ -1,3 +1,4 @@
+#include "Globals.h"
 #include "Application.h"
 #include "ModuleRender.h"
 #include "ModuleEditor.h"
@@ -7,6 +8,12 @@
 #include "ModuleProgram.h"
 #include "ModuleDebugDraw.h"
 #include "ComponentCamera.h"
+
+#include "SDL\include\SDL.h"
+
+#include "glew-2.1.0\include\GL\glew.h"
+
+#include "Math\float4x4.h"
 
 #include "debugdraw.h"
 
@@ -38,12 +45,6 @@ bool ModuleRender::Init()
 
 	App->program->LoadPrograms();
 	GenerateBlockUniforms();
-
-	return true;
-}
-
-bool ModuleRender::Start() 
-{
 
 	return true;
 }
@@ -96,7 +97,7 @@ update_status ModuleRender::PostUpdate()
 	return UPDATE_CONTINUE;
 }
 
-void ModuleRender::DrawDebugData(ComponentCamera* camera) 
+void ModuleRender::DrawDebugData(ComponentCamera* camera) const 
 {
 	if (camera->debugDraw == false)
 	{

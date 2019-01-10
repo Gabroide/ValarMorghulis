@@ -108,7 +108,7 @@ update_status ModuleEditor::Update()
 				
 				if (ImGui::MenuItem("Sphere")) 
 				{
-				
+					App->scene->GenerateSphere(App->scene->goSelected, 20, 20, ath::float3::zero, math::Quat::identity, 1.0f, math::float4(0.3f, 0.7f, 0.2f,1.0f);
 				}
 				
 				if (ImGui::MenuItem("Cube")) 
