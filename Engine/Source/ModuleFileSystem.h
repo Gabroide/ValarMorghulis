@@ -1,11 +1,13 @@
 #ifndef __ModuleFileSystem_h__
 #define __ModuleFileSystem_h__
 
-#include "Module.h"
-#include "Crossguid/crossguid/guid.hpp"
 #include <map>
 #include <vector>
 #include <string>
+
+#include "Module.h"
+
+#include "Crossguid\crossguid\guid.hpp"
 
 class ModuleFileSystem : public Module
 {
@@ -29,7 +31,7 @@ public:
 	void		ChangePathSlashes(std::string& fullPath) const;
 	void		SplitFilePath(const char* fullPath, std::string* path, std::string* file = nullptr, std::string* extension = nullptr) const;
 
-	std::map<std::string, std::string> GetFilesFromDirectoryRecursive(const char* directory);
+	std::map<std::string, std::string> GetFilesFromDirectoryRecursive(const char* directory, const bool includeExtension);
 	
 	std::string NewGuuid();
 

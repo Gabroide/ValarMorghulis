@@ -16,8 +16,8 @@ class ModuleProgram;
 class ModuleTime;
 class ModuleScene;
 class ModuleDebugDraw;
-class ModuleSceneLoader;
 class ModuleFileSystem;
+class ModuleLibrary;
 
 class Application
 {
@@ -25,13 +25,12 @@ public:
 	Application();
 	~Application();
 
-	bool				Init();
+	bool Init();
+	bool CleanUp();
 
-	update_status		Update();
-
-	bool				CleanUp();
-
-	void				FinishUpdate();
+	update_status Update();
+	
+	void FinishUpdate();
 
 public:
 	ModuleRender*		renderer	= nullptr;
@@ -44,8 +43,8 @@ public:
 	ModuleTime*			time		= nullptr;
 	ModuleScene*		scene		= nullptr;
 	ModuleDebugDraw*	debug		= nullptr;
-	ModuleSceneLoader*	loader		= nullptr;
 	ModuleFileSystem*	fileSystem	= nullptr;
+	ModuleLibrary*		library		= nullptr;
 
 private:
 	std::list<Module*>	modules;

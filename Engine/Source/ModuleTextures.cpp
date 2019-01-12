@@ -1,13 +1,24 @@
 #include "Globals.h"
 #include "Application.h"
+#include "ModuleFileSystem.h"
 #include "ModuleRender.h"
 #include "ModuleTextures.h"
+#include "ComponentMaterial.h"
 
-ModuleTextures::ModuleTextures() { }
+// Constructor
+ModuleTextures::ModuleTextures() 
+{
 
-ModuleTextures::~ModuleTextures() { }
+}
 
-bool ModuleTextures::Init() {
+// Destructor
+ModuleTextures::~ModuleTextures() 
+{
+
+}
+
+bool ModuleTextures::Init() 
+{
 	LOG("Init Image library");
 
 	ilutRenderer(ILUT_OPENGL);
@@ -15,11 +26,14 @@ bool ModuleTextures::Init() {
 	iluInit();
 	ilutInit();
 
+	LoadDefaultTextures();
+
+
 	return ilutRenderer(ILUT_OPENGL);
 }
 
-// Load new texture from file path
-Texture* const ModuleTextures::Load(const char* path) {
+Texture* const ModuleTextures::Load(const char* path) 
+{
 	assert(path != nullptr);
 
 	ILuint imageId = 0u;
@@ -27,7 +41,8 @@ Texture* const ModuleTextures::Load(const char* path) {
 	ilGenImages(1, &imageId);
 	ilBindImage(imageId);
 
-	if (ilLoadImage(path)) {
+	if (ilLoadImage(path)) 
+	{
 		unsigned textureId = 0u;
 		ILinfo imageInfo;
 		int pixelDepth = 0;
@@ -43,7 +58,8 @@ Texture* const ModuleTextures::Load(const char* path) {
 
 		iluGetImageInfo(&imageInfo);
 
-		if (imageInfo.Origin == IL_ORIGIN_UPPER_LEFT) {
+		if (imageInfo.Origin == IL_ORIGIN_UPPER_LEFT) 
+		{
 			iluFlipImage();
 		}
 		width = ilGetInteger(IL_IMAGE_WIDTH);
@@ -54,15 +70,21 @@ Texture* const ModuleTextures::Load(const char* path) {
 		// Using RGBA if we got an alpha channel
 		bool success = false;
 		int channels = ilGetInteger(IL_IMAGE_CHANNELS);
-		if (channels == 3) {
+		
+		if (channels == 3) 
+		{
 			success = ilConvertImage(IL_RGB, IL_UNSIGNED_BYTE);
-		} else if (channels == 4) {
+		}
+		else if (channels == 4) 
+		{
 			success = ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
 		}
 
 		// Quit if we failed the conversion
-		if (!success) {
+		if (!success) 
+		{
 			LOG("Error: Could not convert the image to texture correctly. %s", iluErrorString(ilGetError()));
+		
 			return nullptr;
 		}
 
@@ -73,13 +95,14 @@ Texture* const ModuleTextures::Load(const char* path) {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filterType);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filterType);
 
-		if (wrapMode != NULL) {
+		if (wrapMode != NULL)
+		{
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapMode);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapMode);
 		}
 
-		// TODO: Set linear or nearest mipmap
-		if (mipmaping) {
+		if (mipmaping) 
+		{
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mipMapMode);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mipMapMode);
 			glGenerateMipmap(GL_TEXTURE_2D);
@@ -97,13 +120,113 @@ Texture* const ModuleTextures::Load(const char* path) {
 	return nullptr;
 }
 
-void ModuleTextures::LoadDefaulTextures() {
-	defaultTexture = Load("checkers.jpg");
-	noCameraSelectedTexture = Load("nocamselected.jpg");
+void ModuleTextures::LoadMaterial(std::string path, unsigned& textureID, int& width, int& height) {
+	unsigned imageID;
+
+	ilGenImages(1, &imageID);
+
+	ilBindImage(imageID);
+
+	path.insert(0, "/Library/Textures/");
+
+	LOG("Loading material %s", path.c_str());
+
+	char* fileBuffer;
+	unsigned lenghBuffer = App->fileSystem->Load(path.c_str(), &fileBuffer);
+
+	if (ilLoadL(IL_DDS, fileBuffer, lenghBuffer)) 
+	{
+		ILinfo ImageInfo;
+		iluGetImageInfo(&ImageInfo);
+		
+		if (ImageInfo.Origin == IL_ORIGIN_UPPER_LEFT) 
+		{
+			iluFlipImage();
+		}
+
+		if (!ilConvertImage(IL_RGB, IL_UNSIGNED_BYTE)) 
+		{
+			LOG("Error: Image conversion failed %s", iluErrorString(ilGetError()));
+
+			return;
+		}
+
+		glGenTextures(1, &textureID);
+		glBindTexture(GL_TEXTURE_2D, textureID);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+		width = ilGetInteger(IL_IMAGE_WIDTH);
+		height = ilGetInteger(IL_IMAGE_HEIGHT);
+
+		glTexImage2D(GL_TEXTURE_2D, 0, ilGetInteger(IL_IMAGE_FORMAT), width, height, 0, ilGetInteger(IL_IMAGE_FORMAT), GL_UNSIGNED_BYTE, ilGetData());
+	}
+
+	ilDeleteImages(1, &imageID);
+	LOG("Material creation successful.");
 }
 
-void ModuleTextures::DrawGUI() {
-	ImGui::Text("This will be applied only to the next loaded models");
+void ModuleTextures::LoadMaterial(const char* path, ComponentMaterial* componentMaterial, MaterialType materialTypeSelected) 
+{
+	switch (materialTypeSelected) 
+	{
+	case MaterialType::OCCLUSION_MAP:
+		if (componentMaterial->material.occlusionMap != 0u) 
+		{
+			Unload(componentMaterial->material.occlusionMap);
+		}
+		
+		LoadMaterial(path, componentMaterial->material.occlusionMap, componentMaterial->material.ambientWidth, componentMaterial->material.ambientHeight);
+		break;
+	
+	case MaterialType::DIFFUSE_MAP:
+		if (componentMaterial->material.diffuseMap != 0u) 
+		{
+			Unload(componentMaterial->material.diffuseMap);
+		}
+		LoadMaterial(path, componentMaterial->material.diffuseMap, componentMaterial->material.diffuseWidth, componentMaterial->material.diffuseHeight);
+		break;
+	
+	case MaterialType::SPECULAR_MAP:
+		if (componentMaterial->material.specularMap != 0u) 
+		{
+			Unload(componentMaterial->material.specularMap);
+		}
+	
+		LoadMaterial(path, componentMaterial->material.specularMap, componentMaterial->material.specularWidth, componentMaterial->material.specularHeight);
+		break;
+	
+	case MaterialType::EMISSIVE_MAP:
+		if (componentMaterial->material.emissiveMap != 0u) 
+		{
+			Unload(componentMaterial->material.emissiveMap);
+		}
+
+		LoadMaterial(path, componentMaterial->material.emissiveMap, componentMaterial->material.emissiveWidth, componentMaterial->material.emissiveHeight);
+		break;
+	}
+}
+
+void ModuleTextures::Unload(unsigned id) 
+{
+	if (id != 0u) 
+	{
+		glDeleteTextures(1, &id);
+	}
+}
+
+void ModuleTextures::LoadDefaulTextures() 
+{
+	noCameraSelectedTexture = Load("nocamselected.jpg");
+	defaultTexture = Load("checkers.jpg");
+}
+
+void ModuleTextures::DrawGUI() 
+{
+	ImGui::Text("This will be applied to the next loaded models");
 	ImGui::Text("Filter type:");
 	ImGui::RadioButton("Linear", &filterType, GL_LINEAR); ImGui::SameLine();
 	ImGui::RadioButton("Nearest", &filterType, GL_NEAREST);
@@ -112,7 +235,9 @@ void ModuleTextures::DrawGUI() {
 	ImGui::RadioButton("Clamp to border", &wrapMode, GL_CLAMP_TO_BORDER); ImGui::SameLine();
 	ImGui::RadioButton("Repeat", &wrapMode, GL_REPEAT); ImGui::SameLine();
 	ImGui::RadioButton("Mirrored repeat", &wrapMode, GL_MIRRORED_REPEAT);
-	if (ImGui::Checkbox("Mipmap", &mipmaping)) { 
+	
+	if (ImGui::Checkbox("Mipmap", &mipmaping)) 
+	{ 
 		ImGui::RadioButton("Nearest", &mipMapMode, GL_NEAREST_MIPMAP_NEAREST); ImGui::SameLine();
 		ImGui::RadioButton("Linear", &mipMapMode, GL_NEAREST_MIPMAP_LINEAR);
 	}

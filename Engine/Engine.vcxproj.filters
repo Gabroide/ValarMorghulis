@@ -10,22 +10,7 @@
     <ClCompile Include="Source\Main.cpp">
       <Filter>Main</Filter>
     </ClCompile>
-    <ClCompile Include="Source\ModuleProgram.cpp">
-      <Filter>Modules</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\ModuleRender.cpp">
-      <Filter>Modules</Filter>
-    </ClCompile>
     <ClCompile Include="Source\ModuleResourceManager.cpp">
-      <Filter>Modules</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\ModuleScene.cpp">
-      <Filter>Modules</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\ModuleSceneLoader.cpp">
-      <Filter>Modules</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\ModuleTextures.cpp">
       <Filter>Modules</Filter>
     </ClCompile>
     <ClCompile Include="Source\ModuleTime.cpp">
@@ -41,9 +26,6 @@
       <Filter>Modules</Filter>
     </ClCompile>
     <ClCompile Include="Source\ModuleEditor.cpp">
-      <Filter>Modules</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\ModuleInput.cpp">
       <Filter>Modules</Filter>
     </ClCompile>
     <ClCompile Include="Source\IMGUI\imgui_impl_opengl3.cpp">
@@ -221,8 +203,26 @@
       <Filter>Utils</Filter>
     </ClCompile>
     <ClCompile Include="Source\ModuleFileSystem.cpp">
-      <Filter>Modules</Filter>
+      <Filter>Modules\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\ModuleInput.cpp">
+      <Filter>Modules\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ModuleProgram.cpp">
+      <Filter>Modules\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ModuleRender.cpp">
+      <Filter>Modules\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ModuleScene.cpp">
+      <Filter>Modules\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ModuleTextures.cpp">
+      <Filter>Modules\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DockAssets.cpp" />
+    <ClCompile Include="MeshImporter.cpp" />
+    <ClCompile Include="ModuleLibrary.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\GameObject.h">
@@ -231,22 +231,7 @@
     <ClInclude Include="Source\Application.h">
       <Filter>Main</Filter>
     </ClInclude>
-    <ClInclude Include="Source\ModuleProgram.h">
-      <Filter>Modules</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\ModuleRender.h">
-      <Filter>Modules</Filter>
-    </ClInclude>
     <ClInclude Include="Source\ModuleResourceManager.h">
-      <Filter>Modules</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\ModuleScene.h">
-      <Filter>Modules</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\ModuleSceneLoader.h">
-      <Filter>Modules</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\ModuleTextures.h">
       <Filter>Modules</Filter>
     </ClInclude>
     <ClInclude Include="Source\ModuleTime.h">
@@ -517,8 +502,23 @@
       <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="Source\ModuleFileSystem.h">
-      <Filter>Modules</Filter>
+      <Filter>Modules\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\ModuleProgram.h">
+      <Filter>Modules\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ModuleRender.h">
+      <Filter>Modules\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ModuleScene.h">
+      <Filter>Modules\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ModuleTextures.h">
+      <Filter>Modules\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DockAssets.h" />
+    <ClInclude Include="MeshImporter.h" />
+    <ClInclude Include="ModuleLibrary.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Main">
@@ -568,6 +568,12 @@
     </Filter>
     <Filter Include="Docks\Source Files">
       <UniqueIdentifier>{5f5843e1-be49-4f30-867f-5a9d895392a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\Header Files">
+      <UniqueIdentifier>{b225c1d6-ef12-4ce0-a66b-d920e318b97d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\Source Files">
+      <UniqueIdentifier>{8bd36051-b204-4e7d-adbb-7b41c0f593f3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

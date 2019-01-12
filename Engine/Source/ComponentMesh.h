@@ -7,7 +7,6 @@
 #include "Component.h"
 
 #include "MathGeoLib\include\Math\float3.h"
-#include "MathGeoLib\include\Geometry\AABB.h"
 
 #include "Assimp\mesh.h"
 
@@ -17,35 +16,28 @@ class ComponentMaterial;
 class ComponentMesh : public Component
 {
 	public:
-		ComponentMesh(GameObject* goContainer, aiMesh* mesh);
+		ComponentMesh(GameObject* goContainer, Mesh* mesh);
 		ComponentMesh(const ComponentMesh& duplicatedComponent);
 		~ComponentMesh();
 
-		void						ComputeMesh(aiMesh* mesh);
-		void						ComputeMesh(par_shapes_mesh_s* mesh);
-		void						CleanUp();
-		void						Draw(unsigned shaderProgram, const ComponentMaterial* material) const;
-		void						DrawProperties() override;
-		
-		const unsigned				MaterialIndex();
-		
-	public:
-		Component*					Duplicate() override;
+		void			ComputeMesh();
+		void			ComputeMesh(par_shapes_mesh_s* mesh);
+		void			CleanUp();
+		void			Draw(unsigned shaderProgram, const ComponentMaterial* material) const;
+		void			DrawProperties() override;
+		void			LoadMesh(const char* name);
 
 	public:
-		
-		int							numIndices = 0;
-		int							materialIndex = 0;
-		std::vector<math::float3>	vertices;
-		math::AABB					bbox;
+		Component*		Duplicate() override;
 
 	public:
-		const char*					name = nullptr;
+		Mesh			mesh;
+		
+	public:
+		const char*		name = nullptr;
 	
 private:
-		unsigned					vao = 0u;
-		unsigned					vbo = 0u;
-		unsigned					ibo = 0u;
+	std::string			currentMesh;
 
 };
 
