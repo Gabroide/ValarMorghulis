@@ -18,6 +18,7 @@ class Component;
 class ComponentMesh;
 class ComponentMaterial;
 class ComponentTransform;
+
 enum class ComponentType;
 
 class GameObject
@@ -38,8 +39,6 @@ class GameObject
 		void					RemoveComponent(Component* component);
 		void					ComputeBBox();
 		void					ModelTransform(unsigned shader) const;
-
-		std::string				GetFileFolder() const;
 
 		math::float4x4			GetLocalTransform() const;
 		math::float4x4			GetGlobalTransform() const;

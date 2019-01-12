@@ -28,7 +28,7 @@ GameObject::GameObject(const char* goName, const math::float4x4& parentTransform
 	strcpy(copyName, goName);
 	name = copyName;
 
-	if (fileLocation != nullptr)
+	if (fileLocation != nullptr) 
 	{
 		filePath = fileLocation;
 	}
@@ -65,7 +65,8 @@ GameObject::GameObject(const char* goName, const math::float4x4& parentTransform
 	transform = (ComponentTransform*)AddComponent(ComponentType::TRANSFORM);
 	transform->AddTransform(parentTransform);
 
-	if (fileLocation != nullptr) {
+	if (fileLocation != nullptr)
+	{
 		filePath = fileLocation;
 	}
 }
@@ -165,7 +166,7 @@ void GameObject::Update()
 		{
 			(*itChild)->moveGODown = false;
 			
-			if (std::abs(std::distance(goChilds.begin(), itChild)) != goChilds.size() - 1)
+			if (std::abs(std::distance(goChilds.begin(), itChild)) != goChilds.size() - 1) 
 			{
 				LOG("Begin move down");
 			}
@@ -188,7 +189,7 @@ void GameObject::Update()
 			delete *itChild;
 			goChilds.erase(itChild++);
 		}
-		else
+		else 
 		{
 			++itChild;
 		}
@@ -212,45 +213,38 @@ void GameObject::Draw(const math::Frustum& frustum) const
 		child->Draw(frustum);
 	}
 
+	if (mesh == nullptr || mesh != nullptr && !mesh->enabled) 
+	{
+		return;
+	}
+
 	if (App->scene->goSelected == this) 
 	{
 		DrawBBox();
 	}
 
-	ComponentMesh* mesh = (ComponentMesh*)GetComponent(ComponentType::MESH);
-	
-	if (mesh != nullptr && !frustum.Intersects(bbox)) 
+	if (!frustum.Intersects(bbox)) 
 	{
-		if (App->scene->goSelected != this) 
-		{
-			DrawBBox();
-		}
+		DrawBBox();
 	
 		return;
 	}
 
-	ComponentMaterial* material = (ComponentMaterial*)GetComponent(ComponentType::MATERIAL);
-	unsigned shader = 0u;
-	Texture* texture = nullptr;
-
-	if (material != nullptr && material->enabled) 
+	unsigned program = App->program->blinnProgram;
+	
+	if (material == nullptr) 
 	{
-		shader = material->shader;
-		texture = material->texture;
+		program = App->program->textureProgram;
 	}
-	else 
+	else if (!material->enabled) 
 	{
-		shader = App->program->basicProgram;
+		program = App->program->colorProgram;
 	}
 
-	glUseProgram(shader);
-	ModelTransform(shader);
+	glUseProgram(program);
+	ModelTransform(program);
 
-	if (mesh != nullptr && mesh->enabled)
-	{
-		((ComponentMesh*)mesh)->Draw(shader, material);
-	}
-
+	((ComponentMesh*)mesh)->Draw(program, material);
 	glUseProgram(0);
 }
 
@@ -266,7 +260,7 @@ void GameObject::DrawProperties()
 {
 	assert(name != nullptr);
 
-	ImGui::InputText("Name", (char*)name, 30.0f); ImGui::SameLine();
+	ImGui::InputText("Name", (char*)name, 50.0f); ImGui::SameLine();
 
 	if (ImGui::Checkbox("Enabled", &enabled)) 
 	{
@@ -329,7 +323,7 @@ void GameObject::DrawHierarchy(GameObject* goSelected)
 			IM_ASSERT(payload->DataSize == sizeof(GameObject*));
 			GameObject* droppedGo = (GameObject*)*(const int*)payload->Data;
 
-			if (droppedGo->parent != this)
+			if (droppedGo->parent != this) 
 			{
 				bool droppedIntoChild = false;
 				GameObject* inheritedTrasnform = this;
@@ -387,6 +381,7 @@ void GameObject::DrawHierarchy(GameObject* goSelected)
 		{
 			toBeCopied = true;
 		}
+		
 		if (ImGui::Selectable("Remove") && App->scene->goSelected != nullptr) 
 		{
 			toBeDeleted = true;
@@ -426,15 +421,6 @@ void GameObject::DrawHierarchy(GameObject* goSelected)
 	ImGui::PopID();
 }
 
-std::string GameObject::GetFileFolder() const 
-{
-	std::string s(filePath);
-	std::size_t found = s.find_last_of("/\\");
-	s = s.substr(0, found + 1);
-
-	return s;
-}
-
 Component* GameObject::AddComponent(ComponentType type) 
 {
 	Component* component = nullptr;
@@ -448,10 +434,10 @@ Component* GameObject::AddComponent(ComponentType type)
 		{
 			App->camera->selectedCamera = (ComponentCamera*)component;
 		}
-	
+
 		App->camera->gameCameras.push_back((ComponentCamera*)component);
 		break;
-	
+
 	case ComponentType::TRANSFORM:
 		if (GetComponent(ComponentType::TRANSFORM) == nullptr) 
 		{
@@ -460,9 +446,9 @@ Component* GameObject::AddComponent(ComponentType type)
 		}
 		else 
 		{
-			LOG("This GO already have a TRANSFORM");
+			LOG("Warn: This GO already have a TRANSFORM");
 		}
-		
+
 		break;
 
 	case  ComponentType::MESH:
@@ -473,7 +459,7 @@ Component* GameObject::AddComponent(ComponentType type)
 		}
 		else 
 		{
-			LOG("This GO already have a MESH");
+			LOG("Warn: This GO already have a MESH");
 		}
 	
 		break;
@@ -486,17 +472,20 @@ Component* GameObject::AddComponent(ComponentType type)
 		}
 		else 
 		{
-			LOG("This GO already have a MATERIAL");
+			LOG("Warn: This GO already have a MATERIAL");
 		}
-
+	
 		break;
-
+	
 	case ComponentType::EMPTY:
 	default:
 		break;
 	}
 
-	components.push_back(component);
+	if (component != nullptr) 
+	{
+		components.push_back(component);
+	}
 
 	return component;
 }
@@ -524,7 +513,7 @@ Component* GameObject::GetComponent(ComponentType type) const
 	{
 		if (component->componentType == type) 
 		{
-
+		
 			return component;
 		}
 	}
@@ -586,7 +575,7 @@ void GameObject::ComputeBBox()
 	if (mesh != nullptr) 
 	{
 		bbox.SetNegativeInfinity();
-		bbox.Enclose(mesh->bbox);
+		bbox.Enclose(mesh->mesh.bbox);
 		bbox.TransformAsAABB(GetGlobalTransform());
 	}
 }
