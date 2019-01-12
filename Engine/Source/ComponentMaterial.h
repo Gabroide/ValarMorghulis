@@ -30,6 +30,7 @@ class ComponentMaterial : public Component
 		~ComponentMaterial();
 
 		void		DrawProperties() override;
+		void		UnloadMaterial();
 
 	public:
 		Component*	Duplicate() override;

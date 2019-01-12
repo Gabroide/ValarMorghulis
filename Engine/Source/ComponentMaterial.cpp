@@ -1,7 +1,7 @@
 #include "Application.h"
-#include "ModuleProgram.h"
 #include "MouleLibrary.h"
 #include "ComponentMaterial.h"
+#include "ModuleProgram.h"
 
 // Constructor
 ComponentMaterial::ComponentMaterial(GameObject* goContainer) : Component(goContainer, ComponentType::MATERIAL) 
@@ -12,7 +12,7 @@ ComponentMaterial::ComponentMaterial(GameObject* goContainer) : Component(goCont
 // Constructor Overloaded
 ComponentMaterial::ComponentMaterial(GameObject* goContainer, const aiMaterial* material) : Component(goContainer, ComponentType::MATERIAL) 
 {
-	
+	UnloadMaterial();
 }
 
 // Constructor Overloaded
