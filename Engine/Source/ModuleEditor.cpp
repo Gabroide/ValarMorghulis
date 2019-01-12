@@ -85,12 +85,32 @@ update_status ModuleEditor::Update() {
 				if(ImGui::MenuItem("Empty GameObject")) {
 					new GameObject(DEFAULT_GO_NAME, math::float4x4().identity, nullptr, nullptr);
 				}
+
 				if (ImGui::MenuItem("Sphere")) {
-					App->scene->GenerateSphere(App->scene->goSelected, 20, 20, math::float3::zero, math::Quat::identity, 1.0f, math::float4(0.4f, 0.7f, 0.2f, 0.8f));
+					GameObject* sphereGO = new GameObject("Sphere", math::float4x4().identity, App->scene->goSelected, nullptr);
+					App->scene->LoadGeometry(sphereGO, GeometryType::SPHERE);
+					App->scene->goSelected = sphereGO;
 				}
+				
 				if (ImGui::MenuItem("Torus")) {
-					App->scene->GenerateTorus(App->scene->goSelected, math::float3::zero, math::Quat::identity, 0.5f, 0.67f, 30, 30, math::float4(0.4f, 0.7f, 0.2f, 0.8f));
+					GameObject* torusGO = new GameObject("Torus", math::float4x4().identity, App->scene->goSelected, nullptr);
+					App->scene->LoadGeometry(torusGO, GeometryType::TORUS);
+					App->scene->goSelected = torusGO;
 				}
+
+				if (ImGui::MenuItem("Cube")) {
+					GameObject* cubeGO = new GameObject("Cube", math::float4x4().identity, App->scene->goSelected, nullptr);
+					App->scene->LoadGeometry(cubeGO, GeometryType::CUBE);
+					App->scene->goSelected = cubeGO;
+				}
+
+				if (ImGui::MenuItem("Plane")) {
+					GameObject* planeGO = new GameObject("Plane", math::float4x4().identity, App->scene->goSelected, nullptr);
+					App->scene->LoadGeometry(planeGO, GeometryType::PLANE);
+					App->scene->goSelected = planeGO;
+				}
+
+
 				ImGui::EndMenu();
 			}
 			ImGui::EndMenu();
@@ -112,6 +132,11 @@ update_status ModuleEditor::Update() {
 
 			if (ImGui::MenuItem("Lights", NULL, light->IsEnabled())) {
 				light->ToggleEnabled();
+			}
+
+			if ("Assets", NULL, assets->IsEnabled())
+			{
+				assets->ToggleEnabled();
 			}
 
 			if (ImGui::MenuItem("Time", NULL, time->IsEnabled())) {

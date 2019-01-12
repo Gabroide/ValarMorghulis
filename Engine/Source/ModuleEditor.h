@@ -1,22 +1,25 @@
-#ifndef __MODULEEDITOR_H__
-#define __MODULEEDITOR_H__
+#ifndef __ModuleEditor_h__
+#define __ModuleEditor_h__
 
-#include "Module.h"
+#include <vector>
+
 #include "Globals.h"
+#include "Module.h"
 #include "Dock.h"
 #include "DockAbout.h"
-#include "DockConsole.h"
+#include "DockAssets.h"
+#include "DockCamera.h"
 #include "DockConfig.h"
-#include "DockScene.h"
-#include "DockTime.h"
+#include "DockConsole.h"
 #include "DockHierarchy.h"
 #include "DockInspector.h"
-#include "DockCamera.h"
 #include "DockLight.h"
-#include "imgui.h"
-#include "imgui_impl_sdl.h"
-#include "imgui_impl_opengl3.h"
-#include <vector>
+#include "DockScene.h"
+#include "DockTime.h"
+
+#include "IMGUI\imgui.h"
+#include "IMGUI\imgui_impl_sdl.h"
+#include "IMGUI\imgui_impl_opengl3.h"
 
 class Dock;
 class DockConsole;
@@ -27,6 +30,7 @@ class DockHierarchy;
 class DockInspector;
 class DockCamera;
 class DockLight;
+class DockAssets;
 
 class ModuleEditor : public Module
 {
@@ -34,37 +38,37 @@ class ModuleEditor : public Module
 		ModuleEditor();
 		~ModuleEditor();
 
-		bool				Init();
-		update_status		PreUpdate() override;
-		update_status		Update() override;
-		bool				CleanUp() override;
+		bool				Init()		override;
+		bool				CleanUp()	override;
+		bool				SceneFocused() const;
 
-		// ImgUI info
+		update_status		PreUpdate()	override;
+		update_status		Update()	override;
+		
+		// ImGUI info
 		void				AddFPSCount(float fps, float ms) const;
 		void				AddGameFPSCount(float fps, float ms) const;
 		void				CreateDockSpace();
 		void				PrintDocks();
 		void				RenderGUI();
-		bool				SceneFocused() const;
-
-		// SDL events
-		void				ProcessInputEvent(SDL_Event* event) const;
+		void				ProcessInputEvent(SDL_Event* event) const; // SDL events
 
 	public:
 		//Docking
-		DockAbout* about = nullptr;
-		DockConsole* console = nullptr;
-		DockScene* scene = nullptr;
-		DockConfig* config = nullptr;
-		DockTime* time = nullptr;
-		DockHierarchy* hierarchy = nullptr;
-		DockInspector* inspector = nullptr;
-		DockCamera* camera = nullptr;
-		DockLight* light = nullptr;
+		DockAbout*			about		= nullptr;
+		DockConsole*		console		= nullptr;
+		DockScene*			scene		= nullptr;
+		DockConfig*			config		= nullptr;
+		DockTime*			time		= nullptr;
+		DockHierarchy*		hierarchy	= nullptr;
+		DockInspector*		inspector	= nullptr;
+		DockCamera*			camera		= nullptr;
+		DockLight*			light		= nullptr;
+		DockAssets*			assets		= nullptr;
 
 	private:
-		std::list<Dock*> docks;
+		std::list<Dock*>	docks;
 
 };
 
-#endif
+#endif // __ModuleEditor_h__
