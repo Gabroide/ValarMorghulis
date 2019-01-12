@@ -16,7 +16,7 @@ ModuleTextures::ModuleTextures()
 // Destructor
 ModuleTextures::~ModuleTextures() 
 {
-
+	CleanUp();
 }
 
 bool ModuleTextures::Init() 
@@ -32,6 +32,23 @@ bool ModuleTextures::Init()
 
 
 	return ilutRenderer(ILUT_OPENGL);
+}
+
+bool ModuleTextures::CleanUp()
+{
+	for (std::list<ComponentMaterial*>::iterator it = materials.begin(); it != materials.end())
+	{
+		delete *it;
+		it = materials.erase(it);
+		*it = nullptr;
+	}
+
+	delete defaultTexture;
+	delete noCameraSelectedTexture;
+	defaultTexture = nullptr;
+	noCameraSelectedTexture = nullptr;
+
+	return true;
 }
 
 Texture* const ModuleTextures::Load(const char* path) 

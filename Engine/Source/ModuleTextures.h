@@ -1,6 +1,8 @@
 #ifndef __ModuleTextures_h__
 #define __ModuleTextures_h__
 
+#include <list>
+
 #include "Globals.h"
 #include "Module.h"
 
@@ -78,7 +80,8 @@ class ModuleTextures : public Module
 		ModuleTextures();
 		~ModuleTextures();
 
-		bool			Init() override;
+		bool			Init()		override;
+		bool			CleanUp()	override;
 		
 		void			LoadDefaulTextures();
 		void			DrawGUI();
