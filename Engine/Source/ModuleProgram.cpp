@@ -1,33 +1,41 @@
 #include "ModuleProgram.h"
 
-ModuleProgram::ModuleProgram() { }
+// Constructor
+ModuleProgram::ModuleProgram() 
+{
 
-ModuleProgram::~ModuleProgram() { }
+}
 
-bool ModuleProgram::LoadPrograms() {
-	// TODO: this should be pushed back to a vector
-	basicProgram = LoadProgram("./Shaders/default.vs", "./Shaders/default.fs");
+// Destructor
+ModuleProgram::~ModuleProgram() 
+{
+
+}
+
+bool ModuleProgram::LoadPrograms() 
+{
+	colorProgram = LoadProgram("./Shaders/color.vs", "./Shaders/color.fs");
 	textureProgram = LoadProgram("./Shaders/texture.vs", "./Shaders/texture.fs");
 	blinnProgram = LoadProgram("./Shaders/blinn.vs", "./Shaders/blinn.fs");
 
-	return (basicProgram != 0 && textureProgram != 0 && blinnProgram != 0);
+	return (colorProgram != 0 && textureProgram != 0 && blinnProgram != 0);
 }
 
-unsigned ModuleProgram::LoadProgram(const char* vertShaderPath, const char* fragShaderPath) {
+unsigned ModuleProgram::LoadProgram(const char* vertShaderPath, const char* fragShaderPath) 
+{
 	assert(vertShaderPath != nullptr);
 	assert(fragShaderPath != nullptr);
 
 	unsigned program = 0u;
 
-	// How to: https://badvertex.com/2012/11/20/how-to-load-a-glsl-shader-in-opengl-using-c.html
-	vertShader = glCreateShader(GL_VERTEX_SHADER);
-	fragShader = glCreateShader(GL_FRAGMENT_SHADER);
+	unsigned vertShader = glCreateShader(GL_VERTEX_SHADER);
+	unsigned fragShader = glCreateShader(GL_FRAGMENT_SHADER);
 
 	char* vertShaderStr = ReadShaderFile(vertShaderPath);
 	char* fragShaderStr = ReadShaderFile(fragShaderPath);
 
-	if (CompileShader(vertShader, vertShaderStr) && CompileShader(fragShader, fragShaderStr)) {
-
+	if (CompileShader(vertShader, vertShaderStr) && CompileShader(fragShader, fragShaderStr)) 
+	{
 		program = glCreateProgram();
 
 		glAttachShader(program, vertShader);
@@ -40,6 +48,7 @@ unsigned ModuleProgram::LoadProgram(const char* vertShaderPath, const char* frag
 	
 	delete[] vertShaderStr; 
 	delete[] fragShaderStr;
+	
 	// Remove shaders, we wont need them anymore if they are loaded correctly into Program
 	glDeleteShader(vertShader);
 	glDeleteShader(fragShader);
@@ -49,23 +58,30 @@ unsigned ModuleProgram::LoadProgram(const char* vertShaderPath, const char* frag
 	return program;
 }
 
-char* ModuleProgram::ReadShaderFile(const char* shaderPath) {
+char* ModuleProgram::ReadShaderFile(const char* shaderPath) 
+{
 	FILE* file = nullptr;
  	char* shaderData = nullptr;
 	int err = fopen_s(&file, shaderPath, "rb");
-	if (file) {
+	if (file) 
+	{
 		fseek(file, 0, SEEK_END);
 		int size = ftell(file);
 		rewind(file);
 		shaderData = (char*)malloc(size + 1);
 		int res = fread(shaderData, 1, size, file);
 		shaderData[size] = 0;
-		if (res != size) {
+	
+		if (res != size) 
+		{
 			LOG("Error: Shader not loaded correctly");
 			shaderData = nullptr;
 		}
+		
 		fclose(file);
-	} else {
+	} 
+	else
+	{
 		LOG("Error: Shader reading failed with %s", shaderPath);
 		shaderData = nullptr;
 	}
@@ -73,7 +89,8 @@ char* ModuleProgram::ReadShaderFile(const char* shaderPath) {
 	return shaderData;
 }
 
-bool ModuleProgram::CompileShader(unsigned shaderAddress, const char* shaderContent) {
+bool ModuleProgram::CompileShader(unsigned shaderAddress, const char* shaderContent) 
+{
 	assert(shaderContent != nullptr);
 
 	int compiled = GL_FALSE;
@@ -82,11 +99,13 @@ bool ModuleProgram::CompileShader(unsigned shaderAddress, const char* shaderCont
 	glCompileShader(shaderAddress);
 	glGetShaderiv(shaderAddress, GL_COMPILE_STATUS, &compiled);
 
-	if (!compiled) {
+	if (!compiled)
+	{
 		int infoLogLength = 0;
 		glGetShaderiv(shaderAddress, GL_INFO_LOG_LENGTH, &infoLogLength);
 
-		if (infoLogLength > 0) {
+		if (infoLogLength > 0) 
+		{
 			GLchar* strInfoLog = new GLchar[infoLogLength + 1];
 			glGetShaderInfoLog(shaderAddress, infoLogLength, NULL, strInfoLog);
 
@@ -102,12 +121,14 @@ bool ModuleProgram::CompileShader(unsigned shaderAddress, const char* shaderCont
 	return compiled;
 }
 
-void ModuleProgram::CompileProgram(unsigned programAddress) {
+void ModuleProgram::CompileProgram(unsigned programAddress) 
+{
 	int errorLength = 0;
 
 	glGetProgramiv(programAddress, GL_COMPILE_STATUS, &errorLength);
 
-	if (errorLength > 0) {
+	if (errorLength > 0) 
+	{
 		int written = 0;
 		GLchar* strInfoLog = new GLchar[errorLength + 1];
 		glGetProgramInfoLog(programAddress, errorLength, &written, strInfoLog);
@@ -119,13 +140,14 @@ void ModuleProgram::CompileProgram(unsigned programAddress) {
 
 		glDeleteProgram(programAddress); // Don't leak the program.
 	}
-
 }
 
-bool ModuleProgram::CleanUp() {
-	glDeleteProgram(basicProgram);
+bool ModuleProgram::CleanUp() 
+{
+	glDeleteProgram(colorProgram);
 	glDeleteProgram(textureProgram);
-	basicProgram = 0;
+	colorProgram = 0;
 	textureProgram = 0;
+	
 	return true;
 }

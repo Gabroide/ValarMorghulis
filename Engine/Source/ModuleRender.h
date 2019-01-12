@@ -1,5 +1,5 @@
-#ifndef __MODULERENDER_H__
-#define __MODULERENDER_H__
+#ifndef __ModuleRender_h__
+#define __ModuleRender_h__
 
 #include "Module.h"
 
@@ -11,11 +11,13 @@ class ModuleRender : public Module
 		ModuleRender();
 		~ModuleRender();
 
-		bool			Init() override;
-		update_status	PreUpdate() override;
-		update_status	Update() override;
-		update_status	PostUpdate() override;
-		bool			CleanUp();
+		bool			Init()			override;
+		bool			CleanUp()		override;
+
+		update_status	PreUpdate()		override;
+		update_status	Update()		override;
+		update_status	PostUpdate()	override;
+		
 
 	private:
 		void			InitSDL();
@@ -26,14 +28,18 @@ class ModuleRender : public Module
 		void			GenerateBlockUniforms();
 
 	public:
-		bool			cullingFromGameCamera = true;
-		bool			vsyncEnabled = false;
-		void*			context = nullptr;
-		unsigned		ubo = 0u;
+		unsigned		ubo						= 0u;
+
+		bool			cullingFromGameCamera	= true;
+		bool			vsyncEnabled			= false;
+
+	public:
+		void*			context					= nullptr;
 
 	protected:
-		bool   showAxis = true;
-		bool   showGrid = true;
+		bool			showAxis				= true;
+		bool			showGrid				= true;
+
 };
 
-#endif
+#endif // __ModuleRender_h__

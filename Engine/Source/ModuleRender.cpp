@@ -1,35 +1,47 @@
 #include "Globals.h"
 #include "Application.h"
-#include "ModuleScene.h"
-#include "ModuleRender.h"
-#include "ModuleEditor.h"
 #include "ModuleCamera.h"
-#include "ModuleWindow.h"
-#include "ModuleProgram.h"
 #include "ModuleDebugDraw.h"
+#include "ModuleEditor.h"
+#include "ModuleProgram.h"
+#include "ModuleRender.h"
+#include "ModuleScene.h"
+#include "ModuleWindow.h"
 #include "ComponentCamera.h"
-#include "SDL.h"
-#include "GL/glew.h"
-#include "debugdraw.h"
-#include "Math/float4x4.h"
 
-ModuleRender::ModuleRender() { }
+#include "SDL\include\SDL.h"
+
+#include "glew-2.1.0\include\GL/glew.h"
+
+#include "MathGeoLib\include\Math\float4x4.h"
+
+#include "debugdraw.h"
+
+// Constructor
+ModuleRender::ModuleRender() 
+{
+
+}
 
 // Destructor
-ModuleRender::~ModuleRender() { }
+ModuleRender::~ModuleRender() 
+{
+
+}
 
 // Called before render is available
-bool ModuleRender::Init() {
+bool ModuleRender::Init() 
+{
 	LOG("Creating Renderer context");
 
 	InitSDL();
 	glewInit();
 	InitOpenGL();
 
-	if (vsyncEnabled && SDL_GL_SetSwapInterval(1) < 0) {
+	if (vsyncEnabled && SDL_GL_SetSwapInterval(1) < 0) 
+	{
 		LOG("Error: VSync couldn't be enabled \n %s", SDL_GetError());
 	}
-
 
 	App->program->LoadPrograms();
 	GenerateBlockUniforms();
@@ -37,15 +49,16 @@ bool ModuleRender::Init() {
 	return true;
 }
 
-update_status ModuleRender::PreUpdate() {
+update_status ModuleRender::PreUpdate() 
+{
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	return UPDATE_CONTINUE;
 }
 
 // Called every draw update
-update_status ModuleRender::Update() {
-
+update_status ModuleRender::Update() 
+{
 	glBindFramebuffer(GL_FRAMEBUFFER, App->camera->sceneCamera->fbo);
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -55,15 +68,19 @@ update_status ModuleRender::Update() {
 	SetProjectionMatrix(App->camera->sceneCamera);
 	SetViewMatrix(App->camera->sceneCamera);
 
-	if (cullingFromGameCamera && App->camera->selectedCamera != nullptr) {
+	if (cullingFromGameCamera && App->camera->selectedCamera != nullptr) 
+	{
 		App->scene->Draw(App->camera->selectedCamera->frustum);
-	} else {
+	}
+	else 
+	{
 		App->scene->Draw(App->camera->sceneCamera->frustum);
 	}
 
 	DrawDebugData(App->camera->sceneCamera);
 
-	if (App->camera->selectedCamera != nullptr) {
+	if (App->camera->selectedCamera != nullptr) 
+	{
 		glBindFramebuffer(GL_FRAMEBUFFER, App->camera->selectedCamera->fbo);
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -73,61 +90,71 @@ update_status ModuleRender::Update() {
 		SetProjectionMatrix(App->camera->selectedCamera);
 		SetViewMatrix(App->camera->selectedCamera);
 
-		// TODO: we will send the frustum to do the culling in the GOs
 		App->scene->Draw(App->camera->selectedCamera->frustum);
 
 		DrawDebugData(App->camera->selectedCamera);
 	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	
 	return UPDATE_CONTINUE;
 }
 
-update_status ModuleRender::PostUpdate() {
-
+update_status ModuleRender::PostUpdate() 
+{
 	App->editor->RenderGUI();
 	SDL_GL_SwapWindow(App->window->window);
 
 	return UPDATE_CONTINUE;
 }
 
-void ModuleRender::DrawDebugData(ComponentCamera* camera) const {
+void ModuleRender::DrawDebugData(ComponentCamera* camera) const 
+{
+	if (camera->debugDraw == false)
+	{
+	
+		return;
+	}
 
-	if (camera->debugDraw == false) return;
-
-	if (App->camera->selectedCamera != nullptr) {
+	if (App->camera->selectedCamera != nullptr) 
+	{
 		dd::frustum((App->camera->selectedCamera->frustum.ProjectionMatrix() * App->camera->selectedCamera->frustum.ViewMatrix()).Inverted(), dd::colors::Crimson);
 	}
 
-	if (showGrid) {
+	if (showGrid) 
+	{
 		dd::xzSquareGrid(-1000.0f, 1000.0f, 0.0f, 1.0f, math::float3(0.65f, 0.65f, 0.65f));
 	}
 
-	if (showAxis) {
+	if (showAxis) 
+	{
 		dd::axisTriad(math::float4x4::identity, 0.1f, 1.0f, 0, true);
 	}
 
 	App->debug->Draw(camera, camera->fbo, App->window->height, App->window->width);
 }
 
-void ModuleRender::SetViewMatrix(ComponentCamera* camera) const {
+void ModuleRender::SetViewMatrix(ComponentCamera* camera) const 
+{
 	glBindBuffer(GL_UNIFORM_BUFFER, ubo);
 	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(math::float4x4), sizeof(math::float4x4), &camera->GetViewMatrix()[0][0]);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
-void ModuleRender::SetProjectionMatrix(ComponentCamera* camera) const {
+void ModuleRender::SetProjectionMatrix(ComponentCamera* camera) const 
+{
 	glBindBuffer(GL_UNIFORM_BUFFER, ubo);
 	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(math::float4x4), &camera->GetProjectionMatrix()[0][0]);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
-void ModuleRender::GenerateBlockUniforms() {
-	unsigned uniformBlockIndexDefault = glGetUniformBlockIndex(App->program->basicProgram, "Matrices");
+void ModuleRender::GenerateBlockUniforms() 
+{
+	unsigned uniformBlockIndexDefault = glGetUniformBlockIndex(App->program->colorProgram, "Matrices");
 	unsigned uniformBlockIndexTexture = glGetUniformBlockIndex(App->program->textureProgram, "Matrices");
 	unsigned uniformBlockIndexBlinn = glGetUniformBlockIndex(App->program->blinnProgram, "Matrices");
 
-	glUniformBlockBinding(App->program->basicProgram, uniformBlockIndexDefault, 0);
+	glUniformBlockBinding(App->program->colorProgram, uniformBlockIndexDefault, 0);
 	glUniformBlockBinding(App->program->textureProgram, uniformBlockIndexTexture, 0);
 	glUniformBlockBinding(App->program->blinnProgram, uniformBlockIndexBlinn, 0);
 
@@ -139,7 +166,8 @@ void ModuleRender::GenerateBlockUniforms() {
 	glBindBufferRange(GL_UNIFORM_BUFFER, 0, ubo, 0, 2 * sizeof(math::float4x4));
 }
 
-void ModuleRender::InitSDL() {
+void ModuleRender::InitSDL() 
+{
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 
@@ -152,7 +180,8 @@ void ModuleRender::InitSDL() {
 	SDL_GetWindowSize(App->window->window, &App->window->width, &App->window->height);
 }
 
-void ModuleRender::InitOpenGL() const {
+void ModuleRender::InitOpenGL() const 
+{
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_DEPTH_TEST);
@@ -165,8 +194,10 @@ void ModuleRender::InitOpenGL() const {
 	glViewport(0, 0, App->window->width, App->window->height);
 }
 
-bool ModuleRender::CleanUp() {
+bool ModuleRender::CleanUp() 
+{
 	glDeleteBuffers(1, &ubo);
+
 	return true;
 }
 
