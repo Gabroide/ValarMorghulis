@@ -1,13 +1,15 @@
 #include "assert.h"
-#include "par_shapes.h"
 #include "Application.h"
-#include "ModuleScene.h"
 #include "MeshImporter.h"
-#include "ComponentMesh.h"
+#include "ModuleScene.h"
 #include "ModuleLibrary.h"
 #include "ComponentMaterial.h"
-#include "Math/float3.h"
-#include "Math/float2.h"
+#include "ComponentMesh.h"
+
+#include "MathGeoLib\include\Math\float3.h"
+#include "MathGeoLib\include\Math\float2.h"
+
+#include "par_shapes.h"
 
 // Constructor
 ComponentMesh::ComponentMesh(GameObject* goContainer, Mesh* mesh) : Component(goContainer, ComponentType::MESH) 
@@ -35,8 +37,15 @@ Component* ComponentMesh::Duplicate()
 
 void ComponentMesh::CleanUp() 
 {
-	goContainer->mesh = nullptr;
-	delete this;
+	if (mesh.vbo != 0)
+	{
+		glDeleteBuffers(1, &mesh.vbo);
+	}
+
+	if (mesh.ibo != 0)
+	{
+		glDeleteBuffers(1, &mesh.ibo);
+	}
 }
 
 void ComponentMesh::Draw(unsigned shaderProgram, const ComponentMaterial* material) const 
