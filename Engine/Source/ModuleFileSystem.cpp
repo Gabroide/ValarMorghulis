@@ -28,22 +28,22 @@ bool ModuleFileSystem::Init()
 
 	PHYSFS_setWriteDir(".");
 
-	if (PHYSFS_exists("/Library/") == 0) 
+	if (Exists("/Library/")) 
 	{
 		PHYSFS_mkdir("/Library/");
 	}
 	
-	if (PHYSFS_exists("/Library/Textures/") == 0) 
+	if (Exists("/Library/Textures/")) 
 	{
 		PHYSFS_mkdir("/Library/Textures/");
 	}
 	
-	if (PHYSFS_exists("/Library/Meshes/") == 0) 
+	if (Exists("/Library/Meshes/")) 
 	{
 		PHYSFS_mkdir("/Library/Meshes/");
 	}
 	
-	if (PHYSFS_exists("/Library/Scene/") == 0) 
+	if (Exists("/Library/Scene/")) 
 	{
 		PHYSFS_mkdir("/Library/Scene/");
 	}
@@ -103,7 +103,7 @@ unsigned ModuleFileSystem::Save(const char* pathAndFileName, const void* buffer,
 {
 	unsigned result = 0u;
 
-	bool overwrite = PHYSFS_exists(pathAndFileName) != 0;
+	bool overwrite = Exists(pathAndFileName) != 0;
 	PHYSFS_file* fsFile = (append) ? PHYSFS_openAppend(pathAndFileName) : PHYSFS_openWrite(pathAndFileName);
 
 	if (fsFile != nullptr) 

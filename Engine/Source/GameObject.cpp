@@ -158,7 +158,8 @@ void GameObject::Update()
 			
 			if (std::abs(std::distance(goChilds.begin(), itChild)) != 0) 
 			{
-				LOG("Begin move up");
+				LOG("Moving up");
+				std::swap(*itChild, *std::prev(itChild));
 			}
 		}
 
@@ -168,7 +169,8 @@ void GameObject::Update()
 			
 			if (std::abs(std::distance(goChilds.begin(), itChild)) != goChilds.size() - 1) 
 			{
-				LOG("Begin move down");
+				LOG("Moving down");
+				std::swap(*itChild, *std::next(itChild));
 			}
 		}
 
@@ -213,14 +215,14 @@ void GameObject::Draw(const math::Frustum& frustum) const
 		child->Draw(frustum);
 	}
 
-	if (mesh == nullptr || mesh != nullptr && !mesh->enabled) 
-	{
-		return;
-	}
-
 	if (App->scene->goSelected == this) 
 	{
 		DrawBBox();
+	}
+
+	if (mesh == nullptr || mesh != nullptr && !mesh->enabled || mesh != nullptr && mesh->mesh.vbo = 0)
+	{
+		return;
 	}
 
 	if (!frustum.Intersects(bbox)) 
@@ -244,7 +246,11 @@ void GameObject::Draw(const math::Frustum& frustum) const
 	glUseProgram(program);
 	ModelTransform(program);
 
-	((ComponentMesh*)mesh)->Draw(program, material);
+	if (material != nullptr)
+	{
+		((ComponentMesh*)mesh)->Draw(program, material);
+	}
+	
 	glUseProgram(0);
 }
 
@@ -456,6 +462,7 @@ Component* GameObject::AddComponent(ComponentType type)
 		{
 			component = new ComponentMesh(this, nullptr);
 			mesh = (ComponentMesh*)component;
+			AddComponent(ComponentType::MATERIAL);
 		}
 		else 
 		{

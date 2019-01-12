@@ -2,8 +2,10 @@
 #include "Application.h"
 #include "ModuleFileSystem.h"
 #include "ModuleRender.h"
+#include "ModuleScene.h"
 #include "ModuleTextures.h"
 #include "ComponentMaterial.h"
+#include "MaterialImporter.h"
 
 // Constructor
 ModuleTextures::ModuleTextures() 
@@ -80,7 +82,6 @@ Texture* const ModuleTextures::Load(const char* path)
 			success = ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
 		}
 
-		// Quit if we failed the conversion
 		if (!success) 
 		{
 			LOG("Error: Could not convert the image to texture correctly. %s", iluErrorString(ilGetError()));
@@ -222,6 +223,18 @@ void ModuleTextures::LoadDefaulTextures()
 {
 	noCameraSelectedTexture = Load("nocamselected.jpg");
 	defaultTexture = Load("checkers.jpg");
+
+	if (!App->fileSystem->Exists("/Library/Textures/checkers.dds"))
+	{
+		if (App->fileSystem->Exists("/Assets/Default/checkers.png"))
+		{
+			MaterialImporter::Import("/Assets/Default/checkers.png");
+		}
+		else
+		{
+			LOG("Error: Default texture not found");
+		}
+	}
 }
 
 void ModuleTextures::DrawGUI() 
