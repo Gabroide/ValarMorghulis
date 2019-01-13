@@ -1,34 +1,39 @@
-#ifndef __MODULEWINDOW_H__
-#define __MODULEWINDOW_H__
+#ifndef __ModuleWindow_h__
+#define __ModuleWindow_h__
 
 #include "Module.h"
-#include "SDL.h"
+
+#include "SDL\include\SDL.h"
 
 class Application;
 
 class ModuleWindow : public Module
 {
-	public:
+public:
 
-		ModuleWindow();
-		virtual ~ModuleWindow();
+	ModuleWindow();
+	virtual ~ModuleWindow();
 
-		bool	Init() override;
-		bool	CleanUp() override;
-		void	DrawGUI();
-		void	WindowResized(unsigned width, unsigned height);
+	bool			Init()		override;
+	bool			CleanUp()	override;
 
-	public:
-		SDL_Window*		window = nullptr;
-		SDL_Surface*	screen_surface = nullptr;
-		int				width = SCREEN_WIDTH;
-		int				height = SCREEN_HEIGHT;
-		float			screenRatio = SCREEN_WIDTH / SCREEN_HEIGHT;
+	void			DrawGUI();
+	void			WindowResized(unsigned width, unsigned height);
 
-		bool fullscreen = false;
-		bool resizable = true;
-		bool borderless = false;
+public:
+	bool			fullscreen		= false;
+	bool			resizable		= true;
+	bool			borderless		= false;
+	
+	int				width			= SCREEN_WIDTH;
+	int				height			= SCREEN_HEIGHT;
+	
+	float			screenRatio		= SCREEN_WIDTH / SCREEN_HEIGHT;
+
+public:
+	SDL_Window*		window			= nullptr;
+	SDL_Surface*	screen_surface	= nullptr;
 
 };
 
-#endif // __MODULEWINDOW_H__
+#endif // __ModuleWindow_h__
