@@ -8,6 +8,7 @@
 #include "ModuleScene.h"
 #include "ModuleWindow.h"
 #include "ComponentCamera.h"
+#include "QuadTreeValar.h"
 
 #include "SDL\include\SDL.h"
 
@@ -121,14 +122,12 @@ void ModuleRender::DrawDebugData(ComponentCamera* camera) const
 		dd::frustum((App->camera->selectedCamera->frustum.ProjectionMatrix() * App->camera->selectedCamera->frustum.ViewMatrix()).Inverted(), dd::colors::Crimson);
 	}
 
-	if (showGrid) 
+	dd::xzSquareGrid(-1000.0f, 1000.0f, 0.0f, 1.0f, math::float3(0.65f, 0.65f, 0.65f));
+	dd::axisTriad(math::float4x4::identity, 0.1f, 1.0f, 0, true);
+	
+	if (showQuad)
 	{
-		dd::xzSquareGrid(-1000.0f, 1000.0f, 0.0f, 1.0f, math::float3(0.65f, 0.65f, 0.65f));
-	}
-
-	if (showAxis) 
-	{
-		dd::axisTriad(math::float4x4::identity, 0.1f, 1.0f, 0, true);
+		PrintQuadTreeNode(App->scene->quadTree->root);
 	}
 
 	App->debug->Draw(camera, camera->fbo, App->window->height, App->window->width);
@@ -201,3 +200,18 @@ bool ModuleRender::CleanUp()
 	return true;
 }
 
+void ModuleRender::PrintQuadNode(QuadTreeNode* quadNode) const 
+{
+	if (quadNode->childs[0] != nullptr) 
+	{
+		for (int i = 0; i < 4; ++i) 
+		{
+			PrintQuadNode(quadNode->childs[i]);
+		}
+	}
+
+	quadNode->aabb.minPoint.y = -0.1f;
+	quadNode->aabb.maxPoint.y = 0.1f;
+
+	dd::aabb(quadNode->aabb.minPoint, quadNode->aabb.maxPoint, dd::colors::Yellow);
+}

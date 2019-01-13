@@ -57,21 +57,18 @@ class GameObject
 		std::vector<Component*> GetComponents(ComponentType type) const;
 
 	public:
-		bool					enabled = true;
-		bool					drawGOBBox = false;
-		bool					duplicating = false;
+		bool					enabled		= true;
+		bool					drawGOBBox	= false;
+		bool					duplicating	= false;
 		bool					toBeDeleted = false;
-		bool					toBeCopied = false;
-		bool					moveGOUp = false;
-		bool					moveGODown = false;
+		bool					toBeCopied	= false;
+		bool					moveGOUp	= false;
+		bool					moveGODown	= false;
+		bool					staticGo	= false;
 
 		math::AABB				bbox;
 
-
-		
-		
 	public:
-		const char*				filePath	= nullptr;
 		const char*				name		= DEFAULT_GO_NAME;
 		const char*				uuid		= nullptr;
 		const char*				parentUuid	= nullptr;

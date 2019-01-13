@@ -23,6 +23,7 @@ ModuleEditor::ModuleEditor()
 	docks.push_back(time = new DockTime());
 	docks.push_back(camera = new DockCamera());
 	docks.push_back(light = new DockLight());
+	docks.push_back(quad = new DockQuadTree());
 }
 
 // Destructor
@@ -56,11 +57,11 @@ update_status ModuleEditor::PreUpdate()
 
 	CreateDockSpace();
 	return UPDATE_CONTINUE;
+
 }
 
 update_status ModuleEditor::Update() 
 {
-	ImGui::ShowDemoWindow();
 	if (ImGui::BeginMainMenuBar()) 
 	{
 		if (ImGui::BeginMenu("App")) 

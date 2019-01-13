@@ -10,6 +10,7 @@
 #include "ComponentMesh.h"
 #include "ComponentTransform.h"
 #include "Config.h"
+#include "QuadTreeValar.h"
 
 #include "par_shapes.h"
 
@@ -32,7 +33,7 @@ ModuleScene::~ModuleScene()
 bool ModuleScene::Init() 
 {
 	root = new GameObject("root", nullptr);
-	
+	quadTree = new QuadTreeValar();
 	return true;
 }
 

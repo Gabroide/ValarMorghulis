@@ -10,6 +10,7 @@
 #include "ComponentTransform.h"
 #include "ModuleFileSystem.h"
 #include "Config.h"
+#include "QuadTreeValar.h"
 
 #include "SDL\include\SDL_mouse.h"
 
@@ -90,7 +91,7 @@ GameObject::GameObject(const GameObject& duplicateGameObject)
 	strcpy(copyName, duplicateGameObject.name);
 	name = copyName;
 
-	filePath = duplicateGameObject.filePath;
+	saticGo = duplicateGameObject.staticGo;
 	bbox = duplicateGameObject.bbox;
 
 	for (const auto &component : duplicateGameObject.components) 
@@ -274,13 +275,26 @@ void GameObject::DrawProperties()
 {
 	assert(name != nullptr);
 
-	ImGui::InputText("Name", (char*)name, 50.0f); ImGui::SameLine();
-
 	if (ImGui::Checkbox("Enabled", &enabled)) 
 	{
 		for (auto &component : components) 
 		{
 			component->enabled = enabled;
+		}
+	}
+
+	ImGui::SameLine();
+	ImGui::InputText("Name", (char*)name, 50.0f); ImGui::SameLine();
+
+	if (ImGui::Checkbox("Static", &staticGo))
+	{
+		if (staticGo && GetComponentType::MSH)
+		{
+			App->scene->quadTree->Insert(this, true);
+		}
+		else if (!staicGo)
+		{
+			App->scene->quadTree->Remove(this);
 		}
 	}
 
@@ -294,7 +308,7 @@ void GameObject::DrawProperties()
 
 	for (auto &component : components) 
 	{
-		component->DrawProperties();
+		component->DrawProperties(staticGo);
 	}
 }
 
@@ -504,7 +518,7 @@ Component* GameObject::AddComponent(ComponentType type)
 	return component;
 }
 
-void GameObject::RemoveComponent(Component* component) 
+void GameObject::RemoveComponent(Component* component)
 {
 	assert(component != nullptr);
 
@@ -622,6 +636,7 @@ bool GameObject::Save(Config* config)
 	}
 
 	config->AddBool("enabled", enabled);
+	config->AddBool("static", staticGo);
 
 	config->StartArray("components");
 
@@ -641,6 +656,12 @@ void GameObject::Load(Config* config, rapidjson::Value& value)
 {
 	uuid = config->GetString("uuid", value);
 	enabled = config->GetBool("enabled", value);
+	staicGo = config->GetBool("static", value);
+
+	if (staticGo)
+	{
+
+	}
 
 	rapidjson::Value components = value["components"].GetArray();
 

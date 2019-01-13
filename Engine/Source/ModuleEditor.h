@@ -16,6 +16,7 @@
 #include "DockLight.h"
 #include "DockScene.h"
 #include "DockTime.h"
+#include "DockQuadTree.h"
 
 #include "IMGUI\imgui.h"
 #include "IMGUI\imgui_impl_sdl.h"
@@ -31,6 +32,7 @@ class DockInspector;
 class DockCamera;
 class DockLight;
 class DockAssets;
+class DockQuadTree;
 
 class ModuleEditor : public Module
 {
@@ -65,6 +67,7 @@ class ModuleEditor : public Module
 		DockCamera*			camera			= nullptr;
 		DockLight*			light			= nullptr;
 		DockAssets*			assets			= nullptr;
+		DockQuadTree*		quad			= nullptr;
 
 	public:
 		const std::string	FilePickerID	= "###FilePicker";

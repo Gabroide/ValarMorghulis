@@ -18,8 +18,9 @@ enum class GeometryType {
 	CUBE
 };
 
-class config;
 class GameObject;
+class config;
+class QuadTreeValar;
 
 class ModuleScene : public Module
 {
@@ -44,7 +45,7 @@ class ModuleScene : public Module
 	public:
 		GameObject*		CreateGameObject(const char* goName = nullptr, GameObject* goParent = nullptr, const math::float4x4& transform = math::float4x4().identity);
 		GameObject*		CreateCamera(GameObject* goParent = nullptr, const math::float4x4& transform = math::float4x4().identity);
-		GameObject*		CreateGameObjectByUUID()
+		GameObject*		GetGameObjectByUUID(GameObject* gameObject, char uuiObjectName[37]);
 
 	public:
 		float			ambientLight	= 0.3f;
@@ -54,6 +55,8 @@ class ModuleScene : public Module
 	public:
 		GameObject*		root			= nullptr;
 		GameObject*		goSelected		= nullptr;
+
+		QuadTreeValar*	quadTree		= nullptr;
 
 };
 

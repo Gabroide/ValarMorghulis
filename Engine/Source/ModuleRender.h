@@ -4,6 +4,7 @@
 #include "Module.h"
 
 class ComponentCamera;
+class QuadTreeNode;
 
 class ModuleRender : public Module
 {
@@ -18,6 +19,7 @@ class ModuleRender : public Module
 		update_status	Update()		override;
 		update_status	PostUpdate()	override;
 		
+		void			PrintQuadNode(QuadTreeNode* quadNode) const;
 
 	private:
 		void			InitSDL();
@@ -26,6 +28,7 @@ class ModuleRender : public Module
 		void			SetProjectionMatrix(ComponentCamera* camera) const;
 		void			DrawDebugData(ComponentCamera* camera) const;
 		void			GenerateBlockUniforms();
+		void			PrintQuadTreeNode(QuadTreeNode* quadTreeNode) const;
 
 	public:
 		unsigned		ubo						= 0u;
@@ -37,9 +40,8 @@ class ModuleRender : public Module
 		void*			context					= nullptr;
 
 	protected:
-		bool			showAxis				= true;
-		bool			showGrid				= true;
-
+		bool			showQuad				= true;
+		
 };
 
 #endif // __ModuleRender_h__
