@@ -19,6 +19,7 @@ class QuadTreeNode
 		void	Insert(GameObject* gameObject);
 		void	CreateChilds();
 		void	RecalculateSpace();
+		void	ExpandLimits(GameObject* gameObject);
 
 	public:
 		int						maxItems	= 1;

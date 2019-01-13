@@ -6,7 +6,7 @@
 // Constructor
 QuadTreeValar::QuadTreeValar()
 {
-	quadLimits = math::AABB(float3(-20.0f, -0.1f, -20.0f), float3(20.0f, 0.1f, 20.0f));
+	quadLimits = math::AABB(math::float3(-20.0f, -0.1f, -20.0f), math::float3(20.0f, 0.1f, 20.0f));
 	InitQuadTree(quadLimits, true);
 }
 
@@ -24,7 +24,9 @@ void QuadTreeValar::InitQuadTree(const math::AABB& aabb, bool clearAllGameObject
 
 void QuadTreeValar::Insert(GameObject* gameObject, bool addQuadList) 
 {
-	if (root != nullptr && gameObject->bbox.Intersects(root->aabb)) 
+	assert(root != nullptr);
+
+	if (gameObject->bbox.Intersects(root->aabb)) 
 	{
 		if (addQuadList) 
 		{
@@ -33,6 +35,76 @@ void QuadTreeValar::Insert(GameObject* gameObject, bool addQuadList)
 
 		root->Insert(gameObject);
 	}
+	else
+	{
+		ExpandLimits(gameObject);
+	}
+}
+
+void QuadTreeValar::ExpandLimits(GameObject* gameObject) 
+{
+	math::float3 extremePoint = gameObject->bbox.ExtremePoint(quadLimits.CenterPoint());
+	expansionValue = 0.0f;
+
+	if (extremePoint.x < 0.0f && extremePoint.z < 0.0f) 
+	{
+		//Top Left
+		if (quadLimits.minPoint.x > extremePoint.x) 
+		{
+			expansionValue = quadLimits.minPoint.x - extremePoint.x;
+		}
+
+		if (quadLimits.minPoint.z > extremePoint.z)
+		{
+			expansionValue = quadLimits.minPoint.z - extremePoint.z;
+		}
+	}
+	else if (extremePoint.x > 0.0f && extremePoint.z < 0.0f) 
+	{
+		//Top Right
+		if (quadLimits.maxPoint.x < extremePoint.x)
+		{
+			expansionValue = extremePoint.x - quadLimits.maxPoint.x;
+		}
+
+		
+		if (quadLimits.minPoint.z > extremePoint.z) 
+		{
+			expansionValue = quadLimits.minPoint.z - extremePoint.z;
+		}
+	}
+	else if (extremePoint.x > 0.0f && extremePoint.z > 0.0f) 
+	{
+		//Bottom Right
+		if (quadLimits.minPoint.x < extremePoint.x) 
+		{
+			expansionValue = extremePoint.x - quadLimits.maxPoint.x;
+		}
+
+		if (quadLimits.maxPoint.z < extremePoint.z) 
+		{
+			expansionValue = extremePoint.z - quadLimits.minPoint.z;
+		}
+	}
+	else
+	{
+		if (quadLimits.minPoint.x > extremePoint.x) 
+		{
+			expansionValue = quadLimits.minPoint.x - extremePoint.x;
+		}
+
+		if (quadLimits.maxPoint.z < extremePoint.z) 
+		{
+			expansionValue = extremePoint.z - quadLimits.minPoint.z;
+		}
+	}
+
+	quadLimits.maxPoint.x += expansionValue;
+	quadLimits.maxPoint.z += expansionValue;
+	quadLimits.minPoint.x -= expansionValue;
+	quadLimits.minPoint.z -= expansionValue;
+
+	InitQuadTree(quadLimits, false);
 }
 
 void QuadTreeValar::Remove(GameObject* gameObject) 
