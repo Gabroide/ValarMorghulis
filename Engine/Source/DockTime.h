@@ -1,7 +1,6 @@
 #ifndef __DockTime_h__
 #define __DockTime_h__
 
-#include "imgui.h"
 #include "Dock.h"
 
 class DockTime : public Dock

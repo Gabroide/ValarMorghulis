@@ -1,3 +1,4 @@
+
 #include <thread>
 
 #include "Application.h"
@@ -82,13 +83,15 @@ bool ModuleLibrary::Init()
 
 	UpdateMeshesList();
 	UpdateTexturesList();
+	UpdateScenesList();
 
 	return true;
 }
 
 update_status ModuleLibrary::Update() 
 {
-	if (toBeDeleted) {
+	if (toBeDeleted) 
+	{
 		toBeDeleted = false;
 		
 		if (removeHead) 
@@ -121,4 +124,10 @@ void ModuleLibrary::UpdateTexturesList()
 {
 	fileTexturesList.clear();
 	App->fileSystem->GetFilesFromDirectory("/Library/Textures/", fileTexturesList);
+}
+
+void ModuleLibrary::UpdateScenesList()
+{
+	fileScenesList.clear();
+	App->fileSystem->GetFilesFromDirectory("/Library/Scenes/", fileScenesList);
 }

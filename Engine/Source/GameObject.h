@@ -14,10 +14,14 @@
 
 #include "assimp\matrix4x4.h"
 
+#include "rapidjson-1.1.0\include\rapidjson\document.h"
+#include "rapidjson-1.1.0\include\rapidjson\prettywriter.h"
+
 class Component;
 class ComponentMesh;
 class ComponentMaterial;
 class ComponentTransform;
+class Config;
 
 enum class ComponentType;
 
@@ -25,20 +29,23 @@ class GameObject
 {
 	public:
 		GameObject();
-		GameObject(const char* goName, const math::float4x4& transform, const char* fileLocation);
-		GameObject(const char* goName, const math::float4x4& transform, GameObject* goParent, const char* fileLocation);
+		GameObject(const char* goName, const math::float4x4& transform);
+		GameObject(const char* goName, const math::float4x4& transform, GameObject* goParent);
 		GameObject(const GameObject& duplicateGameObject);
 		~GameObject();
+
+		bool					Save(Config* config);
 
 		void					Update();
 		void					Draw(const math::Frustum& frustum) const;
 		void					CleanUp();
 		void					DrawProperties();
 		void					DrawHierarchy(GameObject* goSelected);
-		void					DrawBBox() const;
+		void					DrawBBox() const;n
 		void					RemoveComponent(Component* component);
 		void					ComputeBBox();
 		void					ModelTransform(unsigned shader) const;
+		void					Load(Config* config, rapidjson::Value& value);
 
 		math::float4x4			GetLocalTransform() const;
 		math::float4x4			GetGlobalTransform() const;
@@ -61,13 +68,14 @@ class GameObject
 		math::AABB				bbox;
 
 
-		std::string				uuid		= "";
-		std::string				parentUuid	= "";
+		
 		
 	public:
 		const char*				filePath	= nullptr;
 		const char*				name		= DEFAULT_GO_NAME;
-		
+		const char*				uuid		= nullptr;
+		const char*				parentUuid	= nullptr;
+
 		GameObject*				parent		= nullptr;
 		
 		ComponentTransform*		transform	= nullptr;
@@ -75,8 +83,8 @@ class GameObject
 		ComponentMaterial*		material	= nullptr;
 
 		std::list<GameObject*>	goChilds;
-		std::vector<Component*>	components;
-
+		std::list<Component*>	components;
+	
 };
 
 #endif // __GameObject_h__

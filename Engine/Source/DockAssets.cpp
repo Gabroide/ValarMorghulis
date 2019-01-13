@@ -32,6 +32,7 @@ void DockAssets::Draw()
 	{
 		DrawTreeNode("Meshes", false);
 		DrawTreeNode("Textures", false);
+		DrawTreeNode("Scenes", false);
 
 		ImGui::TreePop();
 	}
@@ -71,6 +72,13 @@ void DockAssets::DrawTreeNode(const char* name, bool isLeaf)
 			for (std::vector<std::string>::iterator iterator = App->library->fileTexturesList.begin(); iterator != App->library->fileTexturesList.end(); ++iterator) 
 			{
 				DrawTreeNode((*iterator).c_str(), true);
+			}
+		}
+		else if (name == "Scenes")
+		{
+			for (std::vector<std::string>::iterator it = App->library->fileScenesList.begin(); it != App->library->fileScenesList.end(); ++it)
+			{
+				DrawTreeNode((*it).c_str(), true);
 			}
 		}
 

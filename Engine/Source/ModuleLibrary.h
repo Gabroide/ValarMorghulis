@@ -20,6 +20,7 @@ public:
 	
 	void					UpdateMeshesList();
 	void					UpdateTexturesList();
+	void					UpdateScenesList();
 
 public:
 	bool					 toBeDeleted	= false;
@@ -27,6 +28,7 @@ public:
 	
 	std::vector<std::string> fileMeshesList;
 	std::vector<std::string> fileTexturesList;
+	std::vector<std::string> fileScenesList;
 
 };
 

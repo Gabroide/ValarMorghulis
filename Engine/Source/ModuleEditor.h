@@ -55,16 +55,19 @@ class ModuleEditor : public Module
 
 	public:
 		//Docking
-		DockAbout*			about		= nullptr;
-		DockConsole*		console		= nullptr;
-		DockScene*			scene		= nullptr;
-		DockConfig*			config		= nullptr;
-		DockTime*			time		= nullptr;
-		DockHierarchy*		hierarchy	= nullptr;
-		DockInspector*		inspector	= nullptr;
-		DockCamera*			camera		= nullptr;
-		DockLight*			light		= nullptr;
-		DockAssets*			assets		= nullptr;
+		DockAbout*			about			= nullptr;
+		DockConsole*		console			= nullptr;
+		DockScene*			scene			= nullptr;
+		DockConfig*			config			= nullptr;
+		DockTime*			time			= nullptr;
+		DockHierarchy*		hierarchy		= nullptr;
+		DockInspector*		inspector		= nullptr;
+		DockCamera*			camera			= nullptr;
+		DockLight*			light			= nullptr;
+		DockAssets*			assets			= nullptr;
+
+	public:
+		const std::string	FilePickerID	= "###FilePicker";
 
 	private:
 		std::list<Dock*>	docks;

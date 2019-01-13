@@ -1,13 +1,18 @@
 #include "Application.h"
-#include "Component.h"
 #include "ModuleFileSystem.h"
+#include "Component.h"
+#include "GameObject.h"
 
 // Constructor
 Component::Component(GameObject* gameObject, ComponentType type) 
 {
 	uuid = App->fileSystem->NewGuuid();
-	parentUuid = gameObject->uuid;
-	goContainer = gameObject;
+	if (gameObject != nullptr)
+	{
+		parentUuid = gameObject->uuid;
+		goContainer = gameObject;
+	}
+	
 	componentType = type;
 }
 
@@ -42,7 +47,7 @@ bool Component::DrawComponentState()
 	bool removed = ImGui::SmallButton("Remove Component");
 
 	ImGui::Text("UUID: "); ImGui::SameLine();
-	ImGui::TextColored({ 0.4f,0.4f,0.4f,1.0f }, uuid.c_str());
+	ImGui::TextColored({ 0.4f,0.4f,0.4f,1.0f }, uuid);
 
 	if (removed)
 	{

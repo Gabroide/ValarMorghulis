@@ -1,6 +1,8 @@
 #include "Application.h"
 #include "ModuleScene.h"
+#include "GameObject.h"
 #include "ComponentTransform.h"
+#include "Config.h"
 
 // Constructor
 ComponentTransform::ComponentTransform(GameObject* goContainer, const math::float4x4& transform) : Component(goContainer, ComponentType::TRANSFORM) 
@@ -78,7 +80,7 @@ void ComponentTransform::SetWorldToLocal(const math::float4x4& parentTrans)
 
 void ComponentTransform::DrawProperties() 
 {
-	if (ImGui::CollapsingHeader("Local Transformation")) 
+	if (ImGui::CollapsingHeader("Local Transform")) 
 	{
 		if (ImGui::DragFloat3("Position", (float*)&position, 0.1f, -1000.f, 1000.f)) 
 		{
@@ -105,4 +107,29 @@ void ComponentTransform::DrawProperties()
 
 		ImGui::Separator();
 	}
+}
+
+/* RapidJson storage */
+void ComponentTransform::Save(Config* config) 
+{
+	config->StartObject();
+
+	config->AddComponentType("componentType", componentType);
+	config->AddString("parentUuid", parentUuid);
+	config->AddString("uuid", uuid);
+	config->AddFloat3("position", position);
+	config->AddQuat("rotation", rotation);
+	config->AddFloat3("eulerRotation", eulerRotation);
+	config->AddFloat3("scale", scale);
+
+	config->EndObject();
+}
+
+void ComponentTransform::Load(Config* config, rapidjson::Value& value) 
+{
+	uuid = config->GetString("uuid", value);
+	position = config->GetFloat3("position", value);
+	eulerRotation = config->GetFloat3("eulerRotation", value);
+	scale = config->GetFloat3("scale", value);
+	rotation = config->GetQuat("rotation", value);
 }

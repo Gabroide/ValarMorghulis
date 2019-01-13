@@ -1,6 +1,8 @@
 #include "Application.h"
-#include "DockLight.h"
 #include "ModuleScene.h"
+#include "Component.h"
+#include "DockLight.h"
+
 
 // Constructor
 DockLight::DockLight() 

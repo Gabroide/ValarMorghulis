@@ -1,8 +1,10 @@
 #ifndef __Component_h__
 #define __Component_h__
 
-#include "GameObject.h"
+#include "rapidjson-1.1.0\include\rapidjson\document.h"
+#include "rapidjson-1.1.0\include\rapidjson\prettywriter.h"
 
+class Config;
 class GameObject;
 
 enum class ComponentType {
@@ -27,7 +29,7 @@ class Component
 		void				Remove();
 		virtual void		Update();
 		
-public:
+	public:
 		virtual void DrawProperties() 
 		{
 		
@@ -48,15 +50,25 @@ public:
 			enabled = false; 
 		};
 		
-public:
-		bool				enabled			= true;
+		virtual void Save(Config* config) 
+		{
 		
+		};
+
+		virtual void Load(Config* config, rapidjson::Value value)
+		{
+
+		};
+
+	public:
+		bool				enabled			= true;
+
 		ComponentType		componentType	= ComponentType::EMPTY;
 		
-		std::string			uuid			= "";
-		std::string			parentUuid		= "";
-		
-public:
+	public:
+		const char*			uuid			= "";
+		const char*			parentUuid = "";
+
 		GameObject*			goContainer		= nullptr;
 
 };

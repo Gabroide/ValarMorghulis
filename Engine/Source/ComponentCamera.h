@@ -3,7 +3,6 @@
 
 #include "Globals.h"
 #include "Component.h"
-#include "GameObject.h"
 
 #include "SDL\include\SDL.h"
 
@@ -14,6 +13,8 @@
 #include "MathGeoLib\include\Math\float4x4.h"
 #include "MathGeoLib\include\Math\MathFunc.h"
 #include "MathGeoLib\include\Geometry\Frustum.h"
+
+class GameObject;
 
 class ComponentCamera : public Component
 {
@@ -31,6 +32,8 @@ class ComponentCamera : public Component
 		void			SetHorizontalFOV(float fovXDegrees);
 		void			SetVerticalFOV(float fovYDegrees);
 		void			CreateFrameBuffer();
+		void			Save(Config* config) override;
+		void			Load(Config* config, rapidjson::Value& value) override;
 
 		Component*		Duplicate()			override;
 		
@@ -38,20 +41,18 @@ class ComponentCamera : public Component
 		math::float4x4	GetProjectionMatrix();
 
 	public:
+		bool			debugDraw			= true;
+
 		unsigned		screenWidth			= SCREEN_WIDTH;
 		unsigned		screenHeight		= SCREEN_HEIGHT;
 		unsigned		fbo					= 0u;
 		unsigned		rbo					= 0u;
 		unsigned		renderTexture		= 0u;
 
-		bool			debugDraw			= true;
-
 		float			maxFov				= 100.0f;
 		float			minFov				= 10.0f;
-		float			pitch				= 0.0f;
-		float			yaw					= 0.0f;
 		float			screenRatio			= screenWidth / screenHeight;
-		float			cameraSpeed			= 15.0f;
+		float			cameraSpeed			= 35.0f;
 		float			rotationSpeed		= 65.0f;
 		float			mouseSensitivity	= 0.2f;
 		float			fovY				= 45.0f;

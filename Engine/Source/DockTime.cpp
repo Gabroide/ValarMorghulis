@@ -1,4 +1,5 @@
 #include "Application.h"
+#include "ModuleScene.h"
 #include "ModuleTime.h"
 #include "ModuleWindow.h"
 #include "DockTime.h"
@@ -42,10 +43,12 @@ void DockTime::Draw()
 		if (App->time->gameState == GameState::STOP) 
 		{
 			App->time->StartGameClock();
+			App->scene->SaveScene();
 		}
 		else
 		{
 			App->time->StopGameClock();
+			App->scene->LoadScene();
 		}
 	}
 

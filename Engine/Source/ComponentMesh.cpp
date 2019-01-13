@@ -1,10 +1,12 @@
 #include "assert.h"
 #include "Application.h"
 #include "MeshImporter.h"
-#include "ModuleScene.h"
 #include "ModuleLibrary.h"
+#include "ModuleScene.h"
+#include "GameObject.h"
 #include "ComponentMaterial.h"
 #include "ComponentMesh.h"
+#include "Config.h"
 
 #include "MathGeoLib\include\Math\float3.h"
 #include "MathGeoLib\include\Math\float2.h"
@@ -158,13 +160,13 @@ void ComponentMesh::DrawProperties()
 		{
 			if (ImGui::BeginCombo("##meshCombo", currentMesh.c_str())) 
 			{	
-				for (std::vector<std::string>::iterator iterator = fileMeshesList.begin(); iterator != fileMeshesList.end(); ++iterator) 
+				for (std::vector<std::string>::iterator it = fileMeshesList.begin(); it != fileMeshesList.end(); ++it) 
 				{
-					bool isSelected = (currentMesh == (*iterator));
+					bool isSelected = (currentMesh == (*it));
 					
-					if (ImGui::Selectable((*iterator).c_str(), isSelected)) 
+					if (ImGui::Selectable((*it).c_str(), isSelected)) 
 					{
-						currentMesh = (*iterator);
+						currentMesh = (*it);
 
 						LoadMesh(currentMesh.c_str());
 						
@@ -358,4 +360,21 @@ void ComponentMesh::ComputeMesh(par_shapes_mesh_s* parMesh)
 	glDisableVertexAttribArray(2);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void ComponentMesh::Save(Config* config) 
+{
+	config->StartObject();
+
+	config->AddComponentType("componentType", componentType);
+	config->AddString("parent", goContainer->uuid);
+	config->AddString("currentMesh", currentMesh.c_str());
+
+	config->EndObject();
+}
+
+void ComponentMesh::Load(Config* config, rapidjson::Value& value) 
+{
+	currentMesh = config->GetString("currentMesh", value);
+	LoadMesh(currentMesh.c_str());
 }

@@ -1,11 +1,7 @@
 #ifndef __ComponentTMaterial_h__
 #define __ComponentTMaterial_h__
 
-#include "assert.h"
-#include "ModuleTextures.h"
 #include "Component.h"
-
-#include "glew-2.1.0\include\GL\glew.h"
 
 #include "MathGeoLib\include\Math\float4.h"
 
@@ -21,6 +17,8 @@ enum class MaterialType {
 	EMISSIVE_MAP
 };
 
+class GameObject;
+
 class ComponentMaterial : public Component
 {
 	public:
@@ -29,8 +27,10 @@ class ComponentMaterial : public Component
 		ComponentMaterial(const ComponentMaterial& duplicatedComponent);
 		~ComponentMaterial();
 
-		void		DrawProperties() override;
+		void		DrawProperties()								override;
 		void		UnloadMaterial();
+		void		Save(Config* config)							override;
+		void		Load(Config*config, rapidjson::Value& value)	override;
 
 	public:
 		Component*	Duplicate() override;

@@ -1,5 +1,7 @@
 #include "Application.h"
 #include "ModuleCamera.h"
+#include "ModuleRender.h"
+#include "ModuleWindow.h"
 #include "DockScene.h"
 
 // Constrctor

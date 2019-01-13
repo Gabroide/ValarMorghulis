@@ -337,7 +337,12 @@ void ModuleFileSystem::SplitFilePath(const char* fullPath, std::string* path, st
 	}
 }
 
-std::string ModuleFileSystem::NewGuuid() 
+const char* ModuleFileSystem::NewGuuid() 
 {
-	return xg::newGuid().str();
+	std::string uuid = xg::newGuuid().str();
+	char* copyName = new char[strlen(uuid.c_str())];
+	strcpy(copyName, uuid.c_str());
+
+	return copyName;
+
 }

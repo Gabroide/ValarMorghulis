@@ -1,9 +1,6 @@
 #ifndef __DockScene_h__
 #define __DockScene_h__
 
-#include "Application.h"
-#include "ModuleRender.h"
-#include "ModuleWindow.h"
 #include "Dock.h"
 
 class DockScene : public Dock

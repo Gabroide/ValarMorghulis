@@ -9,7 +9,10 @@
 #include "ComponentMaterial.h"
 #include "ComponentTransform.h"
 #include "ModuleFileSystem.h"
-#include "SDL/include/SDL_mouse.h"
+#include "Config.h"
+
+#include "SDL\include\SDL_mouse.h"
+
 #include "debugdraw.h"
 
 // Constructor
@@ -20,18 +23,29 @@ GameObject::GameObject()
 }
 
 // Constructor Overloaded
-GameObject::GameObject(const char* goName, const math::float4x4& parentTransform, const char* fileLocation) 
+GameObject::GameObject(const char* goName, GameObject* goParent) 
+{
+	uuid = App->fileSystem->NewGuuid();
+	char* copyName = new char[strlen(goName)];
+	strcpy(copyName, goName);
+	name = copyName;
+
+	if (goParent != nullptr)
+	{
+		parent = goParent;
+		parentUuid = goParent->uuid;
+		goParent->goChilds.push_back(this);
+	}
+}
+
+// Constructor Overloaded
+GameObject::GameObject(const char* goName, const math::float4x4& parentTransform) 
 {
 	uuid = App->fileSystem->NewGuuid();
 
 	char* copyName = new char[strlen(goName)];
 	strcpy(copyName, goName);
 	name = copyName;
-
-	if (fileLocation != nullptr) 
-	{
-		filePath = fileLocation;
-	}
 
 	parent = App->scene->root;
 	parentUuid = App->scene->root->uuid;
@@ -41,7 +55,7 @@ GameObject::GameObject(const char* goName, const math::float4x4& parentTransform
 }
 
 // Constructor Overloaded
-GameObject::GameObject(const char* goName, const math::float4x4& parentTransform, GameObject* goParent, const char* fileLocation) 
+GameObject::GameObject(const char* goName, const math::float4x4& parentTransform, GameObject* goParent) 
 {
 	uuid = App->fileSystem->NewGuuid();
 
@@ -64,11 +78,6 @@ GameObject::GameObject(const char* goName, const math::float4x4& parentTransform
 
 	transform = (ComponentTransform*)AddComponent(ComponentType::TRANSFORM);
 	transform->AddTransform(parentTransform);
-
-	if (fileLocation != nullptr)
-	{
-		filePath = fileLocation;
-	}
 }
 
 // Constructor Overloaded
@@ -116,7 +125,7 @@ GameObject::GameObject(const GameObject& duplicateGameObject)
 	}
 }
 
-// Destructor
+//Destructor
 GameObject::~GameObject() 
 {
 	for (auto &component : components) 
@@ -158,7 +167,6 @@ void GameObject::Update()
 			
 			if (std::abs(std::distance(goChilds.begin(), itChild)) != 0) 
 			{
-				LOG("Moving up");
 				std::swap(*itChild, *std::prev(itChild));
 			}
 		}
@@ -169,7 +177,6 @@ void GameObject::Update()
 			
 			if (std::abs(std::distance(goChilds.begin(), itChild)) != goChilds.size() - 1) 
 			{
-				LOG("Moving down");
 				std::swap(*itChild, *std::next(itChild));
 			}
 		}
@@ -180,14 +187,14 @@ void GameObject::Update()
 			GameObject* goCopied = new GameObject(**itChild);
 			goCopied->parent = this;
 			goChilds.push_back(goCopied);
-			LOG("Duplicated GO: %s", (*itChild)->name);
+			LOG("Duplicated GameObject: %s", (*itChild)->name);
 		}
 
 		if ((*itChild)->toBeDeleted) 
 		{
 			(*itChild)->toBeDeleted = false;
 			(*itChild)->CleanUp();
-			LOG("Removed GO: %s", (*itChild)->name);
+			LOG("Removed GameObject: %s", (*itChild)->name);
 			delete *itChild;
 			goChilds.erase(itChild++);
 		}
@@ -205,14 +212,14 @@ void GameObject::Draw(const math::Frustum& frustum) const
 		return;
 	}
 
-	if (transform == nullptr)
-	{
-		return;
-	}
-
 	for (const auto &child : goChilds) 
 	{
 		child->Draw(frustum);
+	}
+
+	if (transform == nullptr)
+	{
+		return;
 	}
 
 	if (App->scene->goSelected == this) 
@@ -220,8 +227,9 @@ void GameObject::Draw(const math::Frustum& frustum) const
 		DrawBBox();
 	}
 
-	if (mesh == nullptr || mesh != nullptr && !mesh->enabled || mesh != nullptr && mesh->mesh.vbo = 0)
+	if (mesh == nullptr || mesh != nullptr && !mesh->enabled || mesh != nullptr && mesh->mesh.vbo == 0) 
 	{
+	
 		return;
 	}
 
@@ -246,11 +254,11 @@ void GameObject::Draw(const math::Frustum& frustum) const
 	glUseProgram(program);
 	ModelTransform(program);
 
-	if (material != nullptr)
+	if (material != nullptr) 
 	{
 		((ComponentMesh*)mesh)->Draw(program, material);
 	}
-	
+
 	glUseProgram(0);
 }
 
@@ -279,9 +287,9 @@ void GameObject::DrawProperties()
 	if (ImGui::CollapsingHeader("Info")) 
 	{
 		ImGui::Text("UUID: "); ImGui::SameLine();
-		ImGui::TextColored({ 0.4f,0.4f,0.4f,1.0f }, uuid.c_str());
+		ImGui::TextColored({ 0.4f,0.4f,0.4f,1.0f }, uuid);
 		ImGui::Text("Parent UUID: "); ImGui::SameLine();
-		ImGui::TextColored({ 0.4f,0.4f,0.4f,1.0f }, parentUuid.c_str());
+		ImGui::TextColored({ 0.4f,0.4f,0.4f,1.0f }, parentUuid);
 	}
 
 	for (auto &component : components) 
@@ -397,7 +405,7 @@ void GameObject::DrawHierarchy(GameObject* goSelected)
 				App->scene->goSelected = nullptr;
 			}
 		}
-		
+
 		if (ImGui::Selectable("Move up") && App->scene->goSelected != nullptr) 
 		{
 			moveGOUp = true;
@@ -452,21 +460,20 @@ Component* GameObject::AddComponent(ComponentType type)
 		}
 		else 
 		{
-			LOG("Warn: This GO already have a TRANSFORM");
+			LOG("Warn: Transform already exist");
 		}
 
 		break;
 
 	case  ComponentType::MESH:
-		if (GetComponent(ComponentType::MESH) == nullptr) 
-		{
+		if (GetComponent(ComponentType::MESH) == nullptr) {
 			component = new ComponentMesh(this, nullptr);
 			mesh = (ComponentMesh*)component;
 			AddComponent(ComponentType::MATERIAL);
 		}
-		else 
+		else
 		{
-			LOG("Warn: This GO already have a MESH");
+			LOG("Warn: Mesh already exist");
 		}
 	
 		break;
@@ -479,9 +486,9 @@ Component* GameObject::AddComponent(ComponentType type)
 		}
 		else 
 		{
-			LOG("Warn: This GO already have a MATERIAL");
+			LOG("Warn: Material already exist");
 		}
-	
+		
 		break;
 	
 	case ComponentType::EMPTY:
@@ -501,7 +508,7 @@ void GameObject::RemoveComponent(Component* component)
 {
 	assert(component != nullptr);
 
-	for (std::vector<Component*>::iterator it = components.begin(); it != components.end(); ++it) 
+	for (std::list<Component*>::iterator it = components.begin(); it != components.end(); ++it) 
 	{
 		if ((*it) == component) 
 		{
@@ -547,7 +554,7 @@ math::float4x4 GameObject::GetLocalTransform() const
 {
 	if (transform == nullptr) 
 	{
-
+	
 		return math::float4x4::identity;
 	}
 
@@ -558,6 +565,7 @@ math::float4x4 GameObject::GetGlobalTransform() const
 {
 	if (parent != nullptr) 
 	{
+	
 		return parent->GetGlobalTransform() * GetLocalTransform();
 	}
 
@@ -597,5 +605,52 @@ void GameObject::DrawBBox() const
 	for (auto& child : goChilds) 
 	{
 		child->DrawBBox();
+	}
+}
+
+/* RapidJson storage */
+bool GameObject::Save(Config* config) 
+{
+	config->StartObject();
+
+	config->AddString("uuid", uuid);
+	config->AddString("name", name);
+
+	if (parent != nullptr) 
+	{
+		config->AddString("parent", parent->uuid);
+	}
+
+	config->AddBool("enabled", enabled);
+
+	config->StartArray("components");
+
+	for (std::list<Component*>::iterator it = components.begin(); it != components.end(); ++it) 
+	{
+		(*it)->Save(config);
+	}
+
+	config->EndArray();
+
+	config->EndObject();
+
+	return true;
+}
+
+void GameObject::Load(Config* config, rapidjson::Value& value) 
+{
+	uuid = config->GetString("uuid", value);
+	enabled = config->GetBool("enabled", value);
+
+	rapidjson::Value components = value["components"].GetArray();
+
+	for (rapidjson::Value::ValueIterator it = components.Begin(); it != components.End(); ++it) 
+	{
+		Component* component = AddComponent(config->GetComponentType("componentType", (*it)));
+
+		if (component != nullptr) 
+		{
+			component->Load(config, (*it));
+		}
 	}
 }

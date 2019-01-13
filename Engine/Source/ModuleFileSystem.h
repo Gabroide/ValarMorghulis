@@ -33,7 +33,8 @@ public:
 
 	std::map<std::string, std::string> GetFilesFromDirectoryRecursive(const char* directory, const bool includeExtension);
 	
-	std::string NewGuuid();
+public:
+	const char* NewGuuid();
 
 public:
 	char*		basePath = nullptr;

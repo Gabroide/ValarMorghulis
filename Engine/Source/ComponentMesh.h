@@ -11,7 +11,9 @@
 #include "Assimp\mesh.h"
 
 struct par_shapes_mesh_s;
+
 class ComponentMaterial;
+class GameObject;
 
 class ComponentMesh : public Component
 {
@@ -26,6 +28,8 @@ class ComponentMesh : public Component
 		void			Draw(unsigned shaderProgram, const ComponentMaterial* material) const;
 		void			DrawProperties() override;
 		void			LoadMesh(const char* name);
+		void			Save(Config* config)							override;
+		void			Load(Config* config, rapidjson::Value& value)	override;
 
 	public:
 		Component*		Duplicate() override;

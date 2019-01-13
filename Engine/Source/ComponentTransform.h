@@ -11,6 +11,8 @@
 
 #include "Assimp\scene.h""
 
+class GameObject;
+
 class ComponentTransform : public Component
 {
 	public:
@@ -25,7 +27,9 @@ class ComponentTransform : public Component
 		void			SetLocalToWorld(const math::float4x4& localTrans);
 		void			SetWorldToLocal(const math::float4x4& parentTrans);
 		void			DrawProperties() override;
-		
+		void			Save(Config* config);
+		void			Load(Config* config, rapidjson::Value& value);
+
 	public:
 		Component*		Duplicate() override;
 
