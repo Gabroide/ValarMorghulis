@@ -1,12 +1,15 @@
 #include "Globals.h"
 #include <windows.h>
+
 #include "DockAbout.h"
-#include "SDL_version.h"
-#include "IL/il.h"
-#include "assimp/version.h"
-#include "debug_draw.hpp"
-#include "mmgr/mmgr.h"
-#include "GL/glew.h"
+
+#include "SDL\include\SDL_version.h"
+
+#include "DevIL\include\IL\il.h"
+
+#include "Assimp\version.h"
+
+#include "glew-2.1.0\include\GL/glew.h"
 
 // Constructor
 DockAbout::DockAbout() 
