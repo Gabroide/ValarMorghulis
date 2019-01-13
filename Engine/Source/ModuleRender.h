@@ -36,11 +36,13 @@ class ModuleRender : public Module
 		void			DrawWithoutCulling(ComponentMesh* mesh) const;
 		void			CullingFromQuadTree(ComponentCamera* camera, ComponentMesh* mesh);
 		void			CullingFromFrustum(ComponentCamera* camera, ComponentMesh* mesh) const;
+		void			PrintRayCast() const;
 
 	public:
 		bool			frustCulling		= true;
 		bool			vsyncEnabled		= false;
 		bool			showQuad			= false;
+		bool			showRayCast			 = false;
 
 		unsigned		fallback			= 0u;
 		unsigned		ubo					= 0u;

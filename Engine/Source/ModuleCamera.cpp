@@ -1,14 +1,16 @@
 #include "Globals.h"
 #include "Point.h"
-#include "MathGeoLib.h"
+#include "ModuleTime.h"
+#include "MathGeoLib.h" // TODO
 #include "Application.h"
 #include "ModuleInput.h"
+#include "ModuleScene.h"
 #include "ModuleWindow.h"
 #include "ModuleRender.h"
 #include "ModuleEditor.h"
-#include "ModuleScene.h"
 #include "ModuleCamera.h"
-#include "ModuleTime.h"
+#include "QuadTreeValar.h"
+
 
 // Constructor
 ModuleCamera::ModuleCamera() 
@@ -203,9 +205,70 @@ void ModuleCamera::Move()
 
 void ModuleCamera::SelectGameObject() 
 {
-	
-}
+	const fPoint mousePos = App->input->GetMousePosition();
 
+	float normalizedX = mousePos.x * App->window->width - App->editor->scene->viewport.x;
+	float normalizedY = mousePos.y * App->window->height - App->editor->scene->viewport.y;
+	normalizedX = (normalizedX / (App->window->width / 2)) - 1.0f;
+	normalizedY = 1.0f - (normalizedY / (App->window->height / 2));
+
+	rayCast = sceneCamera->frustum.UnProjectLineSegment(normalizedX, normalizedY);
+
+	objectsPossiblePick.clear();
+	App->scene->quadTree->CollectIntersections(objectsPossiblePick, rayCast);
+
+	for (std::list<ComponentMesh*>::iterator iterator = App->renderer->meshes.begin(); iterator != App->renderer->meshes.end(); ++iterator) 
+	{
+		if (!(*iterator)->goContainer->staticGo && (*iterator)->mesh.verticesNumber > 0 && rayCast.Intersects((*iterator)->goContainer->bbox)) 
+		{
+			objectsPossiblePick.push_back((*iterator)->goContainer);
+		}
+	}
+
+	float minDistance = -100.0f;
+	GameObject* gameObjectHit = nullptr;
+	
+	if (objectsPossiblePick.size() > 0) 
+	{
+		for (std::vector<GameObject*>::iterator iterator = objectsPossiblePick.begin(); iterator != objectsPossiblePick.end(); ++iterator) 
+		{
+			ComponentMesh* componentMesh = (ComponentMesh*)(*iterator)->GetComponent(ComponentType::MESH);
+			ComponentTransform* componentTransform = (ComponentTransform*)(*iterator)->GetComponent(ComponentType::TRANSFORM);
+
+			if (componentMesh != nullptr && componentTransform != nullptr) 
+			{
+				Mesh mesh = componentMesh->mesh;
+				math::LineSegment localTransformPikingLine(rayCast);
+				localTransformPikingLine.Transform(componentTransform->GetGlobalTransform().Inverted());
+
+				math::Triangle triangle;
+				
+				for (unsigned i = 0u; i < mesh.indicesNumber; i += 3) 
+				{
+					triangle.a = { mesh.vertices[mesh.indices[i] * 3], mesh.vertices[mesh.indices[i] * 3 + 1], mesh.vertices[mesh.indices[i] * 3 + 2] };
+					triangle.b = { mesh.vertices[mesh.indices[i + 1] * 3], mesh.vertices[mesh.indices[i + 1] * 3 + 1], mesh.vertices[mesh.indices[i + 1] * 3 + 2] };
+					triangle.c = { mesh.vertices[mesh.indices[i + 2] * 3], mesh.vertices[mesh.indices[i + 2] * 3 + 1], mesh.vertices[mesh.indices[i + 2] * 3 + 2] };
+
+					float triangleDistance;
+					math::float3 hitPoint;
+					
+					if (localTransformPikingLine.Intersects(triangle, &triangleDistance, &hitPoint)) {
+						if (minDistance == -100.0f || triangleDistance < minDistance) 
+						{
+							minDistance = triangleDistance;
+							gameObjectHit = *iterator;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if (gameObjectHit != nullptr) 
+	{
+		App->scene->goSelected = gameObjectHit;
+	}
+}
 
 void ModuleCamera::DrawGUI() 
 {
@@ -218,6 +281,8 @@ void ModuleCamera::DrawGUI()
 		ImGui::RadioButton("Frustum", &App->renderer->frustumCullingType, 0); ImGui::SameLine();
 		ImGui::RadioButton("QuadTree", &App->renderer->frustumCullingType, 1);
 	}
+
+	ImGui::Checkbox("Raycast", &App->renderer->showRayCast);
 
 	float fov = math::RadToDeg(sceneCamera->frustum.verticalFov);
 	

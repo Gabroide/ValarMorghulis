@@ -3,6 +3,7 @@
 
 #include "Module.h"
 #include "Globals.h"
+#include "MathGeoLib.h" // TODO
 #include "ComponentMesh.h"
 #include "ComponentTransform.h"
 #include "ComponentCamera.h"
@@ -52,6 +53,8 @@ class ModuleCamera : public Module
 		float						cameraSpeed			= 1700.0f;
 		float						lastX				= 0.0f;
 		float						lastY				= 0.0f;
+
+		math::
 
 	public:
 		ComponentCamera*			quadCamera			= nullptr;
