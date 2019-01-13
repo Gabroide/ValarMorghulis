@@ -7,6 +7,8 @@
 #include "ComponentMaterial.h"
 #include "Config.h"
 
+#include "IMGUI\imgui_internal.h"
+
 // Constructor
 ComponentMaterial::ComponentMaterial(GameObject* goContainer) : Component(goContainer, ComponentType::MATERIAL) 
 {
@@ -45,12 +47,18 @@ void ComponentMaterial::DeleteTexture(unsigned id)
 	}
 }
 
-void ComponentMaterial::DrawProperties(bool enabled) 
+void ComponentMaterial::DrawProperties(bool staticGo) 
 {
 	ImGui::PushID(this);
 	
 	if (ImGui::CollapsingHeader("Material")) 
 	{
+		if (staticGo)
+		{
+			ImGui::PushItemFlag({ ImGuiButtonFlags_Disabled | ImGuiItemFlags_Disabled | ImGuiSelectableFlags_Disabled }, true);
+			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+		}
+
 		bool removed = Component::DrawComponentState();
 		
 		if (removed) 
@@ -123,6 +131,12 @@ void ComponentMaterial::DrawProperties(bool enabled)
 			DrawComboBoxMaterials("EmissiveComboTextures", MaterialType::EMISSIVE_MAP, emissiveSelected);
 			ImGui::Text("Dimensions: %dx%d", material.emissiveWidth, material.emissiveHeight);
 			ImGui::Image((ImTextureID)material.emissiveMap, ImVec2(200, 200));
+		}
+
+		if (staticGo)
+		{
+			ImGui::PopItemFlag();
+			ImGui::PopStyleVar();
 		}
 	}
 

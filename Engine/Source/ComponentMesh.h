@@ -26,7 +26,7 @@ class ComponentMesh : public Component
 		void			ComputeMesh(par_shapes_mesh_s* mesh);
 		void			CleanUp();
 		void			Draw(unsigned shaderProgram, const ComponentMaterial* material) const;
-		void			DrawProperties(bool enabled) override;
+		void			DrawProperties(bool staticGo) override;
 		void			LoadMesh(const char* name);
 		void			Save(Config* config)							override;
 		void			Load(Config* config, rapidjson::Value& value);

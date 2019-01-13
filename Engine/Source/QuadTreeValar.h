@@ -19,7 +19,6 @@ class QuadTreeNode
 		void	Insert(GameObject* gameObject);
 		void	CreateChilds();
 		void	RecalculateSpace();
-		void	ExpandLimits(GameObject* gameObject);
 
 	public:
 		int						maxItems	= 1;
@@ -45,13 +44,16 @@ class QuadTreeValar
 		void					InitQuadTree(const math::AABB& aabb, bool clearAllGameObjects = false);
 		void					Insert(GameObject* gameObject, bool addToAllGameObjects = false);
 		void					Remove(GameObject* gameObject);
-		void					Clear(bool clearAllGameObjects);
+		void					Clear();
+		void					ExpandLimits(GameObject* gameObject);
 
 	public:
+		float					expansionValue	= 0.0f;
+
 		math::AABB				quadLimits;
 	
 	public:
-		QuadTreeNode*			root = nullptr;
+		QuadTreeNode*			root			= nullptr;
 		
 		std::list<GameObject*>	allGO;
 

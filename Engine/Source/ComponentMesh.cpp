@@ -11,6 +11,8 @@
 #include "MathGeoLib\include\Math\float3.h"
 #include "MathGeoLib\include\Math\float2.h"
 
+#include "IMGUI\imgui_internal.h"
+
 #include "par_shapes.h"
 
 // Constructor
@@ -120,34 +122,24 @@ void ComponentMesh::Draw(unsigned shaderProgram, const ComponentMaterial* materi
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void ComponentMesh::DrawProperties(bool enabled) 
+void ComponentMesh::DrawProperties(bool staticGo) 
 {
 	ImGui::PushID(this);
 	
 	if (ImGui::CollapsingHeader("Mesh")) 
 	{
+		if (staticGo)
+		{
+			ImGui::PushItemFlag({ ImGuiButtonFlags_Disabled | ImGuiItemFlags_Disabled | ImGuiSelectableFlags_Disabled }, true);
+			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+		}
+
 		bool removed = Component::DrawComponentState();
 		
 		if (removed) 
 		{
 			ImGui::PopID();
 			return;
-		}
-
-		ImGui::Button("Mesh options");
-
-		if (ImGui::IsItemClicked(0)) 
-		{
-			ImGui::OpenPopup("MeshOptionsContextualMenu");
-		}
-
-		if (ImGui::BeginPopup("MeshOptionsContextualMenu")) 
-		{
-			ImGui::PopID();
-			ImGui::PushID("DeleteMesh");
-			if (ImGui::Button("Delete mesh")) {}
-			ImGui::PopID();
-			ImGui::EndPopup();
 		}
 
 		ImGui::Separator();
@@ -185,6 +177,12 @@ void ComponentMesh::DrawProperties(bool enabled)
 
 		ImGui::Text("Triangles count: %d", mesh.verticesNumber / 3);
 		ImGui::Text("Vertices count: %d", mesh.verticesNumber);
+
+		if (staticGo)
+		{
+			ImGui::PopItemFlag();
+			ImGui::PopStyleVar();
+		}
 	}
 
 	ImGui::PopID();

@@ -4,6 +4,8 @@
 #include "ComponentTransform.h"
 #include "Config.h"
 
+#include "IMGUI\imgui_internal.h"
+
 // Constructor
 ComponentTransform::ComponentTransform(GameObject* goContainer, const math::float4x4& transform) : Component(goContainer, ComponentType::TRANSFORM) 
 {
@@ -78,10 +80,16 @@ void ComponentTransform::SetWorldToLocal(const math::float4x4& parentTrans)
 	RotationToEuler();
 }
 
-void ComponentTransform::DrawProperties(bool enabled) 
+void ComponentTransform::DrawProperties(bool staticGo) 
 {
 	if (ImGui::CollapsingHeader("Local Transform")) 
 	{
+		if (staticGo)
+		{
+			ImGui::PushItemFlag({ ImGuiButtonFlags_Disabled | ImGuiItemFlags_Disabled | ImGuiSelectableFlags_Disabled }, true);
+			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+		}
+
 		if (ImGui::DragFloat3("Position", (float*)&position, 0.1f, -1000.f, 1000.f)) 
 		{
 			edited = true;
@@ -103,6 +111,12 @@ void ComponentTransform::DrawProperties(bool enabled)
 		{
 			goContainer->ComputeBBox();
 			edited = false;
+		}
+
+		if (staticGo)
+		{
+			ImGui::PopItemFlag();
+			ImGui::PopStyleVar();
 		}
 
 		ImGui::Separator();

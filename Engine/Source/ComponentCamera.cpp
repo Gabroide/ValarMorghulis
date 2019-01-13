@@ -11,7 +11,7 @@
 ComponentCamera::ComponentCamera(GameObject* goParent) : Component(goParent, ComponentType::CAMERA) 
 {
 	InitFrustum();
-	CreateFrameBuffer();
+	CreateFrameBuffer(App->window->height);
 }
 
 // Destructor
@@ -37,12 +37,12 @@ ComponentCamera::~ComponentCamera()
 	}
 }
 
-void ComponentCamera::InitFrustum() 
+void ComponentCamera::InitFrustum(math::float3 camPos, math::float3 camFront, math::float3 camUp) 
 {
 	frustum.type = FrustumType::PerspectiveFrustum;
-	frustum.pos = cameraPosition;
-	frustum.front = cameraFront;
-	frustum.up = float3::unitY;
+	frustum.pos = camPos;
+	frustum.front = camFront;
+	frustum.up = camUp;
 	frustum.nearPlaneDistance = 0.1f;
 	frustum.farPlaneDistance = 420.0f;
 	frustum.verticalFov = math::pi / 2.0f;
@@ -221,7 +221,7 @@ void ComponentCamera::Orbit(float dx, float dy)
 	LookAt(center);
 }
 
-void ComponentCamera::CreateFrameBuffer() 
+void ComponentCamera::CreateFrameBuffer(float winWidth, float winHeight) 
 {
 	glDeleteFramebuffers(1, &fbo);
 	glDeleteRenderbuffers(1, &rbo);
@@ -232,7 +232,7 @@ void ComponentCamera::CreateFrameBuffer()
 	glGenTextures(1, &renderTexture);
 	glBindTexture(GL_TEXTURE_2D, renderTexture);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, App->window->width, App->window->height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, winWidth, winHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -243,7 +243,7 @@ void ComponentCamera::CreateFrameBuffer()
 
 	glGenRenderbuffers(1, &rbo);
 	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, App->window->width, App->window->height);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, winWidth, winHeight);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
 
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);

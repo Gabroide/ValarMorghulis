@@ -24,14 +24,14 @@ class ComponentCamera : public Component
 
 		void			DrawProperties(bool enabled)	override;
 		void			Update();
-		void			InitFrustum();
+		void			InitFrustum(math::float3 camPos = math::float3(0.0f, 3.0f, 10.0f), math::float3 camFront = math::float3(0.0f, 0.0f, -1.0f), math::float3 camUp = float3::unitY);
 		void			LookAt(math::float3 target);
 		void			Rotate(float dx, float dy);
 		void			Orbit(float dx, float dy);
 		void			SetScreenNewScreenSize(unsigned newWidth, unsigned newHeight);
 		void			SetHorizontalFOV(float fovXDegrees);
 		void			SetVerticalFOV(float fovYDegrees);
-		void			CreateFrameBuffer();
+		void			CreateFrameBuffer(float winWidth, float winHeight);
 		void			Save(Config* config) override;
 		void			Load(Config* config, rapidjson::Value& value) override;
 
@@ -62,10 +62,6 @@ class ComponentCamera : public Component
 		int				wireFrame			= GL_FILL;
 
 		math::Frustum	frustum;
-
-		math::float3	cameraPosition		= math::float3(0.0f, 3.0f, 20.0f);
-		math::float3	cameraFront			= math::float3(0.0f, 0.0f, -1.0f);
-		math::float3	cameraUp			= math::float3(0.0f, 1.0f, 0.0f);
 
 };
 

@@ -288,14 +288,7 @@ void GameObject::DrawProperties()
 
 	if (ImGui::Checkbox("Static", &staticGo))
 	{
-		if (staticGo && GetComponentType::MSH)
-		{
-			App->scene->quadTree->Insert(this, true);
-		}
-		else if (!staicGo)
-		{
-			App->scene->quadTree->Remove(this);
-		}
+		UpdateStaticChilds(staticGo);
 	}
 
 	if (ImGui::CollapsingHeader("Info")) 
@@ -529,7 +522,6 @@ void GameObject::RemoveComponent(Component* component)
 			components.erase(it);
 			delete component;
 			component = nullptr;
-
 			return;
 		}
 	}
@@ -606,6 +598,24 @@ void GameObject::ComputeBBox()
 		bbox.SetNegativeInfinity();
 		bbox.Enclose(mesh->mesh.bbox);
 		bbox.TransformAsAABB(GetGlobalTransform());
+	}
+}
+
+void GameObject::UpdateStaticChilds(bool staticState) 
+{
+	staticGo = staticState;
+	
+	if (staticGo && GetComponent(ComponentType::MESH) != nullptr) 
+	{
+		App->scene->quadTree->Insert(this, true);
+	}
+	else if (!staticGo) 
+	{
+		App->scene->quadTree->Remove(this);
+	}
+	for (auto &child : goChilds) 
+	{
+		child->UpdateStaticChilds(staticState);
 	}
 }
 

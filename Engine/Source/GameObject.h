@@ -41,11 +41,12 @@ class GameObject
 		void					CleanUp();
 		void					DrawProperties();
 		void					DrawHierarchy(GameObject* goSelected);
-		void					DrawBBox() const;n
+		void					DrawBBox() const;
 		void					RemoveComponent(Component* component);
 		void					ComputeBBox();
 		void					ModelTransform(unsigned shader) const;
 		void					Load(Config* config, rapidjson::Value& value);
+		void					UpdateStaticChilds(bool staticState);
 
 		math::float4x4			GetLocalTransform() const;
 		math::float4x4			GetGlobalTransform() const;

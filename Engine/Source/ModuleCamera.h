@@ -57,6 +57,8 @@ class ModuleCamera : public Module
 	public:
 		ComponentCamera*				sceneCamera			= nullptr;
 		ComponentCamera*				selectedCamera		= nullptr;
+		ComponentCamera*				quadCamera			= nullptr;
+
 		GameObject*						goSelected			= nullptr;
 		
 		std::list<ComponentCamera*>		gameCameras;
