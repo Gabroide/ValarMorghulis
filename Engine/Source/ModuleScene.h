@@ -18,9 +18,9 @@ enum class GeometryType {
 	CUBE
 };
 
+class Config;
 class GameObject;
-class config;
-class QuadTreeValar;
+class QuadTreeChimera;
 
 class ModuleScene : public Module
 {
@@ -28,12 +28,11 @@ class ModuleScene : public Module
 		ModuleScene();
 		~ModuleScene();
 
-		bool			Init()		override;
-		bool			CleanUp()	override;
+		bool			Init() override;
+		bool			CleanUp() override;
+	
+		update_status	Update() override;
 
-		update_status	Update()	override;
-		
-		void			Draw(const math::Frustum& frustum) const;
 		void			DrawHierarchy();
 		void			LoadGeometry(GameObject* goParent, GeometryType geometryType);
 		void			CreateGameObject(Config* config, rapidjson::Value& value);
@@ -45,18 +44,18 @@ class ModuleScene : public Module
 	public:
 		GameObject*		CreateGameObject(const char* goName = nullptr, GameObject* goParent = nullptr, const math::float4x4& transform = math::float4x4().identity);
 		GameObject*		CreateCamera(GameObject* goParent = nullptr, const math::float4x4& transform = math::float4x4().identity);
-		GameObject*		GetGameObjectByUUID(GameObject* gameObject, char uuiObjectName[37]);
+		GameObject*		GetGameObjectByUUID(GameObject* gameObject, char uuidObjectName[37]);
 
 	public:
-		float			ambientLight	= 0.3f;
+		float				ambientLight	= 0.3f;
 
-		math::float3	lightPosition	= math::float3(0.0f, 10.0f, 10.0f);
+		math::float3		lightPosition = math::float3(0.0f, 1000.0f, 1000.0f);
 
 	public:
-		GameObject*		root			= nullptr;
-		GameObject*		goSelected		= nullptr;
-
-		QuadTreeValar*	quadTree		= nullptr;
+		GameObject*			root			= nullptr;
+		GameObject*			goSelected		= nullptr;
+		
+		QuadTreeChimera*	quadTree		= nullptr;
 
 };
 

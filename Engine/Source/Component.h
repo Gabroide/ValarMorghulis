@@ -13,8 +13,7 @@ enum class ComponentType {
 	TRANSFORM,
 	MESH,
 	MATERIAL,
-	LIGHT,
-	AUDIO
+	LIGHT
 };
 
 class Component
@@ -25,50 +24,52 @@ class Component
 		virtual ~Component();
 
 		bool				DrawComponentState();
-		
-		void				Remove();
+
 		virtual void		Update();
-		
 	public:
 		virtual void DrawProperties(bool enabled) 
 		{
-		
+
 		};
-		
-		virtual Component* Duplicate()
+	
+		virtual void Enable() 
 		{ 
-			return nullptr; 
+			enabled = true; 
 		};
 
-		virtual void Enable() 
-		{
-			enabled = true;
-		};
-		
+
 		virtual void Disable() 
 		{ 
 			enabled = false; 
 		};
-		
+
 		virtual void Save(Config* config) 
 		{
 		
 		};
 
-		virtual void Load(Config* config, rapidjson::Value value)
+		virtual void Load(Config* config, rapidjson::Value& value) 
 		{
-
+		
 		};
 
 	public:
+		virtual Component*	Duplicate() 
+		{ 
+			return nullptr; 
+		};
+
+	
+	public:
+		bool				toBeDeleted		= false;
 		bool				enabled			= true;
+	
+		char				uuid[37];
+		char				parentUuid[37];
 
 		ComponentType		componentType	= ComponentType::EMPTY;
-		
+	
 	public:
-		const char*			uuid			= "";
-		const char*			parentUuid = "";
-
 		GameObject*			goContainer		= nullptr;
 
 };

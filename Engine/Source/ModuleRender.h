@@ -2,9 +2,13 @@
 #define __ModuleRender_h__
 
 #include "Module.h"
+#include <list>
+#include <vector>
 
-class ComponentCamera;
+class GameObject;
 class QuadTreeNode;
+class ComponentMesh;
+class ComponentCamera;
 
 class ModuleRender : public Module
 {
@@ -18,30 +22,41 @@ class ModuleRender : public Module
 		update_status	PreUpdate()		override;
 		update_status	Update()		override;
 		update_status	PostUpdate()	override;
-		
-		void			PrintQuadNode(QuadTreeNode* quadNode) const;
-
+	
 	private:
 		void			InitSDL();
 		void			InitOpenGL() const;
 		void			SetViewMatrix(ComponentCamera* camera) const;
 		void			SetProjectionMatrix(ComponentCamera* camera) const;
-		void			DrawDebugData(ComponentCamera* camera) const;
 		void			GenerateBlockUniforms();
-		void			PrintQuadTreeNode(QuadTreeNode* quadTreeNode) const;
+		void			GenerateFallBackMaterial();
+		void			DrawMeshes(ComponentCamera* camera);
+		void			DrawDebugData(ComponentCamera* camera) const;
+		void			PrintQuadNode(QuadTreeNode* quadNode) const;
+		void			DrawWithoutCulling(ComponentMesh* mesh) const;
+		void			CullingFromQuadTree(ComponentCamera* camera, ComponentMesh* mesh);
+		void			CullingFromFrustum(ComponentCamera* camera, ComponentMesh* mesh) const;
 
 	public:
-		unsigned		ubo						= 0u;
+		bool			frustCulling		= true;
+		bool			vsyncEnabled		= false;
+		bool			showQuad			= false;
 
-		bool			cullingFromGameCamera	= true;
-		bool			vsyncEnabled			= false;
+		unsigned		fallback			= 0u;
+		unsigned		ubo					= 0u;
+
+		int				frustumCullingType	= 0;
+
+		float			sceneViewportX		= 0.0f;
+		float			sceneViewportY		= 0.0f;
 
 	public:
-		void*			context					= nullptr;
+		void*			context				= nullptr;
 
-	protected:
-		bool			showQuad				= true;
-		
+		std::list<ComponentMesh*> meshes;
+	
+		std::vector<GameObject*> quadGOCollided;
+
 };
 
 #endif // __ModuleRender_h__

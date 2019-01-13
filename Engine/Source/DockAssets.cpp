@@ -6,13 +6,13 @@
 // Constructor
 DockAssets::DockAssets() 
 {
-	
+
 }
 
 // Destructor
 DockAssets::~DockAssets() 
 {
-	
+
 }
 
 void DockAssets::Draw() 
@@ -74,11 +74,11 @@ void DockAssets::DrawTreeNode(const char* name, bool isLeaf)
 				DrawTreeNode((*iterator).c_str(), true);
 			}
 		}
-		else if (name == "Scenes")
+		else if (name == "Scenes") 
 		{
-			for (std::vector<std::string>::iterator it = App->library->fileScenesList.begin(); it != App->library->fileScenesList.end(); ++it)
+			for (std::vector<std::string>::iterator iterator = App->library->fileScenesList.begin(); iterator != App->library->fileScenesList.end(); ++iterator) 
 			{
-				DrawTreeNode((*it).c_str(), true);
+				DrawTreeNode((*iterator).c_str(), true);
 			}
 		}
 
@@ -115,7 +115,7 @@ void DockAssets::ClickBehaviour(const char* name)
 					App->library->removeHead = true;
 					App->library->toBeDeleted = true;
 				}
-				else if (ext == "dds") 
+				else if (ext == "dds")
 				{
 					nameToRemove.insert(0, "/Library/Textures/");
 					App->library->removeHead = false;
@@ -124,13 +124,10 @@ void DockAssets::ClickBehaviour(const char* name)
 
 				App->fileSystem->Remove(nameToRemove.c_str());
 			}
+
 			ImGui::EndPopup();
 		}
 	}
 }
 
-bool DockAssets::IsFocused() const 
-{ 
-	
-	return focus; 
-}
+bool DockAssets::IsFocused() const { return focus; }

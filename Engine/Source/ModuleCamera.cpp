@@ -1,4 +1,6 @@
 #include "Globals.h"
+#include "Point.h"
+#include "MathGeoLib.h"
 #include "Application.h"
 #include "ModuleInput.h"
 #include "ModuleWindow.h"
@@ -10,8 +12,8 @@
 
 // Constructor
 ModuleCamera::ModuleCamera() 
-{ 
-	
+{
+
 }
 
 // Destructor
@@ -27,8 +29,9 @@ bool ModuleCamera::Init()
 	sceneCamera->debugDraw = true;
 
 	quadCamera = new ComponentCamera(nullptr);
-	quadCamera->InitFrustum(math::float3(0.0f, 20.0f, 0.0f), math::float3(0.0f, -10.0f, 0.0f), math::float3(0.0f, 0.0f, -1.0f));
+	quadCamera->InitOrthographicFrustum(math::float3(0.0f, 8500.0f, 0.0f));
 	quadCamera->debugDraw = true;
+	quadCamera->LookAt(math::float3(0.0f, 0.0f, 0.0f));
 
 	return true;
 }
@@ -58,18 +61,23 @@ update_status ModuleCamera::PreUpdate()
 			{
 				SDL_ShowCursor(SDL_DISABLE);
 				sceneCamera->Orbit(sceneCamera->rotationSpeed * App->input->GetMouseMotion().x, sceneCamera->rotationSpeed * App->input->GetMouseMotion().y);
-			} 
+			}
 			else if (App->input->GetMouseButtonDown(SDL_BUTTON_LEFT) == KEY_REPEAT) 
 			{
 				SDL_ShowCursor(SDL_ENABLE);
 			}
-		} 
+		}
 		else if (App->input->GetKey(SDL_SCANCODE_LALT) == KEY_UP) 
 		{
 			SDL_ShowCursor(SDL_ENABLE);
 		}
 
-			Zoom();
+		Zoom();
+
+		if (App->input->GetMouseButtonDown(SDL_BUTTON_LEFT) == KEY_DOWN) 
+		{
+			SelectGameObject();
+		}
 	}
 
 	return UPDATE_CONTINUE;
@@ -81,11 +89,10 @@ update_status ModuleCamera::Update()
 	{
 		selectedCamera->Update();
 	}
-	
+
 	return UPDATE_CONTINUE;
 }
 
-// Called before quitting
 bool ModuleCamera::CleanUp() 
 {
 	delete sceneCamera;
@@ -100,6 +107,7 @@ bool ModuleCamera::CleanUp()
 void ModuleCamera::Zoom() 
 {
 	const int wheelSlide = App->input->GetMouseWheel();
+	
 	if (wheelSlide != 0) 
 	{
 		float zoomValue = sceneCamera->frustum.verticalFov + -wheelSlide * 20.0f * App->time->realDeltaTime;
@@ -110,7 +118,7 @@ void ModuleCamera::Zoom()
 }
 
 void ModuleCamera::SetScreenNewScreenSize(unsigned newWidth, unsigned newHeight) 
-{	
+{
 	for (auto& camera : gameCameras) 
 	{
 		camera->SetScreenNewScreenSize(newWidth, newHeight);
@@ -123,7 +131,16 @@ void ModuleCamera::FocusSelectedObject()
 {
 	if (App->input->GetKey(SDL_SCANCODE_F) == KEY_DOWN && App->scene->goSelected != nullptr) 
 	{
-		
+		math::AABB& bbox = App->scene->goSelected->bbox;
+		math::float3 HalfSize = bbox.HalfSize();
+		float distX = HalfSize.x / tanf(sceneCamera->frustum.horizontalFov * 0.5f);
+		float distY = HalfSize.y / tanf(sceneCamera->frustum.verticalFov * 0.5f);
+		float camDist = MAX(distX, distY) + HalfSize.z; //camera distance from model
+
+		math::float3 center = bbox.FaceCenterPoint(5);
+		sceneCamera->frustum.pos = center + math::float3(0, 0, camDist);
+		sceneCamera->frustum.front = -math::float3::unitZ;
+		sceneCamera->frustum.up = math::float3::unitY;
 	}
 }
 
@@ -143,10 +160,9 @@ void ModuleCamera::MovementSpeed()
 
 void ModuleCamera::Move() 
 {
-	float distance = 5.0f * App->time->realDeltaTime;
+	float distance = 500.0f * App->time->realDeltaTime;
 	float3 movement = float3::zero;
 	
-	// TODO: Implement it with a switch clause
 	if (App->input->GetKey(SDL_SCANCODE_LSHIFT)) 
 	{
 		distance *= 2;
@@ -185,18 +201,32 @@ void ModuleCamera::Move()
 	sceneCamera->frustum.Translate(movement);
 }
 
+void ModuleCamera::SelectGameObject() 
+{
+	
+}
+
+
 void ModuleCamera::DrawGUI() 
 {
 	ImGui::Checkbox("Debug", &sceneCamera->debugDraw);
 
-	float fov = math::RadToDeg(sceneCamera->frustum.verticalFov);
+	ImGui::Checkbox("Frustum culling", &App->renderer->frustCulling);
+	
+	if (App->renderer->frustCulling) 
+	{
+		ImGui::RadioButton("Frustum", &App->renderer->frustumCullingType, 0); ImGui::SameLine();
+		ImGui::RadioButton("QuadTree", &App->renderer->frustumCullingType, 1);
+	}
 
+	float fov = math::RadToDeg(sceneCamera->frustum.verticalFov);
+	
 	if (ImGui::SliderFloat("FOV", &fov, 40, 120)) 
 	{
 		sceneCamera->frustum.verticalFov = math::DegToRad(fov);
 		sceneCamera->frustum.horizontalFov = 2.f * atanf(tanf(sceneCamera->frustum.verticalFov * 0.5f) * ((float)App->window->width / (float)App->window->height));
 	}
 
-	ImGui::InputFloat("zNear", &sceneCamera->frustum.nearPlaneDistance, 5, 50);
-	ImGui::InputFloat("zFar", &sceneCamera->frustum.farPlaneDistance, 5, 50);
+	ImGui::SliderFloat("zNear", &sceneCamera->frustum.nearPlaneDistance, 10.0f, sceneCamera->frustum.farPlaneDistance);
+	ImGui::SliderFloat("zFar", &sceneCamera->frustum.farPlaneDistance, sceneCamera->frustum.nearPlaneDistance, 100000.0f);
 }

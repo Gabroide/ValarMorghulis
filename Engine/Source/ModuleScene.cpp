@@ -1,39 +1,47 @@
 #include <list>
 
-#include "Application.h"
-#include "ModuleCamera.h"
-#include "ModuleScene.h"
-#include "GameObject.h"
-#include "ComponentCamera.h"
-#include "ComponentLight.h"
-#include "ComponentMaterial.h"
-#include "ComponentMesh.h"
-#include "ComponentTransform.h"
 #include "Config.h"
-#include "QuadTreeValar.h"
-
-#include "par_shapes.h"
+#include "GameObject.h"
+#include "Application.h"
+#include "ModuleScene.h"
+#include "ModuleRender.h"
+#include "ModuleCamera.h"
+#include "ComponentMesh.h"
+#include "ComponentLight.h"
+#include "QuadTreeChimera.h"
+#include "ComponentCamera.h"
+#include "ComponentMaterial.h"
+#include "ComponentTransform.h"
 
 #define PAR_SHAPES_IMPLEMENTATION
-
+#include "par_shapes.h"
 #pragma warning(pop)
 
 // Constructor
 ModuleScene::ModuleScene() 
 {
-
+	
 }
 
-// Destructor
+// Destrutor
 ModuleScene::~ModuleScene() 
 {
 	CleanUp();
 }
 
+bool ModuleScene::CleanUp() 
+{
+	delete root;
+	root = nullptr;
+
+	return true;
+}
+
 bool ModuleScene::Init() 
 {
 	root = new GameObject("root", nullptr);
-	quadTree = new QuadTreeValar();
+	quadTree = new QuadTreeChimera();
+
 	return true;
 }
 
@@ -46,11 +54,6 @@ update_status ModuleScene::Update()
 	return ret;
 }
 
-void ModuleScene::Draw(const math::Frustum& frustum) const 
-{
-	root->Draw(frustum);
-}
-
 void ModuleScene::DrawHierarchy() 
 {
 	for (auto &child : root->goChilds) 
@@ -59,25 +62,16 @@ void ModuleScene::DrawHierarchy()
 	}
 }
 
-bool ModuleScene::CleanUp()
-{
-	delete root;
-	root = nullptr;
-
-	return true;
-}
-
 GameObject* ModuleScene::CreateGameObject(const char* goName, GameObject* goParent, const math::float4x4& transform) 
 {
 	GameObject* gameObject = nullptr;
 
 	if (goName != nullptr) 
-	{		
+	{
 		gameObject = new GameObject(goName, transform, goParent);
 	}
-	else 
+	else
 	{
-
 		if (goParent != nullptr) 
 		{
 			std::string childNameStr = "ChildOf";
@@ -95,13 +89,13 @@ GameObject* ModuleScene::CreateGameObject(const char* goName, GameObject* goPare
 	return gameObject;
 }
 
-GameObject* ModuleScene::CreateCamera(GameObject* goParent, const math::float4x4& transform) 
+GameObject* ModuleScene::CreateCamera(GameObject* goParent, const math::float4x4& transform)
 {
 	GameObject* gameObject = nullptr;
 
 	gameObject = new GameObject(DEFAULT_CAMERA_NAME, transform, goParent);
 	ComponentTransform* goTrans = (ComponentTransform*)gameObject->GetComponent(ComponentType::TRANSFORM);
-	goTrans->SetPosition(math::float3(0.0f, 2.5f, 10.0f));
+	goTrans->SetPosition(math::float3(0.0f, 250.0f, 1000.0f));
 	gameObject->AddComponent(ComponentType::CAMERA);
 
 	return gameObject;
@@ -130,9 +124,9 @@ void ModuleScene::LoadGeometry(GameObject* goParent, GeometryType geometryType)
 		break;
 	}
 
-	if (parMesh != nullptr)
+	if (parMesh != nullptr) 
 	{
-		par_shapes_scale(parMesh, 5.0f, 5.0f, 5.0f);
+		par_shapes_scale(parMesh, 500.0f, 500.0f, 500.0f);
 
 		ComponentMesh* mesh = (ComponentMesh*)goParent->AddComponent(ComponentType::MESH);
 		mesh->ComputeMesh(parMesh);
@@ -147,23 +141,30 @@ void ModuleScene::LoadGeometry(GameObject* goParent, GeometryType geometryType)
 	}
 }
 
-GameObject* ModuleScene::GetGameObjectByUUID(GameObject* gameObject, char uuidObjectName[37]) {
+GameObject* ModuleScene::GetGameObjectByUUID(GameObject* gameObject, char uuidObjectName[37]) 
+{
 	GameObject* result = nullptr;
 
-	if (result == nullptr && (strcmp(gameObject->uuid, uuidObjectName) == 0)) {
+	if (result == nullptr && (strcmp(gameObject->uuid, uuidObjectName) == 0)) 
+	{
 		result = gameObject;
 	}
-	else {
-		for (auto &child : gameObject->goChilds) {
-			if (child->goChilds.size() > 0) {
+	else
+	{
+		for (auto &child : gameObject->goChilds) 
+		{
+			if (child->goChilds.size() > 0) 
+			{
 				result = GetGameObjectByUUID(child, uuidObjectName);
 			}
 
-			if (result == nullptr && (strcmp(child->uuid, uuidObjectName) == 0)) {
+			if (result == nullptr && (strcmp(child->uuid, uuidObjectName) == 0)) 
+			{
 				result = child;
 				break;
 			}
-			else if (result != nullptr) {
+			else if (result != nullptr) 
+			{
 				break;
 			}
 		}
@@ -175,9 +176,9 @@ GameObject* ModuleScene::GetGameObjectByUUID(GameObject* gameObject, char uuidOb
 /* RapidJson storage  */
 void ModuleScene::CreateGameObject(Config* config, rapidjson::Value& value) 
 {
-	if (value.HasMember("parent")) 
+	if (value.HasMember("parentUuid")) 
 	{
-		const char* parentUuid = config->GetString("parent", value);
+		const char* parentUuid = config->GetString("parentUuid", value);
 		char uuidGameObjectParent[37];
 		sprintf_s(uuidGameObjectParent, parentUuid);
 
@@ -199,13 +200,14 @@ void ModuleScene::SaveScene()
 
 	config->AddFloat("ambientLight", ambientLight);
 	config->AddFloat3("ambientLightPosition", lightPosition);
+	config->AddBool("quadTreeEnabled", App->renderer->showQuad);
 
 	config->EndObject();
 
 	config->AddName("sceneCamera");
 	App->camera->sceneCamera->Save(config);
 
-	if (App->camera->selectedCamera != nullptr)
+	if (App->camera->selectedCamera != nullptr) 
 	{
 		config->AddName("selectedCamera");
 		App->camera->selectedCamera->Save(config);
@@ -216,6 +218,9 @@ void ModuleScene::SaveScene()
 	config->EndArray();
 
 	config->WriteToDisk();
+
+	delete config;
+	config = nullptr;
 }
 
 void ModuleScene::SaveGameObject(Config* config, GameObject* gameObject) 
@@ -258,6 +263,8 @@ void ModuleScene::LoadScene()
 			CreateGameObject(config, *it);
 		}
 
+		App->renderer->showQuad = config->GetBool("quadTreeEnabled", scene);
+
 		if (document.HasMember("selectedCamera")) 
 		{
 			rapidjson::Value& selectedCamera = document["selectedCamera"];
@@ -274,5 +281,8 @@ void ModuleScene::ClearScene()
 {
 	delete root;
 	root = nullptr;
+
+	quadTree->InitQuadTree(math::AABB(math::float3(-2000.0f, -2000.0f, -2000.0f), math::float3(2000.0f, 2000.0f, 2000.0f)), true);
+
 	Init();
 }

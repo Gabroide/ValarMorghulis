@@ -1,22 +1,22 @@
+#include "Config.h"
+#include "GameObject.h"
 #include "Application.h"
-#include "ModuleCamera.h"
-#include "ModuleRender.h"
 #include "ModuleScene.h"
 #include "ModuleWindow.h"
-#include "GameObject.h"
+#include "ModuleCamera.h"
+#include "ModuleRender.h"
 #include "ComponentCamera.h"
-#include "Config.h"
 
-// Contructor
+// Constructor
 ComponentCamera::ComponentCamera(GameObject* goParent) : Component(goParent, ComponentType::CAMERA) 
 {
 	InitFrustum();
-	CreateFrameBuffer(App->window->height);
+	CreateFrameBuffer(App->window->width, App->window->height);
 }
 
 // Destructor
 ComponentCamera::~ComponentCamera() 
-{ 
+{
 	glDeleteFramebuffers(1, &fbo);
 	glDeleteRenderbuffers(1, &rbo);
 	glDeleteTextures(1, &renderTexture);
@@ -29,9 +29,8 @@ ComponentCamera::~ComponentCamera()
 			{
 				App->camera->selectedCamera = nullptr;
 			}
-			
+	
 			App->camera->gameCameras.erase(it);
-			
 			return;
 		}
 	}
@@ -43,10 +42,22 @@ void ComponentCamera::InitFrustum(math::float3 camPos, math::float3 camFront, ma
 	frustum.pos = camPos;
 	frustum.front = camFront;
 	frustum.up = camUp;
-	frustum.nearPlaneDistance = 0.1f;
-	frustum.farPlaneDistance = 420.0f;
+	frustum.nearPlaneDistance = 10.0f;
+	frustum.farPlaneDistance = 42000.0f;
 	frustum.verticalFov = math::pi / 2.0f;
 	frustum.horizontalFov = 2.f * atanf(tanf(frustum.verticalFov * 0.5f) * ((float)App->window->width / (float)App->window->height));
+}
+
+void ComponentCamera::InitOrthographicFrustum(math::float3 camPos, math::float3 camFront, math::float3 camUp) 
+{
+	frustum.type = FrustumType::OrthographicFrustum;
+	frustum.pos = camPos;
+	frustum.front = camFront;
+	frustum.up = camUp;
+	frustum.nearPlaneDistance = 10.0f;
+	frustum.farPlaneDistance = 42000.0f;
+	frustum.orthographicWidth = math::pi / 2.0f;
+	frustum.orthographicHeight = math::pi / 2.0f;
 }
 
 void ComponentCamera::Update() 
@@ -55,7 +66,7 @@ void ComponentCamera::Update()
 	{
 		return;
 	}
-	
+
 	if (goContainer->transform == nullptr)
 	{
 		return;
@@ -87,30 +98,28 @@ void ComponentCamera::DrawProperties(bool enabled)
 	
 	if (ImGui::CollapsingHeader("Camera properties")) 
 	{
-		bool removed = Component::DrawComponentState(); 
-	
+		bool removed = Component::DrawComponentState();
+		
 		if (removed) 
 		{
 			ImGui::PopID();
-
 			return;
 		}
 
 		ImGui::Checkbox("Debug", &debugDraw);
 
-		ImGui::Checkbox("Frustum culling", &App->renderer->cullingFromGameCamera);
-
 		ImGui::RadioButton("Wireframe", &wireFrame, GL_LINE); ImGui::SameLine();
 		ImGui::RadioButton("Fill", &wireFrame, GL_FILL);
+
 		ImGui::Separator();
-		
+
 		if (ImGui::SliderFloat("FOV", &fovY, 40, 120)) 
 		{
 			SetVerticalFOV(fovY);
 		}
 
-		ImGui::SliderFloat("zNear", &frustum.nearPlaneDistance, 5, 50);
-		ImGui::SliderFloat("zFar", &frustum.farPlaneDistance, 5, 50);
+		ImGui::SliderFloat("zNear", &frustum.nearPlaneDistance, 10.0f, frustum.farPlaneDistance);
+		ImGui::SliderFloat("zFar", &frustum.farPlaneDistance, frustum.nearPlaneDistance, 100000.0f);
 
 		if (App->camera->selectedCamera == this) 
 		{
@@ -149,6 +158,7 @@ void ComponentCamera::LookAt(math::float3 target)
 math::float4x4 ComponentCamera::GetViewMatrix() 
 {
 	math::float4x4 view = frustum.ViewMatrix();
+
 	return view.Transposed();
 }
 
@@ -166,7 +176,7 @@ void ComponentCamera::SetScreenNewScreenSize(unsigned width, unsigned height)
 
 	SetHorizontalFOV(fovX);
 	SetVerticalFOV(fovY);
-	CreateFrameBuffer();
+	CreateFrameBuffer(App->window->width, App->window->height);
 }
 
 void ComponentCamera::Rotate(float dx, float dy) 
@@ -178,12 +188,11 @@ void ComponentCamera::Rotate(float dx, float dy)
 		frustum.up = rotation.Mul(frustum.up).Normalized();
 	}
 	
-	if (dy != 0) 
+	if (dy != 0)
 	{
 		math::Quat rotation = math::Quat::RotateAxisAngle(frustum.WorldRight(), math::DegToRad(-dy)).Normalized();
 		math::float3 validUp = rotation.Mul(frustum.up).Normalized();
-	
-		// Avoiding gimbal lock
+		
 		if (validUp.y > 0.0f) 
 		{
 			frustum.up = validUp;
@@ -211,7 +220,7 @@ void ComponentCamera::Orbit(float dx, float dy)
 	{
 		math::Quat rotation = math::Quat::RotateAxisAngle(frustum.WorldRight(), math::DegToRad(-dy)).Normalized();
 		math::float3 new_pos = rotation.Mul(frustum.pos);
-	
+		
 		if (!(abs(new_pos.x - center.x) < 0.5f && abs(new_pos.z - center.z) < 0.5f)) 
 		{
 			frustum.pos = new_pos;

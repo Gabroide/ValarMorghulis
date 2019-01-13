@@ -7,13 +7,13 @@
 // Constructor
 ModuleFileSystem::ModuleFileSystem() 
 {
-
+	
 }
 
 // Destructor
 ModuleFileSystem::~ModuleFileSystem() 
 {
-
+	
 }
 
 bool ModuleFileSystem::Init() 
@@ -43,9 +43,9 @@ bool ModuleFileSystem::Init()
 		PHYSFS_mkdir("/Library/Meshes/");
 	}
 	
-	if (Exists("/Library/Scene/")) 
+	if (Exists("/Library/Scenes/")) 
 	{
-		PHYSFS_mkdir("/Library/Scene/");
+		PHYSFS_mkdir("/Library/Scenes/");
 	}
 
 	return true;
@@ -75,7 +75,7 @@ unsigned ModuleFileSystem::Load(const char* pathAndFileName, char** buffer) cons
 			
 			if (readed != size) 
 			{
-				LOG("Error reading from file %s: %s\n", pathAndFileName, PHYSFS_getLastError());
+				LOG("Error: Reading from file %s: %s\n", pathAndFileName, PHYSFS_getLastError());
 				delete[] buffer;
 				buffer = nullptr;
 			}
@@ -87,13 +87,13 @@ unsigned ModuleFileSystem::Load(const char* pathAndFileName, char** buffer) cons
 
 		if (PHYSFS_close(fsFile) == 0) 
 		{
-			LOG("Error closing file %s: %s\n", pathAndFileName, PHYSFS_getLastError());
+			LOG("Error: File %s had an error closing: %s\n", pathAndFileName, PHYSFS_getLastError());
 		}
 	}
 	else
 	{
 		const char* error = PHYSFS_getLastError();
-		LOG("Error opening file %s: %s\n", pathAndFileName, error);
+		LOG("Error: File %s cannot be opened: %s\n", pathAndFileName, error);
 	}
 
 	return result;
@@ -103,13 +103,12 @@ unsigned ModuleFileSystem::Save(const char* pathAndFileName, const void* buffer,
 {
 	unsigned result = 0u;
 
-	bool overwrite = Exists(pathAndFileName) != 0;
 	PHYSFS_file* fsFile = (append) ? PHYSFS_openAppend(pathAndFileName) : PHYSFS_openWrite(pathAndFileName);
 
 	if (fsFile != nullptr) 
 	{
 		unsigned written = (unsigned)PHYSFS_write(fsFile, (const void*)buffer, 1, size);
-		
+	
 		if (written == size) 
 		{
 			result = written;
@@ -117,17 +116,17 @@ unsigned ModuleFileSystem::Save(const char* pathAndFileName, const void* buffer,
 		}
 		else 
 		{
-			LOG("Error while writing to file %s: %s", pathAndFileName, PHYSFS_getLastError());
+			LOG("Error: File %s had an error while writing: %s", pathAndFileName, PHYSFS_getLastError());
 		}
 
 		if (PHYSFS_close(fsFile) == 0) 
 		{
-			LOG("Error closing file %s: %s", pathAndFileName, PHYSFS_getLastError());
+			LOG("Error: File %s had an error closing: %s\n", pathAndFileName, PHYSFS_getLastError());
 		}
 	}
 	else 
 	{
-		LOG("Error opening file %s: %s", pathAndFileName, PHYSFS_getLastError());
+		LOG("Error: File %s cannot be opened: %s\n", pathAndFileName, PHYSFS_getLastError());
 	}
 
 	return result;
@@ -165,7 +164,7 @@ bool ModuleFileSystem::AddPath(const char* path)
 
 	if (PHYSFS_mount(path, nullptr, 1) == 0) 
 	{
-		LOG("Error adding a path: %s\n", PHYSFS_getLastError());
+		LOG("Error: Cannot add a path: %s\n", PHYSFS_getLastError());
 	}
 	else 
 	{
@@ -207,7 +206,7 @@ bool ModuleFileSystem::Copy(const char* sourcePath, const char* destinationPath)
 	}
 	else 
 	{
-		LOG("Error while copy from [%s] to [%s]", sourcePath, destinationPath);
+		LOG("Error: Couldn't copy from [%s] to [%s]", sourcePath, destinationPath);
 	}
 
 	return result;
@@ -224,33 +223,40 @@ std::map<std::string, std::string> ModuleFileSystem::GetFilesFromDirectoryRecurs
 
 	for (iterator = enumeratedFIles; *iterator != nullptr; iterator++) 
 	{
-		if (PHYSFS_isDirectory((directoryString + *iterator).c_str())) 
+		if (PHYSFS_isDirectory((directoryString + *iterator).c_str()))
 		{
 			directoryList.push_back(*iterator);
 		}
 		else 
 		{
-			std::string fileName((*iterator));
-			size_t positionDot = fileName.find_last_of(".");
-			size_t positionUnderScore = fileName.find_last_not_of("_");
-			fileName = fileName.substr(0, positionDot);
-
-			if (positionUnderScore != 0)
+			if (includeExtension) 
 			{
-				fileName = fileName.substr(0, positionUnderScore);
+				result[(*iterator)] = directoryString;
 			}
+			else 
+			{
+				std::string fileName((*iterator));
+				size_t positionDot = fileName.find_last_of(".");
+				size_t positionUnderscore = fileName.find_last_of("_");
+				fileName = fileName.substr(0, positionDot);
 
-			result[fileName] = directoryString;
+				if (positionUnderscore != 0) 
+				{
+					fileName = fileName.substr(0, positionUnderscore);
+				}
+
+				result[fileName] = directoryString;
+			}
 		}
 	}
 
 	PHYSFS_freeList(enumeratedFIles);
 
-	for (std::vector<std::string>::iterator iterator = directoryList.begin(); iterator != directoryList.end(); ++iterator) 
+	for (std::vector<std::string>::iterator it = directoryList.begin(); it != directoryList.end(); ++it) 
 	{
-		(*iterator).insert(0, directory);
-		(*iterator).append("/");
-		std::map<std::string, std::string> partialResult = GetFilesFromDirectoryRecursive((*iterator).c_str(), includeExtension);
+		(*it).insert(0, directory);
+		(*it).append("/");
+		std::map<std::string, std::string> partialResult = GetFilesFromDirectoryRecursive((*it).c_str(), includeExtension);
 		result.insert(partialResult.begin(), partialResult.end());
 	}
 
@@ -339,10 +345,8 @@ void ModuleFileSystem::SplitFilePath(const char* fullPath, std::string* path, st
 
 const char* ModuleFileSystem::NewGuuid() 
 {
-	std::string uuid = xg::newGuuid().str();
+	std::string uuid = xg::newGuid().str();
 	char* copyName = new char[strlen(uuid.c_str())];
 	strcpy(copyName, uuid.c_str());
-
 	return copyName;
-
 }

@@ -1,3 +1,4 @@
+#include "Config.h"
 #include "Application.h"
 #include "ModuleScene.h"
 #include "ModuleInput.h"
@@ -6,11 +7,10 @@
 #include "ComponentMesh.h"
 #include "ComponentLight.h"
 #include "ComponentCamera.h"
+#include "QuadTreeChimera.h"
 #include "ComponentMaterial.h"
 #include "ComponentTransform.h"
 #include "ModuleFileSystem.h"
-#include "Config.h"
-#include "QuadTreeValar.h"
 
 #include "SDL\include\SDL_mouse.h"
 
@@ -19,14 +19,14 @@
 // Constructor
 GameObject::GameObject() 
 {
-	uuid = App->fileSystem->NewGuuid();
+	sprintf_s(uuid, App->fileSystem->NewGuuid());
 	transform = (ComponentTransform*)AddComponent(ComponentType::TRANSFORM);
 }
 
 // Constructor Overloaded
 GameObject::GameObject(const char* goName, GameObject* goParent) 
 {
-	uuid = App->fileSystem->NewGuuid();
+	sprintf_s(uuid, App->fileSystem->NewGuuid());
 	char* copyName = new char[strlen(goName)];
 	strcpy(copyName, goName);
 	name = copyName;
@@ -34,22 +34,22 @@ GameObject::GameObject(const char* goName, GameObject* goParent)
 	if (goParent != nullptr)
 	{
 		parent = goParent;
-		parentUuid = goParent->uuid;
+		sprintf_s(parentUuid, goParent->uuid);
 		goParent->goChilds.push_back(this);
 	}
 }
 
-// Constructor Overloaded
-GameObject::GameObject(const char* goName, const math::float4x4& parentTransform) 
+// Constructor O
+GameObject::GameObject(const char* goName, const math::float4x4& parentTransform)
 {
-	uuid = App->fileSystem->NewGuuid();
+	sprintf_s(uuid, App->fileSystem->NewGuuid());
 
 	char* copyName = new char[strlen(goName)];
 	strcpy(copyName, goName);
 	name = copyName;
 
 	parent = App->scene->root;
-	parentUuid = App->scene->root->uuid;
+	sprintf_s(parentUuid, App->scene->root->uuid);
 	transform = (ComponentTransform*)AddComponent(ComponentType::TRANSFORM);
 	transform->AddTransform(parentTransform);
 	App->scene->root->goChilds.push_back(this);
@@ -58,7 +58,7 @@ GameObject::GameObject(const char* goName, const math::float4x4& parentTransform
 // Constructor Overloaded
 GameObject::GameObject(const char* goName, const math::float4x4& parentTransform, GameObject* goParent) 
 {
-	uuid = App->fileSystem->NewGuuid();
+	sprintf_s(uuid, App->fileSystem->NewGuuid());
 
 	char* copyName = new char[strlen(goName)];
 	strcpy(copyName, goName);
@@ -67,13 +67,13 @@ GameObject::GameObject(const char* goName, const math::float4x4& parentTransform
 	if (goParent != nullptr) 
 	{
 		parent = goParent;
-		parentUuid = goParent->uuid;
+		sprintf_s(parentUuid, goParent->uuid);
 		goParent->goChilds.push_back(this);
 	}
 	else 
 	{
 		parent = App->scene->root;
-		parentUuid = App->scene->root->uuid;
+		sprintf_s(parentUuid, App->scene->root->uuid);
 		App->scene->root->goChilds.push_back(this);
 	}
 
@@ -84,14 +84,14 @@ GameObject::GameObject(const char* goName, const math::float4x4& parentTransform
 // Constructor Overloaded
 GameObject::GameObject(const GameObject& duplicateGameObject) 
 {
-	uuid = App->fileSystem->NewGuuid();
-	parentUuid = duplicateGameObject.parentUuid;
+	sprintf_s(uuid, App->fileSystem->NewGuuid());
+	sprintf_s(uuid, duplicateGameObject.parentUuid);
 
 	char* copyName = new char[strlen(duplicateGameObject.name)];
 	strcpy(copyName, duplicateGameObject.name);
 	name = copyName;
 
-	saticGo = duplicateGameObject.staticGo;
+	staticGo = duplicateGameObject.staticGo;
 	bbox = duplicateGameObject.bbox;
 
 	for (const auto &component : duplicateGameObject.components) 
@@ -99,7 +99,8 @@ GameObject::GameObject(const GameObject& duplicateGameObject)
 		Component* duplicatedComponent = component->Duplicate();
 		components.push_back(duplicatedComponent);
 		duplicatedComponent->goContainer = this;
-		duplicatedComponent->parentUuid = uuid;
+
+		sprintf_s(duplicatedComponent->parentUuid, uuid);
 		
 		if (duplicatedComponent->componentType == ComponentType::TRANSFORM) 
 		{
@@ -121,12 +122,12 @@ GameObject::GameObject(const GameObject& duplicateGameObject)
 	{
 		GameObject* duplicatedChild = new GameObject(*child);
 		duplicatedChild->parent = this;
-		duplicatedChild->parentUuid = uuid;
+		sprintf_s(duplicatedChild->parentUuid, uuid);
 		goChilds.push_back(duplicatedChild);
 	}
 }
 
-//Destructor
+// Destructor
 GameObject::~GameObject() 
 {
 	for (auto &component : components) 
@@ -153,19 +154,19 @@ GameObject::~GameObject()
 
 void GameObject::Update() 
 {
-	if (!enabled)
+	if (!enabled) 
 	{
 		return;
 	}
 
-	for (std::list<GameObject*>::iterator itChild = goChilds.begin(); itChild != goChilds.end();) 
+	for std::list<GameObject*>::iterator itChild = goChilds.begin(); itChild != goChilds.end();) 
 	{
 		(*itChild)->Update();
 
 		if ((*itChild)->moveGOUp) 
 		{
 			(*itChild)->moveGOUp = false;
-			
+		
 			if (std::abs(std::distance(goChilds.begin(), itChild)) != 0) 
 			{
 				std::swap(*itChild, *std::prev(itChild));
@@ -195,7 +196,7 @@ void GameObject::Update()
 		{
 			(*itChild)->toBeDeleted = false;
 			(*itChild)->CleanUp();
-			LOG("Removed GameObject: %s", (*itChild)->name);
+			LOG("Removed GO: %s", (*itChild)->name);
 			delete *itChild;
 			goChilds.erase(itChild++);
 		}
@@ -204,63 +205,6 @@ void GameObject::Update()
 			++itChild;
 		}
 	}
-}
-
-void GameObject::Draw(const math::Frustum& frustum) const 
-{
-	if (!enabled)
-	{
-		return;
-	}
-
-	for (const auto &child : goChilds) 
-	{
-		child->Draw(frustum);
-	}
-
-	if (transform == nullptr)
-	{
-		return;
-	}
-
-	if (App->scene->goSelected == this) 
-	{
-		DrawBBox();
-	}
-
-	if (mesh == nullptr || mesh != nullptr && !mesh->enabled || mesh != nullptr && mesh->mesh.vbo == 0) 
-	{
-	
-		return;
-	}
-
-	if (!frustum.Intersects(bbox)) 
-	{
-		DrawBBox();
-	
-		return;
-	}
-
-	unsigned program = App->program->blinnProgram;
-	
-	if (material == nullptr) 
-	{
-		program = App->program->textureProgram;
-	}
-	else if (!material->enabled) 
-	{
-		program = App->program->colorProgram;
-	}
-
-	glUseProgram(program);
-	ModelTransform(program);
-
-	if (material != nullptr) 
-	{
-		((ComponentMesh*)mesh)->Draw(program, material);
-	}
-
-	glUseProgram(0);
 }
 
 void GameObject::CleanUp() 
@@ -282,11 +226,12 @@ void GameObject::DrawProperties()
 			component->enabled = enabled;
 		}
 	}
-
+	
 	ImGui::SameLine();
-	ImGui::InputText("Name", (char*)name, 50.0f); ImGui::SameLine();
 
-	if (ImGui::Checkbox("Static", &staticGo))
+	ImGui::InputText("Name", (char*)name, 50.0f);
+
+	if (ImGui::Checkbox("Static", &staticGo)) 
 	{
 		UpdateStaticChilds(staticGo);
 	}
@@ -299,9 +244,20 @@ void GameObject::DrawProperties()
 		ImGui::TextColored({ 0.4f,0.4f,0.4f,1.0f }, parentUuid);
 	}
 
-	for (auto &component : components) 
+	if (components.size() > 0) 
 	{
-		component->DrawProperties(staticGo);
+		for (std::list<Component*>::iterator it = components.begin(); it != components.end();) 
+		{
+			if (!(*it)->toBeDeleted) 
+			{
+				(*it)->DrawProperties(staticGo);
+				it++;
+			}
+			else 
+			{
+				it = RemoveComponent(it);
+			}
+		}
 	}
 }
 
@@ -372,7 +328,7 @@ void GameObject::DrawHierarchy(GameObject* goSelected)
 					
 					droppedGo->parent->goChilds.remove(droppedGo);
 					droppedGo->parent = this;
-					droppedGo->parentUuid = uuid;
+					sprintf_s(droppedGo->parentUuid, uuid);
 					
 					if (droppedGo->transform != nullptr) 
 					{
@@ -412,7 +368,7 @@ void GameObject::DrawHierarchy(GameObject* goSelected)
 				App->scene->goSelected = nullptr;
 			}
 		}
-
+		
 		if (ImGui::Selectable("Move up") && App->scene->goSelected != nullptr) 
 		{
 			moveGOUp = true;
@@ -446,12 +402,12 @@ Component* GameObject::AddComponent(ComponentType type)
 {
 	Component* component = nullptr;
 
-	switch (type) 
+	switch (type)
 	{
 	case ComponentType::CAMERA:
 		component = new ComponentCamera(this);
 		
-		if (App->camera->selectedCamera == nullptr) 
+		if (App->camera->selectedCamera == nullptr)
 		{
 			App->camera->selectedCamera = (ComponentCamera*)component;
 		}
@@ -467,35 +423,36 @@ Component* GameObject::AddComponent(ComponentType type)
 		}
 		else 
 		{
-			LOG("Warn: Transform already exist");
+			LOG("Warn: A TRANSFORM exists for this GameObject");
 		}
 
 		break;
 
 	case  ComponentType::MESH:
-		if (GetComponent(ComponentType::MESH) == nullptr) {
+		if (GetComponent(ComponentType::MESH) == nullptr)
+		{
 			component = new ComponentMesh(this, nullptr);
 			mesh = (ComponentMesh*)component;
 			AddComponent(ComponentType::MATERIAL);
 		}
-		else
+		else 
 		{
-			LOG("Warn: Mesh already exist");
+			LOG("Warn: A MESH exists for this GameObject");
 		}
-	
+
 		break;
-	
+
 	case ComponentType::MATERIAL:
-		if (GetComponent(ComponentType::MATERIAL) == nullptr) 
+		if (GetComponent(ComponentType::MATERIAL) == nullptr)
 		{
 			component = new ComponentMaterial(this);
 			material = (ComponentMaterial*)component;
 		}
 		else 
 		{
-			LOG("Warn: Material already exist");
+			LOG("Warn: A MATERIAL exists for this GameObject");
 		}
-		
+	
 		break;
 	
 	case ComponentType::EMPTY:
@@ -511,20 +468,14 @@ Component* GameObject::AddComponent(ComponentType type)
 	return component;
 }
 
-void GameObject::RemoveComponent(Component* component)
+std::list<Component*>::iterator GameObject::RemoveComponent(std::list<Component*>::iterator component) 
 {
-	assert(component != nullptr);
+	assert(*component != nullptr);
 
-	for (std::list<Component*>::iterator it = components.begin(); it != components.end(); ++it) 
-	{
-		if ((*it) == component) 
-		{
-			components.erase(it);
-			delete component;
-			component = nullptr;
-			return;
-		}
-	}
+	delete *component;
+	*component = nullptr;
+
+	return components.erase(component);
 }
 
 Component* GameObject::GetComponent(ComponentType type) const 
@@ -571,7 +522,7 @@ math::float4x4 GameObject::GetGlobalTransform() const
 {
 	if (parent != nullptr) 
 	{
-	
+
 		return parent->GetGlobalTransform() * GetLocalTransform();
 	}
 
@@ -613,22 +564,10 @@ void GameObject::UpdateStaticChilds(bool staticState)
 	{
 		App->scene->quadTree->Remove(this);
 	}
+	
 	for (auto &child : goChilds) 
 	{
 		child->UpdateStaticChilds(staticState);
-	}
-}
-
-void GameObject::DrawBBox() const 
-{
-	if (mesh != nullptr) 
-	{
-		dd::aabb(bbox.minPoint, bbox.maxPoint, math::float3(0.0f, 1.0f, 0.0f), true);
-	}
-
-	for (auto& child : goChilds) 
-	{
-		child->DrawBBox();
 	}
 }
 
@@ -642,7 +581,7 @@ bool GameObject::Save(Config* config)
 
 	if (parent != nullptr) 
 	{
-		config->AddString("parent", parent->uuid);
+		config->AddString("parentUuid", parent->uuid);
 	}
 
 	config->AddBool("enabled", enabled);
@@ -664,13 +603,18 @@ bool GameObject::Save(Config* config)
 
 void GameObject::Load(Config* config, rapidjson::Value& value) 
 {
-	uuid = config->GetString("uuid", value);
+	sprintf_s(uuid, config->GetString("uuid", value));
+
 	enabled = config->GetBool("enabled", value);
-	staicGo = config->GetBool("static", value);
+	staticGo = config->GetBool("static", value);
 
-	if (staticGo)
+	if (parent != nullptr) 
 	{
-
+		sprintf_s(parentUuid, config->GetString("parentUuid", value));
+	}
+	else 
+	{
+		sprintf_s(parentUuid, "");
 	}
 
 	rapidjson::Value components = value["components"].GetArray();
@@ -683,5 +627,10 @@ void GameObject::Load(Config* config, rapidjson::Value& value)
 		{
 			component->Load(config, (*it));
 		}
+	}
+
+	if (staticGo) 
+	{
+		App->scene->quadTree->Insert(this, true);
 	}
 }

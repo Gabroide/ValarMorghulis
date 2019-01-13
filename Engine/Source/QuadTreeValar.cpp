@@ -6,9 +6,9 @@
 #include "ComponentMesh.h"
 
 // Constructor
-QuadTreeValar::QuadTreeValar()
+QuadTreeValar::QuadTreeValar() 
 {
-	quadLimits = math::AABB(math::float3(-20.0f, -0.1f, -20.0f), math::float3(20.0f, 0.1f, 20.0f));
+	quadLimits = math::AABB(math::float3(-2000.0f, -2000.0f, -2000.0f), math::float3(2000.0f, 2000.0f, 2000.0f));
 	InitQuadTree(quadLimits, true);
 }
 
@@ -20,13 +20,14 @@ QuadTreeValar::~QuadTreeValar()
 
 void QuadTreeValar::InitQuadTree(const math::AABB& aabb, bool clearAllGameObjects) 
 {
-	if (clearAllGameObjects)
+	if (clearAllGameObjects) 
 	{
 		Clear();
 	}
-	
+
 	App->camera->quadCamera->frustum.pos.y = aabb.maxPoint.y * 2.0f;
-	App->camera->quadCamera->frustum.farPlaneDistance = App->camera->quadCamera->frustum.pos.y + aabb.Size().y;
+	App->camera->quadCamera->frustum.farPlaneDistance = App->camera->quadCamera->frustum.pos.y + aabb.Size().y + 20000.0f;
+
 	root = new QuadTreeNode(aabb);
 }
 
@@ -38,12 +39,12 @@ void QuadTreeValar::Insert(GameObject* gameObject, bool addQuadList)
 	{
 		if (addQuadList) 
 		{
-			allGO.push_back(gameObject);
+			goList.push_back(gameObject);
 		}
 
 		root->Insert(gameObject);
 	}
-	else
+	else 
 	{
 		ExpandLimits(gameObject);
 	}
@@ -62,11 +63,11 @@ void QuadTreeValar::Remove(GameObject* gameObject)
 {
 	if (root != nullptr) 
 	{
-		allGO.remove(gameObject);
+		goList.remove(gameObject);
 
 		InitQuadTree(quadLimits);
 
-		for (std::list<GameObject*>::iterator it = allGO.begin(); it != allGO.end(); ++it) 
+		for (std::list<GameObject*>::iterator it = goList.begin(); it != goList.end(); ++it) 
 		{
 			Insert(*it);
 		}
@@ -75,7 +76,7 @@ void QuadTreeValar::Remove(GameObject* gameObject)
 
 void QuadTreeValar::Clear() 
 {
-	allGO.clear();
+	goList.clear();
 
 	delete root;
 	root = nullptr;
@@ -89,6 +90,7 @@ QuadTreeNode::QuadTreeNode()
 	childs[3] = nullptr;
 }
 
+// Constructpr
 QuadTreeNode::QuadTreeNode(const math::AABB& aabb) : aabb(aabb) 
 {
 	childs[0] = nullptr;
@@ -97,6 +99,7 @@ QuadTreeNode::QuadTreeNode(const math::AABB& aabb) : aabb(aabb)
 	childs[3] = nullptr;
 }
 
+// Destrucor
 QuadTreeNode::~QuadTreeNode() 
 {
 	delete childs[0];
@@ -167,7 +170,7 @@ void QuadTreeNode::RecalculateSpace()
 		GameObject* gameObject = *iterator;
 		bool intersects[4];
 		
-		for (int i = 0; i < 4; ++i)
+		for (int i = 0; i < 4; ++i) 
 		{
 			ComponentMesh* componentMesh = (ComponentMesh*)(gameObject)->GetComponent(ComponentType::MESH);
 			
@@ -181,7 +184,7 @@ void QuadTreeNode::RecalculateSpace()
 		{
 			++iterator;
 		}
-		else 
+		else
 		{
 			iterator = goList.erase(iterator);
 			
@@ -198,6 +201,6 @@ void QuadTreeNode::RecalculateSpace()
 
 bool QuadTreeNode::IsLeaf() const 
 {
-
+	
 	return childs[0] == nullptr;
 }

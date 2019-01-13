@@ -1,10 +1,9 @@
+#include "Config.h"
+#include "GameObject.h"
 #include "Application.h"
 #include "ModuleScene.h"
-#include "GameObject.h"
-#include "ComponentTransform.h"
-#include "Config.h"
-
 #include "IMGUI\imgui_internal.h"
+#include "ComponentTransform.h"
 
 // Constructor
 ComponentTransform::ComponentTransform(GameObject* goContainer, const math::float4x4& transform) : Component(goContainer, ComponentType::TRANSFORM) 
@@ -22,10 +21,7 @@ ComponentTransform::ComponentTransform(const ComponentTransform& duplicatedTrans
 }
 
 // Destructor
-ComponentTransform::~ComponentTransform() 
-{
-
-}
+ComponentTransform::~ComponentTransform() { }
 
 Component* ComponentTransform::Duplicate() 
 {
@@ -60,7 +56,7 @@ void ComponentTransform::RotationToEuler()
 	eulerRotation.z = math::RadToDeg(eulerRotation.z);
 }
 
-void ComponentTransform::SetPosition(const float3& pos) 
+void ComponentTransform::SetPosition(const math::float3& pos) 
 {
 	position = pos;
 }
@@ -84,23 +80,23 @@ void ComponentTransform::DrawProperties(bool staticGo)
 {
 	if (ImGui::CollapsingHeader("Local Transform")) 
 	{
-		if (staticGo)
+		if (staticGo) 
 		{
 			ImGui::PushItemFlag({ ImGuiButtonFlags_Disabled | ImGuiItemFlags_Disabled | ImGuiSelectableFlags_Disabled }, true);
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
 		}
 
-		if (ImGui::DragFloat3("Position", (float*)&position, 0.1f, -1000.f, 1000.f)) 
+		if (ImGui::DragFloat3("Position", (float*)&position, 10.0f, -100000.f, 100000.f)) 
 		{
 			edited = true;
 		}
 
-		if (ImGui::DragFloat3("Rotation", (float*)&eulerRotation, 0.5f, -180, 180.f)) 
+		if (ImGui::DragFloat3("Rotation", (float*)&eulerRotation, 0.5f, -360, 360.f)) 
 		{
 			edited = true;
 		}
 
-		if (ImGui::DragFloat3("Scale", (float*)&scale, 0.1f, 0.01f, 100.f)) 
+		if (ImGui::DragFloat3("Scale", (float*)&scale, 0.1f, 0.1f, 100.f)) 
 		{
 			edited = true;
 		}
@@ -113,7 +109,7 @@ void ComponentTransform::DrawProperties(bool staticGo)
 			edited = false;
 		}
 
-		if (staticGo)
+		if (staticGo) 
 		{
 			ImGui::PopItemFlag();
 			ImGui::PopStyleVar();
@@ -141,7 +137,8 @@ void ComponentTransform::Save(Config* config)
 
 void ComponentTransform::Load(Config* config, rapidjson::Value& value) 
 {
-	uuid = config->GetString("uuid", value);
+	sprintf_s(uuid, config->GetString("uuid", value));
+	sprintf_s(parentUuid, config->GetString("parentUuid", value));
 	position = config->GetFloat3("position", value);
 	eulerRotation = config->GetFloat3("eulerRotation", value);
 	scale = config->GetFloat3("scale", value);

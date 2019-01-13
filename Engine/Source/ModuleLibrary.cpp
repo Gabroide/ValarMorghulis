@@ -1,17 +1,16 @@
-
-#include <thread>
-
-#include "Application.h"
-#include "ModuleFileSystem.h"
 #include "ModuleLibrary.h"
-#include "MaterialImporter.h"
+#include "Application.h"
 #include "MeshImporter.h"
+#include "ModuleFileSystem.h"
+#include "MaterialImporter.h"
 
 #include "IMGUI\imgui.h"
 
+#include <thread>;
+
 bool stopWatcher = false;
 
-// Constructor
+// Constructior
 ModuleLibrary::ModuleLibrary() 
 {
 	
@@ -20,12 +19,13 @@ ModuleLibrary::ModuleLibrary()
 // Destructor
 ModuleLibrary::~ModuleLibrary() 
 {
-
+	
 }
 
 void LibraryWatcher() 
-{
+{	
 	return;
+	
 	std::map<std::string, std::string> oldFilesAssets;
 	std::map<std::string, std::string> currentFilesAssets;
 	std::map<std::string, std::string> currentFilesLibrary;
@@ -65,6 +65,7 @@ void LibraryWatcher()
 			oldFilesAssets = currentFilesAssets;
 			App->library->UpdateMeshesList();
 			App->library->UpdateTexturesList();
+			App->library->UpdateScenesList();
 		}
 		else if (oldFilesAssets.size() > currentFilesAssets.size()) 
 		{
@@ -126,7 +127,7 @@ void ModuleLibrary::UpdateTexturesList()
 	App->fileSystem->GetFilesFromDirectory("/Library/Textures/", fileTexturesList);
 }
 
-void ModuleLibrary::UpdateScenesList()
+void ModuleLibrary::UpdateScenesList() 
 {
 	fileScenesList.clear();
 	App->fileSystem->GetFilesFromDirectory("/Library/Scenes/", fileScenesList);

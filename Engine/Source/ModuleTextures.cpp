@@ -1,16 +1,16 @@
 #include "Globals.h"
 #include "Application.h"
-#include "ModuleFileSystem.h"
 #include "ModuleRender.h"
-#include "ModuleScene.h"
 #include "ModuleTextures.h"
+#include "ModuleScene.h"
 #include "ComponentMaterial.h"
 #include "MaterialImporter.h"
+#include "ModuleFileSystem.h"
 
 // Constructor
 ModuleTextures::ModuleTextures() 
 {
-
+	
 }
 
 // Destructor
@@ -28,24 +28,14 @@ bool ModuleTextures::Init()
 	iluInit();
 	ilutInit();
 
-	LoadDefaultTextures();
-
+	LoadDefaulTextures();
 
 	return ilutRenderer(ILUT_OPENGL);
 }
 
-bool ModuleTextures::CleanUp()
+bool ModuleTextures::CleanUp() 
 {
-	for (std::list<ComponentMaterial*>::iterator it = materials.begin(); it != materials.end())
-	{
-		delete *it;
-		it = materials.erase(it);
-		*it = nullptr;
-	}
-
-	delete defaultTexture;
 	delete noCameraSelectedTexture;
-	defaultTexture = nullptr;
 	noCameraSelectedTexture = nullptr;
 
 	return true;
@@ -81,6 +71,7 @@ Texture* const ModuleTextures::Load(const char* path)
 		{
 			iluFlipImage();
 		}
+		
 		width = ilGetInteger(IL_IMAGE_WIDTH);
 		height = ilGetInteger(IL_IMAGE_HEIGHT);
 		format = ilGetInteger(IL_IMAGE_FORMAT);
@@ -102,7 +93,6 @@ Texture* const ModuleTextures::Load(const char* path)
 		if (!success) 
 		{
 			LOG("Error: Could not convert the image to texture correctly. %s", iluErrorString(ilGetError()));
-		
 			return nullptr;
 		}
 
@@ -113,7 +103,7 @@ Texture* const ModuleTextures::Load(const char* path)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filterType);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filterType);
 
-		if (wrapMode != NULL)
+		if (wrapMode != NULL) 
 		{
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapMode);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapMode);
@@ -125,20 +115,21 @@ Texture* const ModuleTextures::Load(const char* path)
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mipMapMode);
 			glGenerateMipmap(GL_TEXTURE_2D);
 			glGenerateTextureMipmap(textureId);
-		} 
+		}
 
-		ilDeleteImages(1, &imageId); 
+		ilDeleteImages(1, &imageId);
 		glBindTexture(GL_TEXTURE_2D, 0);
 
-		return new Texture(textureId, width, height); 
+		return new Texture(textureId, width, height);
 	}
 
-	LOG("Error: Texture loading %s",iluErrorString(ilGetError()));
+	LOG("Error: Texture loading %s", iluErrorString(ilGetError()));
 
 	return nullptr;
 }
 
-void ModuleTextures::LoadMaterial(std::string path, unsigned& textureID, int& width, int& height) {
+void ModuleTextures::LoadMaterial(std::string path, unsigned& textureID, int& width, int& height) 
+{
 	unsigned imageID;
 
 	ilGenImages(1, &imageID);
@@ -165,7 +156,6 @@ void ModuleTextures::LoadMaterial(std::string path, unsigned& textureID, int& wi
 		if (!ilConvertImage(IL_RGB, IL_UNSIGNED_BYTE)) 
 		{
 			LOG("Error: Image conversion failed %s", iluErrorString(ilGetError()));
-
 			return;
 		}
 
@@ -184,7 +174,7 @@ void ModuleTextures::LoadMaterial(std::string path, unsigned& textureID, int& wi
 	}
 
 	ilDeleteImages(1, &imageID);
-	LOG("Material creation successful.");
+	LOG("Material has been created succesfully.");
 }
 
 void ModuleTextures::LoadMaterial(const char* path, ComponentMaterial* componentMaterial, MaterialType materialTypeSelected) 
@@ -196,7 +186,7 @@ void ModuleTextures::LoadMaterial(const char* path, ComponentMaterial* component
 		{
 			Unload(componentMaterial->material.occlusionMap);
 		}
-		
+	
 		LoadMaterial(path, componentMaterial->material.occlusionMap, componentMaterial->material.ambientWidth, componentMaterial->material.ambientHeight);
 		break;
 	
@@ -205,18 +195,19 @@ void ModuleTextures::LoadMaterial(const char* path, ComponentMaterial* component
 		{
 			Unload(componentMaterial->material.diffuseMap);
 		}
+
 		LoadMaterial(path, componentMaterial->material.diffuseMap, componentMaterial->material.diffuseWidth, componentMaterial->material.diffuseHeight);
 		break;
-	
+
 	case MaterialType::SPECULAR_MAP:
 		if (componentMaterial->material.specularMap != 0u) 
 		{
 			Unload(componentMaterial->material.specularMap);
 		}
-	
+		
 		LoadMaterial(path, componentMaterial->material.specularMap, componentMaterial->material.specularWidth, componentMaterial->material.specularHeight);
 		break;
-	
+
 	case MaterialType::EMISSIVE_MAP:
 		if (componentMaterial->material.emissiveMap != 0u) 
 		{
@@ -239,24 +230,11 @@ void ModuleTextures::Unload(unsigned id)
 void ModuleTextures::LoadDefaulTextures() 
 {
 	noCameraSelectedTexture = Load("nocamselected.jpg");
-	defaultTexture = Load("checkers.jpg");
-
-	if (!App->fileSystem->Exists("/Library/Textures/checkers.dds"))
-	{
-		if (App->fileSystem->Exists("/Assets/Default/checkers.png"))
-		{
-			MaterialImporter::Import("/Assets/Default/checkers.png");
-		}
-		else
-		{
-			LOG("Error: Default texture not found");
-		}
-	}
 }
 
 void ModuleTextures::DrawGUI() 
 {
-	ImGui::Text("This will be applied to the next loaded models");
+	ImGui::Text("This will be applied only to the next loaded models");
 	ImGui::Text("Filter type:");
 	ImGui::RadioButton("Linear", &filterType, GL_LINEAR); ImGui::SameLine();
 	ImGui::RadioButton("Nearest", &filterType, GL_NEAREST);
@@ -267,7 +245,7 @@ void ModuleTextures::DrawGUI()
 	ImGui::RadioButton("Mirrored repeat", &wrapMode, GL_MIRRORED_REPEAT);
 	
 	if (ImGui::Checkbox("Mipmap", &mipmaping)) 
-	{ 
+	{
 		ImGui::RadioButton("Nearest", &mipMapMode, GL_NEAREST_MIPMAP_NEAREST); ImGui::SameLine();
 		ImGui::RadioButton("Linear", &mipMapMode, GL_NEAREST_MIPMAP_LINEAR);
 	}

@@ -1,27 +1,30 @@
 #include "Globals.h"
+#include "GameObject.h"
 #include "Application.h"
-#include "ModuleCamera.h"
-#include "ModuleDebugDraw.h"
-#include "ModuleEditor.h"
-#include "ModuleProgram.h"
-#include "ModuleRender.h"
 #include "ModuleScene.h"
+#include "ModuleRender.h"
+#include "ModuleEditor.h"
+#include "ModuleCamera.h"
 #include "ModuleWindow.h"
+#include "ModuleProgram.h"
+#include "ModuleDebugDraw.h"
+#include "QuadTreeChimera.h"
 #include "ComponentCamera.h"
-#include "QuadTreeValar.h"
+#include "ComponentMesh.h"
+#include "ComponentMaterial.h"
 
 #include "SDL\include\SDL.h"
 
 #include "glew-2.1.0\include\GL/glew.h"
 
-#include "MathGeoLib\include\Math\float4x4.h"
-
 #include "debugdraw.h"
+
+#include "MathGeoLib\include\Math\float4x4.h"
 
 // Constructor
 ModuleRender::ModuleRender() 
 {
-
+	
 }
 
 // Destructor
@@ -46,6 +49,7 @@ bool ModuleRender::Init()
 
 	App->program->LoadPrograms();
 	GenerateBlockUniforms();
+	GenerateFallBackMaterial();
 
 	return true;
 }
@@ -60,22 +64,23 @@ update_status ModuleRender::PreUpdate()
 // Called every draw update
 update_status ModuleRender::Update() 
 {
+	sceneViewportX = ImGui::GetCursorPosX() + ImGui::GetWindowPos().x;
+	sceneViewportY = ImGui::GetCursorPosY() + ImGui::GetWindowPos().y;
+
 	glBindFramebuffer(GL_FRAMEBUFFER, App->camera->sceneCamera->fbo);
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 	glPolygonMode(GL_FRONT_AND_BACK, App->camera->sceneCamera->wireFrame);
-
 	SetProjectionMatrix(App->camera->sceneCamera);
 	SetViewMatrix(App->camera->sceneCamera);
 
-	if (cullingFromGameCamera && App->camera->selectedCamera != nullptr) 
+	if (frustCulling && App->camera->selectedCamera != nullptr) 
 	{
-		App->scene->Draw(App->camera->selectedCamera->frustum);
+		DrawMeshes(App->camera->selectedCamera);
 	}
 	else 
 	{
-		App->scene->Draw(App->camera->sceneCamera->frustum);
+		DrawMeshes(App->camera->sceneCamera);
 	}
 
 	DrawDebugData(App->camera->sceneCamera);
@@ -85,33 +90,28 @@ update_status ModuleRender::Update()
 		glBindFramebuffer(GL_FRAMEBUFFER, App->camera->selectedCamera->fbo);
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 		glPolygonMode(GL_FRONT_AND_BACK, App->camera->selectedCamera->wireFrame);
-
 		SetProjectionMatrix(App->camera->selectedCamera);
 		SetViewMatrix(App->camera->selectedCamera);
-
-		App->scene->Draw(App->camera->selectedCamera->frustum);
-
+		DrawMeshes(App->camera->selectedCamera);
 		DrawDebugData(App->camera->selectedCamera);
 	}
 
-	if (App->camera->quadCamera != nullptr)
+	if (App->camera->quadCamera != nullptr) 
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, App->camera->quadCamera->fbo);
-		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		SetProjectionMatrix(App->camera->quadCamera);
 		SetViewMatrix(App->camera->quadCamera);
-
-		App->scene->Draw(App->camera->quadCamera->frustum);
-
 		DrawDebugData(App->camera->quadCamera);
 	}
 
+	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	
+
 	return UPDATE_CONTINUE;
 }
 
@@ -127,7 +127,6 @@ void ModuleRender::DrawDebugData(ComponentCamera* camera) const
 {
 	if (camera->debugDraw == false)
 	{
-	
 		return;
 	}
 
@@ -136,15 +135,16 @@ void ModuleRender::DrawDebugData(ComponentCamera* camera) const
 		dd::frustum((App->camera->selectedCamera->frustum.ProjectionMatrix() * App->camera->selectedCamera->frustum.ViewMatrix()).Inverted(), dd::colors::Crimson);
 	}
 
-	dd::xzSquareGrid(-1000.0f, 1000.0f, 0.0f, 1.0f, math::float3(0.65f, 0.65f, 0.65f));
-	dd::axisTriad(math::float4x4::identity, 0.1f, 1.0f, 0, true);
-	
-	if (showQuad)
+	//Grid and axis debug
+	dd::xzSquareGrid(-100000.0f, 100000.0f, 0.0f, 100.0f, math::float3(0.65f, 0.65f, 0.65f));
+	dd::axisTriad(math::float4x4::identity, 10.0f, 100.0f, 0, true);
+
+	if (showQuad) 
 	{
-		PrintQuadTreeNode(App->scene->quadTree->root);
+		PrintQuadNode(App->scene->quadTree->root);
 	}
 
-	App->debug->Draw(camera, camera->fbo, App->window->height, App->window->width);
+	App->debug->Draw(camera, camera->fbo, camera->screenWidth, camera->screenHeight);
 }
 
 void ModuleRender::SetViewMatrix(ComponentCamera* camera) const 
@@ -186,7 +186,7 @@ void ModuleRender::InitSDL()
 
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);	
+	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
 	context = SDL_GL_CreateContext(App->window->window);
@@ -205,6 +205,97 @@ void ModuleRender::InitOpenGL() const
 	glClearDepth(1.0f);
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	glViewport(0, 0, App->window->width, App->window->height);
+}
+
+void ModuleRender::GenerateFallBackMaterial() 
+{
+	char fallbackImage[3] = { GLubyte(255), GLubyte(255), GLubyte(255) };
+
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glGenTextures(1, &fallback);
+	glBindTexture(GL_TEXTURE_2D, fallback);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, fallbackImage);
+}
+
+void ModuleRender::DrawMeshes(ComponentCamera* camera) 
+{
+	for (std::list<ComponentMesh*>::iterator it = meshes.begin(); it != meshes.end(); ++it) 
+	{
+		if ((*it)->enabled) 
+		{
+			if (frustCulling) 
+			{
+				if (frustumCullingType == 1) 
+				{
+					CullingFromQuadTree(camera, *it);
+				}
+				else 
+				{
+					CullingFromFrustum(camera, *it);
+				}
+			}
+			else 
+			{
+				DrawWithoutCulling(*it);
+			}
+		}
+	}
+}
+
+void ModuleRender::DrawWithoutCulling(ComponentMesh* mesh) const 
+{
+	if (App->scene->goSelected == mesh->goContainer) 
+	{
+		dd::aabb(mesh->goContainer->bbox.minPoint, mesh->goContainer->bbox.maxPoint, math::float3(0.0f, 1.0f, 0.0f), true);
+	}
+
+	unsigned program = App->program->blinnProgram;
+	ComponentMaterial* compMat = (ComponentMaterial*)mesh->goContainer->GetComponent(ComponentType::MATERIAL);
+
+	glUseProgram(program);
+
+	mesh->goContainer->ModelTransform(program);
+	mesh->Draw(program, compMat);
+
+	glUseProgram(0);
+}
+
+void ModuleRender::CullingFromFrustum(ComponentCamera* camera, ComponentMesh* mesh) const 
+{
+	if (App->camera->selectedCamera != nullptr && !camera->frustum.Intersects(mesh->goContainer->bbox)) 
+	{
+		dd::aabb(mesh->goContainer->bbox.minPoint, mesh->goContainer->bbox.maxPoint, math::float3(0.0f, 1.0f, 0.0f), true);
+	}
+	else 
+	{
+		DrawWithoutCulling(mesh);
+	}
+}
+
+void ModuleRender::CullingFromQuadTree(ComponentCamera* camera, ComponentMesh* mesh) 
+{
+	quadGOCollided.clear();
+	App->scene->quadTree->CollectIntersections(quadGOCollided, camera->frustum);
+
+	for (std::list<ComponentMesh*>::iterator it = meshes.begin(); it != meshes.end(); ++it) 
+	{
+		if (!(*it)->goContainer->staticGo && (*it)->mesh.verticesNumber > 0 && camera->frustum.Intersects((*it)->goContainer->bbox)) 
+		{
+			quadGOCollided.push_back((*it)->goContainer);
+		}
+	}
+
+	for (std::vector<GameObject*>::iterator it = quadGOCollided.begin(); it != quadGOCollided.end(); ++it) 
+	{
+		if ((*it)->enabled) 
+		{
+			DrawWithoutCulling((ComponentMesh*)(*it)->GetComponent(ComponentType::MESH));
+		}
+	}
 }
 
 bool ModuleRender::CleanUp() 

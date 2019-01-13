@@ -1,30 +1,30 @@
 #include "assert.h"
-#include "Application.h"
-#include "MeshImporter.h"
-#include "ModuleLibrary.h"
-#include "ModuleScene.h"
-#include "GameObject.h"
-#include "ComponentMaterial.h"
-#include "ComponentMesh.h"
 #include "Config.h"
+#include "par_shapes.h"
+#include "GameObject.h"
+#include "Application.h"
+#include "ModuleScene.h"
+#include "ModuleRender.h"
+#include "MeshImporter.h"
+#include "ComponentMesh.h"
+#include "ModuleLibrary.h"
+#include "IMGUI\imgui_internal.h"
+#include "ComponentMaterial.h"
 
 #include "MathGeoLib\include\Math\float3.h"
 #include "MathGeoLib\include\Math\float2.h"
 
-#include "IMGUI\imgui_internal.h"
-
-#include "par_shapes.h"
-
 // Constructor
 ComponentMesh::ComponentMesh(GameObject* goContainer, Mesh* mesh) : Component(goContainer, ComponentType::MESH) 
 {
-
+	App->renderer->meshes.push_back(this);
 }
 
 // Constructor Overloaded
 ComponentMesh::ComponentMesh(const ComponentMesh& duplicatedComponent) : Component(duplicatedComponent) 
 {
 	mesh = duplicatedComponent.mesh;
+	App->renderer->meshes.push_back(this);
 }
 
 // Destructor
@@ -41,12 +41,14 @@ Component* ComponentMesh::Duplicate()
 
 void ComponentMesh::CleanUp() 
 {
-	if (mesh.vbo != 0)
+	App->renderer->meshes.remove(this);
+
+	if (mesh.vbo != 0) 
 	{
 		glDeleteBuffers(1, &mesh.vbo);
 	}
 
-	if (mesh.ibo != 0)
+	if (mesh.ibo != 0) 
 	{
 		glDeleteBuffers(1, &mesh.ibo);
 	}
@@ -54,6 +56,12 @@ void ComponentMesh::CleanUp()
 
 void ComponentMesh::Draw(unsigned shaderProgram, const ComponentMaterial* material) const 
 {
+	if (material == nullptr) 
+	{
+	
+		return;
+	}
+
 	glActiveTexture(GL_TEXTURE0);
 
 	glUniform4f(glGetUniformLocation(shaderProgram, "diffuseColor"), material->material.diffuseColor.x, material->material.diffuseColor.y, material->material.diffuseColor.z, 1.0f);
@@ -67,53 +75,57 @@ void ComponentMesh::Draw(unsigned shaderProgram, const ComponentMaterial* materi
 	glUniform1f(glGetUniformLocation(shaderProgram, "k_specular"), material->material.specularK);
 	glUniform4fv(glGetUniformLocation(shaderProgram, "newColor"), 1, (float*)&material->material.color);
 
-	if (material->material.diffuseMap != 0) 
+	glActiveTexture(GL_TEXTURE0);
+	
+	if (material->enabled && material->material.diffuseMap != 0) 
 	{
-		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, material->material.diffuseMap);
-		glUniform1i(glGetUniformLocation(shaderProgram, "diffuseMap"), 0);
-		glUniform1i(glGetUniformLocation(shaderProgram, "useDiffuseMap"), 1);
 	}
 	else 
 	{
-		glUniform1i(glGetUniformLocation(shaderProgram, "useDiffuseMap"), 0);
+		glBindTexture(GL_TEXTURE_2D, App->renderer->fallback);
 	}
+	
+	glUniform1i(glGetUniformLocation(shaderProgram, "diffuseMap"), 0);
 
-	if (material->material.emissiveMap != 0) 
+	glActiveTexture(GL_TEXTURE1);
+	
+	if (material->enabled && material->material.emissiveMap != 0) 
 	{
-		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, material->material.emissiveMap);
-		glUniform1i(glGetUniformLocation(shaderProgram, "emissiveMap"), 1);
-		glUniform1i(glGetUniformLocation(shaderProgram, "useEmissiveMap"), 1);
 	}
 	else 
 	{
-		glUniform1i(glGetUniformLocation(shaderProgram, "useEmissiveMap"), 0);
+		glBindTexture(GL_TEXTURE_2D, App->renderer->fallback);
 	}
+	
+	glUniform1i(glGetUniformLocation(shaderProgram, "emissiveMap"), 1);
 
-	if (material->material.occlusionMap != 0) 
+	glActiveTexture(GL_TEXTURE2);
+	
+	if (material->enabled && material->material.occlusionMap != 0)
 	{
-		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, material->material.occlusionMap);
-		glUniform1i(glGetUniformLocation(shaderProgram, "occlusionMap"), 2);
-		glUniform1i(glGetUniformLocation(shaderProgram, "useOcclusionMap"), 1);
 	}
 	else 
 	{
-		glUniform1i(glGetUniformLocation(shaderProgram, "useOcclusionMap"), 0);
+		glBindTexture(GL_TEXTURE_2D, App->renderer->fallback);
+	}
+	
+	glUniform1i(glGetUniformLocation(shaderProgram, "occlusionMap"), 2);
+
+	glActiveTexture(GL_TEXTURE3);
+	
+	if (material->enabled && material->material.specularMap != 0) 
+	{
+		glBindTexture(GL_TEXTURE_2D, material->material.specularMap);
+	}
+	else 
+	{
+		glBindTexture(GL_TEXTURE_2D, App->renderer->fallback);
 	}
 
-	if (material->material.specularMap != 0) 
-	{
-		glActiveTexture(GL_TEXTURE3);
-		glBindTexture(GL_TEXTURE_2D, material->material.specularMap);
-		glUniform1i(glGetUniformLocation(shaderProgram, "specularMap"), 3);
-		glUniform1i(glGetUniformLocation(shaderProgram, "useSpecularMap"), 1);
-	}
-	else 
-	{
-		glUniform1i(glGetUniformLocation(shaderProgram, "useSpecularMap"), 0);
-	}
+	glUniform1i(glGetUniformLocation(shaderProgram, "specularMap"), 3);
 
 	glBindVertexArray(mesh.vao);
 	glDrawElements(GL_TRIANGLES, mesh.indicesNumber, GL_UNSIGNED_INT, 0);
@@ -128,7 +140,7 @@ void ComponentMesh::DrawProperties(bool staticGo)
 	
 	if (ImGui::CollapsingHeader("Mesh")) 
 	{
-		if (staticGo)
+		if (staticGo) 
 		{
 			ImGui::PushItemFlag({ ImGuiButtonFlags_Disabled | ImGuiItemFlags_Disabled | ImGuiSelectableFlags_Disabled }, true);
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -139,19 +151,20 @@ void ComponentMesh::DrawProperties(bool staticGo)
 		if (removed) 
 		{
 			ImGui::PopID();
+		
 			return;
 		}
-
+		
 		ImGui::Separator();
 
+
 		std::vector<std::string> fileMeshesList = App->library->fileMeshesList;
-		currentMesh;
 		fileMeshesList.insert(fileMeshesList.begin(), "Select mesh");
 
 		if (fileMeshesList.size() > 0) 
 		{
 			if (ImGui::BeginCombo("##meshCombo", currentMesh.c_str())) 
-			{	
+			{
 				for (std::vector<std::string>::iterator it = fileMeshesList.begin(); it != fileMeshesList.end(); ++it) 
 				{
 					bool isSelected = (currentMesh == (*it));
@@ -168,7 +181,7 @@ void ComponentMesh::DrawProperties(bool staticGo)
 						}
 					}
 				}
-
+		
 				ImGui::EndCombo();
 			}
 		}
@@ -178,7 +191,7 @@ void ComponentMesh::DrawProperties(bool staticGo)
 		ImGui::Text("Triangles count: %d", mesh.verticesNumber / 3);
 		ImGui::Text("Vertices count: %d", mesh.verticesNumber);
 
-		if (staticGo)
+		if (staticGo) 
 		{
 			ImGui::PopItemFlag();
 			ImGui::PopStyleVar();
@@ -302,7 +315,7 @@ void ComponentMesh::ComputeMesh(par_shapes_mesh_s* parMesh)
 	glBufferData(GL_ARRAY_BUFFER, mesh.vertexSize * parMesh->npoints, nullptr, GL_STATIC_DRAW);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(math::float3) * parMesh->npoints, parMesh->points);
 
-	if (parMesh->normals) 
+	if (parMesh->normals)
 	{
 		glBufferSubData(GL_ARRAY_BUFFER, mesh.normalsOffset * parMesh->npoints, sizeof(math::float3) * parMesh->npoints, parMesh->normals);
 	}

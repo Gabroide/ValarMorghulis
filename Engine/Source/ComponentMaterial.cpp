@@ -1,28 +1,27 @@
 #include "assert.h"
-#include "Application.h"
-#include "MouleLibrary.h"
-#include "ModuleProgram.h"
-#include "ModuleTextures.h"
-#include "GameObject.h"
-#include "ComponentMaterial.h"
 #include "Config.h"
+#include "GameObject.h"
+#include "Application.h"
+#include "ModuleProgram.h"
+#include "ModuleLibrary.h"
+#include "imgui_internal.h"
+#include "ModuleTextures.h"
+#include "ComponentMaterial.h"
 
-#include "IMGUI\imgui_internal.h"
-
-// Constructor
+// Constructoe
 ComponentMaterial::ComponentMaterial(GameObject* goContainer) : Component(goContainer, ComponentType::MATERIAL) 
 {
-	
+
 }
 
 // Constructor Overloaded
 ComponentMaterial::ComponentMaterial(GameObject* goContainer, const aiMaterial* material) : Component(goContainer, ComponentType::MATERIAL) 
 {
-	UnloadMaterial();
+
 }
 
-// Constructor Overloaded
-ComponentMaterial::ComponentMaterial(const ComponentMaterial& duplicatedComponent) : Component(duplicatedComponent)
+// Costructor Overloaded
+ComponentMaterial::ComponentMaterial(const ComponentMaterial& duplicatedComponent) : Component(duplicatedComponent) 
 {
 	material = duplicatedComponent.material;
 }
@@ -30,7 +29,7 @@ ComponentMaterial::ComponentMaterial(const ComponentMaterial& duplicatedComponen
 // Destructor
 ComponentMaterial::~ComponentMaterial() 
 {
-
+	UnloadMaterial();
 }
 
 Component* ComponentMaterial::Duplicate() 
@@ -39,9 +38,9 @@ Component* ComponentMaterial::Duplicate()
 	return new ComponentMaterial(*this);
 }
 
-void ComponentMaterial::DeleteTexture(unsigned id)
+void ComponentMaterial::DeleteTexture(unsigned id) 
 {
-	if (id != 0)
+	if (id != 0u) 
 	{
 		glDeleteTextures(1, &id);
 	}
@@ -53,7 +52,7 @@ void ComponentMaterial::DrawProperties(bool staticGo)
 	
 	if (ImGui::CollapsingHeader("Material")) 
 	{
-		if (staticGo)
+		if (staticGo) 
 		{
 			ImGui::PushItemFlag({ ImGuiButtonFlags_Disabled | ImGuiItemFlags_Disabled | ImGuiSelectableFlags_Disabled }, true);
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
@@ -79,7 +78,7 @@ void ComponentMaterial::DrawProperties(bool staticGo)
 		{
 			ImGui::PushID("AddMaterial");
 			
-			if (ImGui::MenuItem("Add material")) 
+			if (ImGui::MenuItem("Add material"))
 			{
 			
 			}
@@ -133,7 +132,7 @@ void ComponentMaterial::DrawProperties(bool staticGo)
 			ImGui::Image((ImTextureID)material.emissiveMap, ImVec2(200, 200));
 		}
 
-		if (staticGo)
+		if (staticGo) 
 		{
 			ImGui::PopItemFlag();
 			ImGui::PopStyleVar();
@@ -177,7 +176,7 @@ void ComponentMaterial::DrawComboBoxMaterials(const char* id, MaterialType matTy
 	}
 }
 
-void ComponentMaterial::UnloadMaterial()
+void ComponentMaterial::UnloadMaterial() 
 {
 	DeleteTexture(material.diffuseMap);
 	DeleteTexture(material.specularMap);
