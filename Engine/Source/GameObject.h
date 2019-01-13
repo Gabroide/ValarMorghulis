@@ -44,9 +44,6 @@ class GameObject
 		void					UpdateStaticChilds(bool staticState);
 		void					Load(Config* config, rapidjson::Value& value);
 
-		math::float4x4			GetLocalTransform() const;
-		math::float4x4			GetGlobalTransform() const;
-		
 	public:
 		Component*						AddComponent(ComponentType type);
 		Component*						GetComponent(ComponentType type) const;

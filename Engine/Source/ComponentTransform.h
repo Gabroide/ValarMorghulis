@@ -30,6 +30,9 @@ class ComponentTransform : public Component
 		void			Save(Config* config);
 		void			Load(Config* config, rapidjson::Value& value);
 
+		math::float4x4	GetLocalTransform() const;
+		math::float4x4	GetGlobalTransform() const;
+
 	public:
 		Component*		Duplicate() override;
 

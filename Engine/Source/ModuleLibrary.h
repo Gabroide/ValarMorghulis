@@ -9,26 +9,27 @@
 
 class ModuleLibrary : public Module
 {
-public:
-	ModuleLibrary();
-	~ModuleLibrary();
+	public:
+		ModuleLibrary();
+		~ModuleLibrary();
 
-	bool					Init()		override;
-	bool					CleanUp()	override;
+		bool					Init()		override;
+		bool					CleanUp()	override;
 
-	update_status			Update()	override;
+		update_status			Update()	override;
+
+		void					UpdateMeshesList();
+		void					UpdateTexturesList();
+		void					UpdateScenesList();
+
+	public:
+		bool					 toBeDeleted = false;
+		bool			  		 removeHead = false;
 	
-	void					UpdateMeshesList();
-	void					UpdateTexturesList();
-	void					UpdateScenesList();
-
-public:
-	bool					 toBeDeleted	= false;
-	bool			  		 removeHead		= false;
-	
-	std::vector<std::string> fileMeshesList;
-	std::vector<std::string> fileTexturesList;
-	std::vector<std::string> fileScenesList;
+	public:
+		std::vector<std::string>* fileMeshesList = nullptr;
+		std::vector<std::string>* fileTexturesList	= nullptr;
+		std::vector<std::string>* fileScenesList	= nullptr;
 
 };
 

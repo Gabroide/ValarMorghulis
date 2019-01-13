@@ -144,36 +144,30 @@ void ComponentMaterial::DrawProperties(bool staticGo)
 
 void ComponentMaterial::DrawComboBoxMaterials(const char* id, MaterialType matType, static std::string& currentTexture) 
 {
-	std::vector<std::string> fileTexturesList = App->library->fileTexturesList;
-	fileTexturesList.insert(fileTexturesList.begin(), "Select a Texture");
-
-	if (fileTexturesList.size() > 0) 
+	ImGui::PushID(id);
+	
+	if (ImGui::BeginCombo("##", currentTexture.c_str())) 
 	{
-		ImGui::PushID(id);
-		
-		if (ImGui::BeginCombo("##", currentTexture.c_str())) 
+		for (std::vector<std::string>::iterator iterator = App->library->fileTexturesList->begin(); iterator != App->library->fileTexturesList->end(); ++iterator) 
 		{
-			for (std::vector<std::string>::iterator iterator = fileTexturesList.begin(); iterator != fileTexturesList.end(); ++iterator) 
+			bool isSelected = (currentTexture == (*iterator).c_str());
+			
+			if (ImGui::Selectable((*iterator).c_str(), isSelected)) 
 			{
-				bool isSelected = (currentTexture == (*iterator).c_str());
+				currentTexture = (*iterator).c_str();
+				App->textures->LoadMaterial(currentTexture.c_str(), this, matType);
 				
-				if (ImGui::Selectable((*iterator).c_str(), isSelected)) 
+				if (isSelected) 
 				{
-					currentTexture = (*iterator).c_str();
-					App->textures->LoadMaterial(currentTexture.c_str(), this, matType);
-					
-					if (isSelected) 
-					{
-						ImGui::SetItemDefaultFocus();
-					}
+					ImGui::SetItemDefaultFocus();
 				}
 			}
-
-			ImGui::EndCombo();
 		}
 
-		ImGui::PopID();
+		ImGui::EndCombo();
 	}
+
+	ImGui::PopID();
 }
 
 void ComponentMaterial::UnloadMaterial() 

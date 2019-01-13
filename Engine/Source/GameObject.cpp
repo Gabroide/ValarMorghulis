@@ -85,13 +85,18 @@ GameObject::GameObject(const char* goName, const math::float4x4& parentTransform
 GameObject::GameObject(const GameObject& duplicateGameObject) 
 {
 	sprintf_s(uuid, App->fileSystem->NewGuuid());
-	sprintf_s(uuid, duplicateGameObject.parentUuid);
+	sprintf_s(parentUuid, duplicateGameObject.parentUuid);
 
 	char* copyName = new char[strlen(duplicateGameObject.name)];
 	strcpy(copyName, duplicateGameObject.name);
 	name = copyName;
 
 	staticGo = duplicateGameObject.staticGo;
+	if (staticGo)
+	{
+		UpdateStaticChilds(staticGo);
+	}
+
 	bbox = duplicateGameObject.bbox;
 
 	for (const auto &component : duplicateGameObject.components) 
@@ -507,31 +512,9 @@ std::vector<Component*> GameObject::GetComponents(ComponentType type) const
 	return list;
 }
 
-math::float4x4 GameObject::GetLocalTransform() const 
-{
-	if (transform == nullptr) 
-	{
-	
-		return math::float4x4::identity;
-	}
-
-	return math::float4x4::FromTRS(transform->position, transform->rotation, transform->scale);
-}
-
-math::float4x4 GameObject::GetGlobalTransform() const 
-{
-	if (parent != nullptr) 
-	{
-
-		return parent->GetGlobalTransform() * GetLocalTransform();
-	}
-
-	return GetLocalTransform();
-}
-
 void GameObject::ModelTransform(unsigned shader) const 
 {
-	glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_TRUE, &GetGlobalTransform()[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_TRUE, &transform->GetGlobalTransform()[0][0]);
 }
 
 void GameObject::ComputeBBox() 
@@ -544,11 +527,11 @@ void GameObject::ComputeBBox()
 		}
 	}
 
-	if (mesh != nullptr) 
+	if (mesh != nullptr && transform != nullptr) 
 	{
 		bbox.SetNegativeInfinity();
 		bbox.Enclose(mesh->mesh.bbox);
-		bbox.TransformAsAABB(GetGlobalTransform());
+		bbox.TransformAsAABB(transform->GetGlobalTransform());
 	}
 }
 

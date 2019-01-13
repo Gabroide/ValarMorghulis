@@ -31,6 +31,8 @@ class ComponentMesh : public Component
 		void			Save(Config* config)							override;
 		void			Load(Config* config, rapidjson::Value& value);
 
+		st::vector<	string>	fileMeshList;
+
 	public:
 		Component*		Duplicate() override;
 
@@ -40,8 +42,8 @@ class ComponentMesh : public Component
 	public:
 		const char*		name = nullptr;
 	
-private:
-	std::string			currentMesh;
+	private:
+		std::string			currentMesh;
 
 };
 

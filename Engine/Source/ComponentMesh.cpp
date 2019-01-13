@@ -158,32 +158,23 @@ void ComponentMesh::DrawProperties(bool staticGo)
 		ImGui::Separator();
 
 
-		std::vector<std::string> fileMeshesList = App->library->fileMeshesList;
-		fileMeshesList.insert(fileMeshesList.begin(), "Select mesh");
-
-		if (fileMeshesList.size() > 0) 
+		for (std::vector<std::string>::iterator it = App->library->fileMeshesList->begin(); it != App->library->fileMeshesList->end(); ++it)
 		{
-			if (ImGui::BeginCombo("##meshCombo", currentMesh.c_str())) 
-			{
-				for (std::vector<std::string>::iterator it = fileMeshesList.begin(); it != fileMeshesList.end(); ++it) 
-				{
-					bool isSelected = (currentMesh == (*it));
+			bool isSelected = (currentMesh == (*it));
 					
-					if (ImGui::Selectable((*it).c_str(), isSelected)) 
-					{
-						currentMesh = (*it);
+			if (ImGui::Selectable((*it).c_str(), isSelected)) 
+			{
+				currentMesh = (*it);
 
-						LoadMesh(currentMesh.c_str());
+				LoadMesh(currentMesh.c_str());
 						
-						if (isSelected) 
-						{
-							ImGui::SetItemDefaultFocus();
-						}
-					}
+				if (isSelected)
+				{
+					ImGui::SetItemDefaultFocus();
 				}
-		
-				ImGui::EndCombo();
 			}
+		
+			ImGui::EndCombo();
 		}
 
 		ImGui::Separator();

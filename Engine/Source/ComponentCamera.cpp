@@ -72,7 +72,7 @@ void ComponentCamera::Update()
 		return;
 	}
 
-	math::float4x4 transform = goContainer->GetGlobalTransform();
+	math::float4x4 transform = goContainer->transform->GetGlobbalTransform();
 	frustum.pos = transform.TranslatePart();
 	frustum.front = transform.RotatePart().Mul(math::float3::unitZ).Normalized();
 	frustum.up = transform.RotatePart().Mul(math::float3::unitY).Normalized();
@@ -94,7 +94,7 @@ void ComponentCamera::SetVerticalFOV(float fovYDegrees)
 
 void ComponentCamera::DrawProperties(bool enabled) 
 {
-	ImGui::PushID(this);
+	ImGui::PushID(this);-
 	
 	if (ImGui::CollapsingHeader("Camera properties")) 
 	{
