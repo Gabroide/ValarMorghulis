@@ -22,7 +22,7 @@ class ComponentCamera : public Component
 		ComponentCamera(GameObject* goParent);
 		~ComponentCamera();
 
-		void			DrawProperties()	override;
+		void			DrawProperties(bool enabled)	override;
 		void			Update();
 		void			InitFrustum();
 		void			LookAt(math::float3 target);

@@ -78,7 +78,7 @@ void ComponentTransform::SetWorldToLocal(const math::float4x4& parentTrans)
 	RotationToEuler();
 }
 
-void ComponentTransform::DrawProperties() 
+void ComponentTransform::DrawProperties(bool enabled) 
 {
 	if (ImGui::CollapsingHeader("Local Transform")) 
 	{

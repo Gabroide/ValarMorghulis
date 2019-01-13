@@ -26,7 +26,7 @@ class ComponentTransform : public Component
 		void			RotationToEuler();
 		void			SetLocalToWorld(const math::float4x4& localTrans);
 		void			SetWorldToLocal(const math::float4x4& parentTrans);
-		void			DrawProperties() override;
+		void			DrawProperties(bool enabled) override;
 		void			Save(Config* config);
 		void			Load(Config* config, rapidjson::Value& value);
 

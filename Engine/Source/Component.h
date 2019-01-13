@@ -30,7 +30,7 @@ class Component
 		virtual void		Update();
 		
 	public:
-		virtual void DrawProperties() 
+		virtual void DrawProperties(bool enabled) 
 		{
 		
 		};

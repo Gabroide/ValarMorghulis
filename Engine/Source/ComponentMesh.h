@@ -26,10 +26,10 @@ class ComponentMesh : public Component
 		void			ComputeMesh(par_shapes_mesh_s* mesh);
 		void			CleanUp();
 		void			Draw(unsigned shaderProgram, const ComponentMaterial* material) const;
-		void			DrawProperties() override;
+		void			DrawProperties(bool enabled) override;
 		void			LoadMesh(const char* name);
 		void			Save(Config* config)							override;
-		void			Load(Config* config, rapidjson::Value& value)	override;
+		void			Load(Config* config, rapidjson::Value& value);
 
 	public:
 		Component*		Duplicate() override;

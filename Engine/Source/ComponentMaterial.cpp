@@ -37,7 +37,7 @@ Component* ComponentMaterial::Duplicate()
 	return new ComponentMaterial(*this);
 }
 
-void ComponentMaterial::Deleteexture(const aiMaterial* material)
+void ComponentMaterial::DeleteTexture(unsigned id)
 {
 	if (id != 0)
 	{
@@ -45,7 +45,7 @@ void ComponentMaterial::Deleteexture(const aiMaterial* material)
 	}
 }
 
-void ComponentMaterial::DrawProperties() 
+void ComponentMaterial::DrawProperties(bool enabled) 
 {
 	ImGui::PushID(this);
 	

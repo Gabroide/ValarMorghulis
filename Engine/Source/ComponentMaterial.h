@@ -27,10 +27,11 @@ class ComponentMaterial : public Component
 		ComponentMaterial(const ComponentMaterial& duplicatedComponent);
 		~ComponentMaterial();
 
-		void		DrawProperties()								override;
+		void		DrawProperties(bool enabled);
 		void		UnloadMaterial();
 		void		Save(Config* config)							override;
-		void		Load(Config*config, rapidjson::Value& value)	override;
+		void		Load(Config*config, rapidjson::Value& value);
+		void		DeleteTexture(unsigned id);
 
 	public:
 		Component*	Duplicate() override;

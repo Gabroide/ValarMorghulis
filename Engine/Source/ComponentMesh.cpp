@@ -120,7 +120,7 @@ void ComponentMesh::Draw(unsigned shaderProgram, const ComponentMaterial* materi
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void ComponentMesh::DrawProperties() 
+void ComponentMesh::DrawProperties(bool enabled) 
 {
 	ImGui::PushID(this);
 	
