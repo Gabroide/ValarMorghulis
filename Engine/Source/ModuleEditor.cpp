@@ -52,15 +52,16 @@ bool ModuleEditor::Init()
 }
 
 update_status ModuleEditor::PreUpdate() 
-{	
+{
+	//BROFILER_CATEGORY("EditorPreUpdate()", Profiler::Color::Azure);
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplSDL2_NewFrame(App->window->window);
 	ImGui::NewFrame();
 	ImGuizmo::BeginFrame();
 
 	CreateDockSpace();
+	
 	return UPDATE_CONTINUE;
-
 }
 
 update_status ModuleEditor::Update() 

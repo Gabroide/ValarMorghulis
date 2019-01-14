@@ -25,14 +25,11 @@ void MeshImporter::ImportFBX(const char* filePath)
 	}
 }
 
-bool MeshImporter::Import(const aiMesh* aiMesh, const char* meshName) 
-{
+bool MeshImporter::Import(const aiMesh* aiMesh, const char* meshName) {
 	bool result = false;
 
-	if (aiMesh == nullptr) 
-	{
+	if (aiMesh == nullptr) {
 		LOG("Error: FBX failed to import");
-	
 		return result;
 	}
 
@@ -42,24 +39,18 @@ bool MeshImporter::Import(const aiMesh* aiMesh, const char* meshName)
 	meshStruct.vertices = new float[meshStruct.verticesNumber * 3];
 	memcpy(meshStruct.vertices, aiMesh->mVertices, sizeof(float) * meshStruct.verticesNumber * 3);
 
-	if (aiMesh->HasFaces()) 
-	{
+	if (aiMesh->HasFaces()) {
 		meshStruct.indicesNumber = aiMesh->mNumFaces * 3;
 		meshStruct.indices = new unsigned[meshStruct.indicesNumber];
-		
-		for (unsigned i = 0u; i < aiMesh->mNumFaces; ++i) 
-		{
+		for (unsigned i = 0u; i < aiMesh->mNumFaces; ++i) {
 			memcpy(&meshStruct.indices[i * 3], aiMesh->mFaces[i].mIndices, 3 * sizeof(unsigned));
 		}
 	}
 
-	if (aiMesh->HasTextureCoords(0)) 
-	{
+	if (aiMesh->HasTextureCoords(0)) {
 		meshStruct.uvs = new float[meshStruct.verticesNumber * 2];
 		int uvsCount = 0;
-		
-		for (unsigned i = 0u; i < meshStruct.verticesNumber; i++) 
-		{
+		for (unsigned i = 0u; i < meshStruct.verticesNumber; i++) {
 			meshStruct.uvs[uvsCount] = aiMesh->mTextureCoords[0][i].x;
 			uvsCount++;
 			meshStruct.uvs[uvsCount] = aiMesh->mTextureCoords[0][i].y;
@@ -67,14 +58,12 @@ bool MeshImporter::Import(const aiMesh* aiMesh, const char* meshName)
 		}
 	}
 
-	if (aiMesh->HasNormals()) 
-	{
+	if (aiMesh->HasNormals()) {
 		meshStruct.normals = new float[meshStruct.verticesNumber * 3];
 		memcpy(meshStruct.normals, aiMesh->mNormals, sizeof(float) * meshStruct.verticesNumber * 3);
 	}
 
-	if (aiMesh->HasVertexColors(0)) 
-	{
+	if (aiMesh->HasVertexColors(0)) {
 		meshStruct.colors = new float[meshStruct.verticesNumber * 3];
 		memcpy(meshStruct.colors, aiMesh->mColors, sizeof(float) * meshStruct.verticesNumber * 3);
 	}

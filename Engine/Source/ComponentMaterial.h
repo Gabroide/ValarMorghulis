@@ -13,7 +13,7 @@ enum class MaterialType {
 	NO_TYPE_SELECTED = 0,
 	OCCLUSION_MAP,
 	DIFFUSE_MAP,
-	SPECLAR_MAP,
+	SPECULAR_MAP,
 	EMISSIVE_MAP
 };
 
@@ -40,7 +40,6 @@ class ComponentMaterial : public Component
 		Material	material;
 
 	private:
-		void		DeleteTexture(unsigned id);
 		void		DrawComboBoxMaterials(const char* id, MaterialType matType, static std::string& labelCurrentFileTextureSelected);
 
 	private:

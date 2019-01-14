@@ -54,7 +54,7 @@ class ModuleCamera : public Module
 		float						lastX				= 0.0f;
 		float						lastY				= 0.0f;
 
-		math::
+		math::LineSegment			rayCast;
 
 	public:
 		ComponentCamera*			quadCamera			= nullptr;

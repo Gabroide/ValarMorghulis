@@ -31,7 +31,7 @@ void DockScene::Draw()
 
 	ImGui::Image((ImTextureID)App->camera->sceneCamera->renderTexture, { (float)App->window->width, (float)App->window->height }, { 0,1 }, { 1,0 });
 
-	App->renderer - DrawImGuizmo(size.x, size.y, pos.x, pos.y);
+	App->renderer->DrawImGuizmo(size.x, size.y, pos.x, pos.y);
 
 	focus = ImGui::IsWindowFocused();
 	ImGui::End();

@@ -4,7 +4,7 @@
 #include "ModuleFileSystem.h"
 
 // Constructor
-Config::Config() 
+Config::Config()
 {
 	stringBuffer = new rapidjson::StringBuffer();
 	writer = new rapidjson::PrettyWriter<rapidjson::StringBuffer>(*stringBuffer);
@@ -30,20 +30,19 @@ void Config::AddComponentType(const char* name, ComponentType componentType)
 	case ComponentType::CAMERA:
 		writer->String("CAMERA");
 		break;
-
+	
 	case ComponentType::MATERIAL:
 		writer->String("MATERIAL");
 		break;
-
+	
 	case ComponentType::MESH:
 		writer->String("MESH");
 		break;
-
+	
 	case ComponentType::TRANSFORM:
 		writer->String("TRANSFORM");
 		break;
 	}
-
 }
 
 void Config::AddInt(const char* name, int value) 
@@ -122,21 +121,25 @@ ComponentType Config::GetComponentType(const char* name, rapidjson::Value& value
 
 	if (strcmp(stringComponentType, "TRANSFORM") == 0) 
 	{
+	
 		return ComponentType::TRANSFORM;
 	}
 	
 	if (strcmp(stringComponentType, "MESH") == 0) 
 	{
+	
 		return ComponentType::MESH;
 	}
 	
 	if (strcmp(stringComponentType, "MATERIAL") == 0) 
 	{
+	
 		return ComponentType::MATERIAL;
 	}
 	
 	if (strcmp(stringComponentType, "CAMERA") == 0) 
 	{
+
 		return ComponentType::CAMERA;
 	}
 }

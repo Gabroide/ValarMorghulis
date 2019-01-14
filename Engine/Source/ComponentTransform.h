@@ -2,50 +2,47 @@
 #define __ComponentTransform_h__
 
 #include "Component.h"
-
-#include "MathGeoLib\include\Math\MathFunc.h"
-#include "MathGeoLib\include\Math\float4x4.h"
-#include "MathGeoLib\include\Math\Quat.h"
-
-#include "IMGUI\imgui.h"
-
-#include "Assimp\scene.h""
+#include "imgui.h"
+#include "Math/MathFunc.h"
+#include "Math/float4x4.h"
+#include "Math/Quat.h"
+#include <assimp/scene.h> 
 
 class GameObject;
 
 class ComponentTransform : public Component
 {
-	public:
-		ComponentTransform(GameObject* goContainer, const math::float4x4& transform);
-		ComponentTransform(const ComponentTransform& duplicatedTransform);
-		~ComponentTransform();
+public:
+	ComponentTransform(GameObject* goContainer, const math::float4x4& transform);
+	ComponentTransform(const ComponentTransform& duplicatedTransform);
+	~ComponentTransform();
 
-		void			AddTransform(const math::float4x4& transform);
-		void			SetRotation(const math::Quat& rot);
-		void			SetPosition(const math::float3& pos);
-		void			RotationToEuler();
-		void			SetLocalToWorld(const math::float4x4& localTrans);
-		void			SetWorldToLocal(const math::float4x4& parentTrans);
-		void			DrawProperties(bool staticGo) override;
-		void			Save(Config* config);
-		void			Load(Config* config, rapidjson::Value& value);
-		void			GlobalTransform(const math::float4x4& global);
+	void AddTransform(const math::float4x4& transform);
+	void SetRotation(const math::Quat& rot);
+	void SetPosition(const math::float3& pos);
+	void RotationToEuler();
 
-		math::float4x4	GetLocalTransform() const;
-		math::float4x4	GetGlobalTransform() const;
+	void SetLocalToWorld(const math::float4x4& localTrans);
+	void SetWorldToLocal(const math::float4x4& parentTrans);
+	void SetGlobalTransform(const math::float4x4& global);
 
-	public:
-		Component*		Duplicate() override;
 
-	public:
-		bool			edited			= false;
+	math::float4x4 GetLocalTransform() const;
+	math::float4x4 GetGlobalTransform() const;
 
-		math::float3	position		= math::float3::zero;
-		math::float3	eulerRotation	= math::float3::zero;
-		math::float3	scale			= math::float3::zero;
 
-		math::Quat		rotation = math::Quat::identity;
+	void		DrawProperties(bool enabled) override;
+	Component*	Duplicate() override;
 
+	void Save(Config* config) override;
+	void Load(Config* config, rapidjson::Value& value) override;
+
+public:
+	math::float3	position = math::float3::zero;
+	math::Quat		rotation = math::Quat::identity;
+	math::float3	eulerRotation = math::float3::zero;
+	math::float3	scale = math::float3::zero;
+	bool			edited = false;
 };
 
 #endif // __ComponentTransform_h__

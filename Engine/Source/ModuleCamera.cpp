@@ -1,7 +1,7 @@
 #include "Globals.h"
 #include "Point.h"
 #include "ModuleTime.h"
-#include "MathGeoLib.h" // TODO
+#include "MathGeoLib.h"
 #include "Application.h"
 #include "ModuleInput.h"
 #include "ModuleScene.h"
@@ -11,14 +11,8 @@
 #include "ModuleCamera.h"
 #include "QuadTreeValar.h"
 
+ModuleCamera::ModuleCamera() { }
 
-// Constructor
-ModuleCamera::ModuleCamera() 
-{
-
-}
-
-// Destructor
 ModuleCamera::~ModuleCamera() 
 {
 	CleanUp();
@@ -80,6 +74,7 @@ update_status ModuleCamera::PreUpdate()
 		{
 			SelectGameObject();
 		}
+
 	}
 
 	return UPDATE_CONTINUE;
@@ -252,7 +247,8 @@ void ModuleCamera::SelectGameObject()
 					float triangleDistance;
 					math::float3 hitPoint;
 					
-					if (localTransformPikingLine.Intersects(triangle, &triangleDistance, &hitPoint)) {
+					if (localTransformPikingLine.Intersects(triangle, &triangleDistance, &hitPoint)) 
+					{
 						if (minDistance == -100.0f || triangleDistance < minDistance) 
 						{
 							minDistance = triangleDistance;
@@ -266,7 +262,21 @@ void ModuleCamera::SelectGameObject()
 
 	if (gameObjectHit != nullptr) 
 	{
-		App->scene->goSelected = gameObjectHit;
+		if (App->renderer->selectAncestorOnClick) 
+		{
+			GameObject* inheritedTrasnform = gameObjectHit;
+			
+			while (inheritedTrasnform->parent != App->scene->root) 
+			{
+				inheritedTrasnform = inheritedTrasnform->parent;
+			}
+		
+			App->scene->goSelected = inheritedTrasnform;
+		}
+		else 
+		{
+			App->scene->goSelected = gameObjectHit;
+		}
 	}
 }
 
@@ -282,7 +292,9 @@ void ModuleCamera::DrawGUI()
 		ImGui::RadioButton("QuadTree", &App->renderer->frustumCullingType, 1);
 	}
 
-	ImGui::Checkbox("Raycast", &App->renderer->showRayCast);
+	ImGui::Checkbox("Raycast drawing", &App->renderer->showRayCast);
+
+	ImGui::Checkbox("Select ancestor on click", &App->renderer->selectAncestorOnClick);
 
 	float fov = math::RadToDeg(sceneCamera->frustum.verticalFov);
 	

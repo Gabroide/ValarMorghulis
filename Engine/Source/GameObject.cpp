@@ -164,7 +164,7 @@ void GameObject::Update()
 		return;
 	}
 
-	for std::list<GameObject*>::iterator itChild = goChilds.begin(); itChild != goChilds.end();) 
+	for (std::list<GameObject*>::iterator itChild = goChilds.begin(); itChild != goChilds.end();)
 	{
 		(*itChild)->Update();
 
@@ -328,7 +328,7 @@ void GameObject::DrawHierarchy(GameObject* goSelected)
 
 					if (droppedGo->transform != nullptr) 
 					{
-						droppedGo->transform->SetLocalToWorld(droppedGo->GetGlobalTransform());
+						droppedGo->transform->SetLocalToWorld(droppedGo->transform->GetGlobalTransform());
 					}
 					
 					droppedGo->parent->goChilds.remove(droppedGo);
@@ -337,7 +337,7 @@ void GameObject::DrawHierarchy(GameObject* goSelected)
 					
 					if (droppedGo->transform != nullptr) 
 					{
-						droppedGo->transform->SetWorldToLocal(droppedGo->parent->GetGlobalTransform());
+						droppedGo->transform->SetWorldToLocal(droppedGo->parent->transform->GetGlobalTransform());
 					}
 				}
 			}

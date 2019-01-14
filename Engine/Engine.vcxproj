@@ -54,7 +54,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>false</SDLCheck>
       <ExceptionHandling>Sync</ExceptionHandling>
-      <AdditionalIncludeDirectories>.\Source\physicsFS\include;./Source/glew-2.1.0/include;./Source/SDL/include;./Source/MathGeoLib/include;./Source/IMGUI;./Source/DevIL/include;./Source/Assimp/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\ImGuizmo;.\rapidjson-1.1.0\include\rapidjson;.\Source\physicsFS\include;./Source/glew-2.1.0/include;./Source/SDL/include;./Source/MathGeoLib/include;./Source/IMGUI;./Source/DevIL/include;./Source/Assimp/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -71,7 +71,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>false</SDLCheck>
       <ExceptionHandling>Sync</ExceptionHandling>
-      <AdditionalIncludeDirectories>.\Source\physicsFS\include;./Source/glew-2.1.0/include;./Source/SDL/include;./Source/MathGeoLib/include;./Source/IMGUI;./Source/DevIL/include;./Source/Assimp/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\ImGuizmo;.\rapidjson-1.1.0\include\rapidjson;.\Source\physicsFS\include;./Source/glew-2.1.0/include;./Source/SDL/include;./Source/MathGeoLib/include;./Source/IMGUI;./Source/DevIL/include;./Source/Assimp/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -84,7 +84,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="DockAssets.h" />
-    <ClInclude Include="MeshImporter.h" />
     <ClInclude Include="ModuleLibrary.h" />
     <ClInclude Include="Source\Application.h" />
     <ClInclude Include="Source\Component.h" />
@@ -93,6 +92,7 @@
     <ClInclude Include="Source\ComponentMaterial.h" />
     <ClInclude Include="Source\ComponentMesh.h" />
     <ClInclude Include="Source\ComponentTransform.h" />
+    <ClInclude Include="Source\Config.h" />
     <ClInclude Include="Source\Crossguid\crossguid\guid.hpp" />
     <ClInclude Include="Source\debugdraw.h" />
     <ClInclude Include="Source\Dock.h" />
@@ -103,6 +103,7 @@
     <ClInclude Include="Source\DockHierarchy.h" />
     <ClInclude Include="Source\DockInspector.h" />
     <ClInclude Include="Source\DockLight.h" />
+    <ClInclude Include="Source\DockQuadTree.h" />
     <ClInclude Include="Source\DockScene.h" />
     <ClInclude Include="Source\DockTime.h" />
     <ClInclude Include="Source\GameObject.h" />
@@ -165,6 +166,7 @@
     <ClInclude Include="Source\MathGeoLib\include\Math\sse_mathfun.h" />
     <ClInclude Include="Source\MathGeoLib\include\Math\TransformOps.h" />
     <ClInclude Include="Source\MathGeoLib\include\Time\Clock.h" />
+    <ClInclude Include="Source\MeshImporter.h" />
     <ClInclude Include="Source\mmgr\mmgr.h" />
     <ClInclude Include="Source\mmgr\nommgr.h" />
     <ClInclude Include="Source\Module.h" />
@@ -182,12 +184,10 @@
     <ClInclude Include="Source\ModuleWindow.h" />
     <ClInclude Include="Source\par_shapes.h" />
     <ClInclude Include="Source\Point.h" />
+    <ClInclude Include="Source\QuadTreeValar.h" />
     <ClInclude Include="Source\Timer.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="DockAssets.cpp" />
-    <ClCompile Include="MeshImporter.cpp" />
-    <ClCompile Include="ModuleLibrary.cpp" />
     <ClCompile Include="Source\Application.cpp" />
     <ClCompile Include="Source\Component.cpp" />
     <ClCompile Include="Source\ComponentCamera.cpp" />
@@ -195,15 +195,18 @@
     <ClCompile Include="Source\ComponentMaterial.cpp" />
     <ClCompile Include="Source\ComponentMesh.cpp" />
     <ClCompile Include="Source\ComponentTransform.cpp" />
+    <ClCompile Include="Source\Config.cpp" />
     <ClCompile Include="Source\Crossguid\guid.cpp" />
     <ClCompile Include="Source\Dock.cpp" />
     <ClCompile Include="Source\DockAbout.cpp" />
+    <ClCompile Include="Source\DockAssets.cpp" />
     <ClCompile Include="Source\DockCamera.cpp" />
     <ClCompile Include="Source\DockConfig.cpp" />
     <ClCompile Include="Source\DockConsole.cpp" />
     <ClCompile Include="Source\DockHierarchy.cpp" />
     <ClCompile Include="Source\DockInspector.cpp" />
     <ClCompile Include="Source\DockLight.cpp" />
+    <ClCompile Include="Source\DockQuadTree.cpp" />
     <ClCompile Include="Source\DockScene.cpp" />
     <ClCompile Include="Source\DockTime.cpp" />
     <ClCompile Include="Source\GameObject.cpp" />
@@ -248,12 +251,14 @@
     <ClCompile Include="Source\MathGeoLib\include\Math\SSEMath.cpp" />
     <ClCompile Include="Source\MathGeoLib\include\Math\TransformOps.cpp" />
     <ClCompile Include="Source\MathGeoLib\include\Time\Clock.cpp" />
+    <ClCompile Include="Source\MeshImporter.cpp" />
     <ClCompile Include="Source\mmgr\mmgr.cpp" />
     <ClCompile Include="Source\ModuleCamera.cpp" />
     <ClCompile Include="Source\ModuleDebugDraw.cpp" />
     <ClCompile Include="Source\ModuleEditor.cpp" />
     <ClCompile Include="Source\ModuleFileSystem.cpp" />
     <ClCompile Include="Source\ModuleInput.cpp" />
+    <ClCompile Include="Source\ModuleLibrary.cpp" />
     <ClCompile Include="Source\ModuleProgram.cpp" />
     <ClCompile Include="Source\ModuleRender.cpp" />
     <ClCompile Include="Source\ModuleResourceManager.cpp" />
@@ -261,6 +266,7 @@
     <ClCompile Include="Source\ModuleTextures.cpp" />
     <ClCompile Include="Source\ModuleTime.cpp" />
     <ClCompile Include="Source\ModuleWindow.cpp" />
+    <ClCompile Include="Source\QuadTreeValar.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Game\Shaders\blinn.fs" />

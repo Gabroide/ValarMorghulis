@@ -182,17 +182,17 @@ void ModuleInput::FileDropped(const char* fileDroppedPath)
 	std::string extension(fileName.substr(fileName.length() - 3));
 	
 	std::size_t found = fileName.find("Models");
-	fileName = fileName.substr(found, fileName - length());
+	fileName = fileName.substr(found, fileName.length());
 
 	if (extension == "png" || extension == "tif") 
 	{
 		App->fileSystem->ChangePathSlashes(fileName);
 		MaterialImporter::Import(fileName.c_str());
 	}
-	else if (extension == "fbx" || extensio == "FBX")
+	else if (extension == "fbx" || extension == "FBX")
 	{
 		App->fileSystem->ChangePathSlashes(fileName);
-		MeshImporter::Import(fileName.c_str());
+		MeshImporter::ImportFBX(fileName.c_str());
 	}
 	else 
 	{

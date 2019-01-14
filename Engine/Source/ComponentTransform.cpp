@@ -3,35 +3,27 @@
 #include "Application.h"
 #include "ModuleRender.h"
 #include "ModuleScene.h"
-#include "IMGUI\imgui_internal.h"
+#include "imgui_internal.h"
 #include "ComponentTransform.h"
 
-// Constructor
-ComponentTransform::ComponentTransform(GameObject* goContainer, const math::float4x4& transform) : Component(goContainer, ComponentType::TRANSFORM) 
-{
+ComponentTransform::ComponentTransform(GameObject* goContainer, const math::float4x4& transform) : Component(goContainer, ComponentType::TRANSFORM) {
 	AddTransform(transform);
 }
 
-// Constructor Overloaded
-ComponentTransform::ComponentTransform(const ComponentTransform& duplicatedTransform) : Component(duplicatedTransform) 
-{
+ComponentTransform::ComponentTransform(const ComponentTransform& duplicatedTransform) : Component(duplicatedTransform) {
 	position = duplicatedTransform.position;
 	rotation = duplicatedTransform.rotation;
 	scale = duplicatedTransform.scale;
 	eulerRotation = duplicatedTransform.eulerRotation;
 }
 
-// Destructor
 ComponentTransform::~ComponentTransform() { }
 
-Component* ComponentTransform::Duplicate() 
-{
-
+Component* ComponentTransform::Duplicate() {
 	return new ComponentTransform(*this);
 }
 
-void ComponentTransform::AddTransform(const math::float4x4& transform) 
-{
+void ComponentTransform::AddTransform(const math::float4x4& transform) {
 	math::float3 translation;
 	math::float3 scaling;
 	math::Quat aiRotation;
@@ -43,134 +35,107 @@ void ComponentTransform::AddTransform(const math::float4x4& transform)
 	RotationToEuler();
 }
 
-void ComponentTransform::SetRotation(const Quat& rot) 
-{
+void ComponentTransform::SetRotation(const Quat& rot) {
 	rotation = rot;
 	RotationToEuler();
 }
 
-void ComponentTransform::RotationToEuler() 
-{
+void ComponentTransform::RotationToEuler() {
 	eulerRotation = rotation.ToEulerXYZ();
 	eulerRotation.x = math::RadToDeg(eulerRotation.x);
 	eulerRotation.y = math::RadToDeg(eulerRotation.y);
 	eulerRotation.z = math::RadToDeg(eulerRotation.z);
 }
 
-void ComponentTransform::SetPosition(const math::float3& pos) 
-{
+void ComponentTransform::SetPosition(const math::float3& pos) {
 	position = pos;
 }
 
-void ComponentTransform::SetLocalToWorld(const math::float4x4& localTrans) 
-{
+void ComponentTransform::SetLocalToWorld(const math::float4x4& localTrans) {
 	math::float4x4 world = localTrans;
 	world.Decompose(position, rotation, scale);
 	RotationToEuler();
 }
 
-void ComponentTransform::SetWorldToLocal(const math::float4x4& parentTrans) 
-{
+void ComponentTransform::SetWorldToLocal(const math::float4x4& parentTrans) {
 	math::float4x4 world = math::float4x4::FromTRS(position, rotation, scale);
 	math::float4x4 local = parentTrans.Inverted() * world;
 	local.Decompose(position, rotation, scale);
 	RotationToEuler();
 }
 
-math::float4x4 ComponentTransform::GetLocalTransform() const 
-{
-
+math::float4x4 ComponentTransform::GetLocalTransform() const {
 	return math::float4x4::FromTRS(position, rotation, scale);
 }
 
-math::float4x4 ComponentTransform::GetGlobalTransform() const 
-{
-	if (goContainer->parent != nullptr && goContainer->parent->transform != nullptr) 
-	{
-	
-		return goContainer->parent->transform->GetGlobalTransform() * goContainer->parent->transform->GetLocalTransform();
+math::float4x4 ComponentTransform::GetGlobalTransform() const {
+	if (goContainer->parent != nullptr && goContainer->parent->transform != nullptr) {
+		return goContainer->parent->transform->GetGlobalTransform() * goContainer->transform->GetLocalTransform();
 	}
 
 	return GetLocalTransform();
 }
 
-void ComponentTransform::SetGlobalTransform(const math::float4x4& global) 
-{
+void ComponentTransform::SetGlobalTransform(const math::float4x4& global) {
 	SetLocalToWorld(global);
 	math::float4x4 parentglobal = math::float4x4::identity;
 
-	if (goContainer->parent != nullptr && goContainer->parent->transform != nullptr) 
-	{
+	if (goContainer->parent != nullptr && goContainer->parent->transform != nullptr) {
 		parentglobal = goContainer->parent->transform->GetGlobalTransform();
 	}
-	
 	SetWorldToLocal(parentglobal);
 	goContainer->ComputeBBox();
 }
 
-void ComponentTransform::DrawProperties(bool staticGo) 
-{
-	if (ImGui::CollapsingHeader("Local Transform")) 
-	{
-		if (staticGo) 
-		{
+void ComponentTransform::DrawProperties(bool staticGo) {
+
+	if (ImGui::CollapsingHeader("Local Transform")) {
+
+		// https://github.com/ocornut/imgui/issues/211
+		if (staticGo) {
 			ImGui::PushItemFlag({ ImGuiButtonFlags_Disabled | ImGuiItemFlags_Disabled | ImGuiSelectableFlags_Disabled }, true);
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
 		}
 
-		if (ImGui::DragFloat3("Position", (float*)&position, 10.0f, -100000.f, 100000.f)) 
-		{
+		if (ImGui::DragFloat3("Position", (float*)&position, 10.0f, -100000.f, 100000.f)) {
 			edited = true;
 		}
 
-		if (ImGui::DragFloat3("Rotation", (float*)&eulerRotation, 0.5f, -360, 360.f)) 
-		{
+		if (ImGui::DragFloat3("Rotation", (float*)&eulerRotation, 0.5f, -360, 360.f)) {
 			edited = true;
 		}
 
-		if (ImGui::DragFloat3("Scale", (float*)&scale, 0.1f, 0.1f, 100.f)) 
-		{
+		if (ImGui::DragFloat3("Scale", (float*)&scale, 0.1f, 0.1f, 100.f)) {
 			edited = true;
 		}
 
 		rotation = rotation.FromEulerXYZ(math::DegToRad(eulerRotation.x), math::DegToRad(eulerRotation.y), math::DegToRad(eulerRotation.z));
 
-		ImGui::Text("Edit a GameObject");
-		if (ImGui::Button("Translate") //TODO
-		{
+		ImGui::Text("Select one to edit the GO");
+		if (ImGui::Button("Trans")) {
 			App->renderer->imGuizmoActivity = ImGuizmo::TRANSLATE;
 		}
-
 		ImGui::SameLine();
-
-		if (ImGui::Text("Rotate"))
-		{
+		if (ImGui::Button("Rotate")) {
 			App->renderer->imGuizmoActivity = ImGuizmo::ROTATE;
 		}
-
-		ImGui::SmaeLine();
-
-		if (ImGui::Text("Scale"))
-		{
+		ImGui::SameLine();
+		if (ImGui::Button("Scale")) {
 			App->renderer->imGuizmoActivity = ImGuizmo::SCALE;
 			App->renderer->imGuizmoMode = ImGuizmo::LOCAL;
 		}
 
-		if (App->renderer->imGuizmoActivity != ImGuizmo::SCALE)
-		{
-			ImGui::RadioButton("Local", &App->renderer->imGuizmoActivity, ImGuizmo::LOCAL);
-			ImGui::SameLine();
+		if (App->renderer->imGuizmoActivity != ImGuizmo::SCALE) {
+			ImGui::RadioButton("Local", &App->renderer->imGuizmoMode, ImGuizmo::LOCAL); ImGui::SameLine();
 			ImGui::RadioButton("Global", &App->renderer->imGuizmoMode, ImGuizmo::WORLD);
 		}
 
-		if (edited) 
-		{
+		if (edited) {
 			goContainer->ComputeBBox();
 			edited = false;
 		}
 
-		if (staticGo) 
-		{
+		if (staticGo) {
 			ImGui::PopItemFlag();
 			ImGui::PopStyleVar();
 		}
@@ -180,8 +145,7 @@ void ComponentTransform::DrawProperties(bool staticGo)
 }
 
 /* RapidJson storage */
-void ComponentTransform::Save(Config* config) 
-{
+void ComponentTransform::Save(Config* config) {
 	config->StartObject();
 
 	config->AddComponentType("componentType", componentType);
@@ -195,8 +159,7 @@ void ComponentTransform::Save(Config* config)
 	config->EndObject();
 }
 
-void ComponentTransform::Load(Config* config, rapidjson::Value& value) 
-{
+void ComponentTransform::Load(Config* config, rapidjson::Value& value) {
 	sprintf_s(uuid, config->GetString("uuid", value));
 	sprintf_s(parentUuid, config->GetString("parentUuid", value));
 	position = config->GetFloat3("position", value);
