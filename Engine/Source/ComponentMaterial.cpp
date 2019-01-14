@@ -23,7 +23,7 @@ ComponentMaterial::ComponentMaterial(GameObject* goContainer, const aiMaterial* 
 
 ComponentMaterial::ComponentMaterial(const ComponentMaterial& duplicatedComponent) : Component(duplicatedComponent) 
 {
-	difusseSelected = duplicatedComponent.diffuseSelected;
+	diffuseSelected = duplicatedComponent.diffuseSelected;
 	occlusionSelected = duplicatedComponent.occlusionSelected;
 	specularSelected = duplicatedComponent.specularSelected;
 	emissiveSelected = duplicatedComponent.emissiveSelected;
@@ -35,52 +35,73 @@ ComponentMaterial::~ComponentMaterial()
 	UnloadMaterial();
 }
 
-Component* ComponentMaterial::Duplicate() {
+Component* ComponentMaterial::Duplicate()
+{
+
 	return new ComponentMaterial(*this);
 }
 
-void ComponentMaterial::DeleteTexture(unsigned id) {
-	if (id != 0u) {
+void ComponentMaterial::DeleteTexture(unsigned id) 
+{
+	if (id != 0u) 
+	{
 		glDeleteTextures(1, &id);
 	}
 }
 
-void ComponentMaterial::DrawProperties(bool staticGo) {
+void ComponentMaterial::DrawProperties(bool staticGo) 
+{
 	ImGui::PushID(this);
-	if (ImGui::CollapsingHeader("Material")) {
 
-		if (staticGo) {
+	if (ImGui::CollapsingHeader("Material")) 
+	{
+		if (staticGo) 
+		{
 			ImGui::PushItemFlag({ ImGuiButtonFlags_Disabled | ImGuiItemFlags_Disabled | ImGuiSelectableFlags_Disabled }, true);
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
 		}
 
 		bool removed = Component::DrawComponentState();
-		if (removed) {
+		
+		if (removed) 
+		{
 			ImGui::PopID();
+		
 			return;
 		}
 
 		ImGui::Button("Material options");
 
-		if (ImGui::IsItemClicked(0)) {
+		if (ImGui::IsItemClicked(0)) 
+		{
 			ImGui::OpenPopup("MaterialOptionsContextualMenu");
 		}
 
-		if (ImGui::BeginPopup("MaterialOptionsContextualMenu")) {
+		if (ImGui::BeginPopup("MaterialOptionsContextualMenu")) 
+		{
 			ImGui::PushID("AddMaterial");
-			if (ImGui::MenuItem("Add material")) {}
+		
+			if (ImGui::MenuItem("Add material")) 
+			{
+			
+			}
+
 			ImGui::PopID();
 			ImGui::PushID("DeleteMaterial");
-			if (ImGui::MenuItem("Remove materials")) {
+			
+			if (ImGui::MenuItem("Remove materials")) 
+			{
 				UnloadMaterial();
 			}
+			
 			ImGui::PopID();
 			ImGui::EndPopup();
 		}
 
 		ImGui::Separator();
 
-		if (ImGui::CollapsingHeader("Diffuse")) {
+		if (ImGui::CollapsingHeader("Diffuse")) 
+		{
 			ImGui::ColorEdit3("Diffuse color", (float*)&material.diffuseColor);
 			DrawComboBoxMaterials("DiffuseComboTextures", MaterialType::DIFFUSE_MAP, diffuseSelected);
 			ImGui::Text("Dimensions: %dx%d", material.diffuseWidth, material.diffuseHeight);
@@ -88,14 +109,16 @@ void ComponentMaterial::DrawProperties(bool staticGo) {
 			ImGui::SliderFloat("K diffuse", &material.diffuseK, 0.0f, 1.0f);
 		}
 
-		if (ImGui::CollapsingHeader("Ambient")) {
+		if (ImGui::CollapsingHeader("Ambient")) 
+		{
 			DrawComboBoxMaterials("OcclusionComboTextures", MaterialType::OCCLUSION_MAP, occlusionSelected);
 			ImGui::Text("Dimensions: %dx%d", material.ambientWidth, material.ambientHeight);
 			ImGui::Image((ImTextureID)material.occlusionMap, ImVec2(200, 200));
 			ImGui::SliderFloat("K ambient", &material.ambientK, 0.0f, 1.0f);
 		}
 
-		if (ImGui::CollapsingHeader("Specular")) {
+		if (ImGui::CollapsingHeader("Specular")) 
+		{
 			ImGui::ColorEdit3("Specular color", (float*)&material.specularColor);
 			DrawComboBoxMaterials("SpecularComboTextures", MaterialType::SPECULAR_MAP, specularSelected);
 			ImGui::Text("Dimensions: %dx%d", material.specularWidth, material.specularHeight);
@@ -104,31 +127,41 @@ void ComponentMaterial::DrawProperties(bool staticGo) {
 			ImGui::SliderFloat("K shininess", &material.shininess, 0.0f, 128.0f);
 		}
 
-		if (ImGui::CollapsingHeader("Emissive")) {
+		if (ImGui::CollapsingHeader("Emissive")) 
+		{
 			ImGui::ColorEdit3("Emissive color", (float*)&material.emissiveColor);
 			DrawComboBoxMaterials("EmissiveComboTextures", MaterialType::EMISSIVE_MAP, emissiveSelected);
 			ImGui::Text("Dimensions: %dx%d", material.emissiveWidth, material.emissiveHeight);
 			ImGui::Image((ImTextureID)material.emissiveMap, ImVec2(200, 200));
 		}
 
-		if (staticGo) {
+		if (staticGo) 
+		{
 			ImGui::PopItemFlag();
 			ImGui::PopStyleVar();
 		}
 	}
+
 	ImGui::PopID();
 }
 
-void ComponentMaterial::DrawComboBoxMaterials(const char* id, MaterialType matType, static std::string& currentTexture) {
-
+void ComponentMaterial::DrawComboBoxMaterials(const char* id, MaterialType matType, static std::string& currentTexture) 
+{
 	ImGui::PushID(id);
-	if (ImGui::BeginCombo("##", currentTexture.c_str())) {
-		for (std::vector<std::string>::iterator iterator = App->library->fileTexturesList->begin(); iterator != App->library->fileTexturesList->end(); ++iterator) {
+
+	if (ImGui::BeginCombo("##", currentTexture.c_str()))
+	{
+		for (std::vector<std::string>::iterator iterator = App->library->fileTexturesList->begin(); iterator != App->library->fileTexturesList->end(); ++iterator) 
+		{
 			bool isSelected = (currentTexture == (*iterator).c_str());
-			if (ImGui::Selectable((*iterator).c_str(), isSelected)) {
+		
+			if (ImGui::Selectable((*iterator).c_str(), isSelected)) 
+			{
 				currentTexture = (*iterator).c_str();
 				App->textures->LoadMaterial(currentTexture.c_str(), this, matType);
-				if (isSelected) {
+			
+				if (isSelected) 
+				{
 					ImGui::SetItemDefaultFocus();
 				}
 			}
@@ -140,7 +173,8 @@ void ComponentMaterial::DrawComboBoxMaterials(const char* id, MaterialType matTy
 	ImGui::PopID();
 }
 
-void ComponentMaterial::UnloadMaterial() {
+void ComponentMaterial::UnloadMaterial() 
+{
 	DeleteTexture(material.diffuseMap);
 	DeleteTexture(material.specularMap);
 	DeleteTexture(material.occlusionMap);
@@ -150,7 +184,8 @@ void ComponentMaterial::UnloadMaterial() {
 	material = emptyMaterial;
 }
 
-void ComponentMaterial::Save(Config* config) {
+void ComponentMaterial::Save(Config* config) 
+{
 	config->StartObject();
 
 	config->AddComponentType("componentType", componentType);
@@ -174,7 +209,8 @@ void ComponentMaterial::Save(Config* config) {
 	config->EndObject();
 }
 
-void ComponentMaterial::Load(Config* config, rapidjson::Value& value) {
+void ComponentMaterial::Load(Config* config, rapidjson::Value& value) 
+{
 	diffuseSelected = config->GetString("diffuseSelected", value);
 	material.diffuseColor = config->GetFloat4("diffuseColor", value);
 	material.diffuseK = config->GetFloat("diffuseK", value);

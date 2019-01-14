@@ -13,39 +13,49 @@
 #include "Math/float3.h"
 #include "Math/float2.h"
 
-ComponentMesh::ComponentMesh(GameObject* goContainer, Mesh* mesh) : Component(goContainer, ComponentType::MESH) {
+ComponentMesh::ComponentMesh(GameObject* goContainer, Mesh* mesh) : Component(goContainer, ComponentType::MESH) 
+{
 	App->renderer->meshes.push_back(this);
 }
 
-ComponentMesh::ComponentMesh(const ComponentMesh& duplicatedComponent) : Component(duplicatedComponent) {
+ComponentMesh::ComponentMesh(const ComponentMesh& duplicatedComponent) : Component(duplicatedComponent) 
+{
 	mesh = duplicatedComponent.mesh;
+	currentMesh = duplicatedComponent.currentMesh;
 	App->renderer->meshes.push_back(this);
 }
 
-ComponentMesh::~ComponentMesh() {
+ComponentMesh::~ComponentMesh() 
+{
 	CleanUp();
 }
 
-Component* ComponentMesh::Duplicate() {
+Component* ComponentMesh::Duplicate() 
+{
+
 	return new ComponentMesh(*this);
 }
 
-void ComponentMesh::CleanUp() {
-
+void ComponentMesh::CleanUp() 
+{
 	App->renderer->meshes.remove(this);
 
-	if (mesh.vbo != 0) {
+	if (mesh.vbo != 0) 
+	{
 		glDeleteBuffers(1, &mesh.vbo);
 	}
 
-	if (mesh.ibo != 0) {
+	if (mesh.ibo != 0) 
+	{
 		glDeleteBuffers(1, &mesh.ibo);
 	}
 }
 
-void ComponentMesh::Draw(unsigned shaderProgram, const ComponentMaterial* material) const {
-
-	if (material == nullptr) {
+void ComponentMesh::Draw(unsigned shaderProgram, const ComponentMaterial* material) const 
+{
+	if (material == nullptr) 
+	{
+	
 		return;
 	}
 
@@ -63,39 +73,55 @@ void ComponentMesh::Draw(unsigned shaderProgram, const ComponentMaterial* materi
 	glUniform4fv(glGetUniformLocation(shaderProgram, "newColor"), 1, (float*)&material->material.color);
 
 	glActiveTexture(GL_TEXTURE0);
-	if (material->enabled && material->material.diffuseMap != 0) {
+	
+	if (material->enabled && material->material.diffuseMap != 0) 
+	{
 		glBindTexture(GL_TEXTURE_2D, material->material.diffuseMap);
 	}
-	else {
+	else 
+	{
 		glBindTexture(GL_TEXTURE_2D, App->renderer->fallback);
 	}
+	
 	glUniform1i(glGetUniformLocation(shaderProgram, "diffuseMap"), 0);
 
 	glActiveTexture(GL_TEXTURE1);
-	if (material->enabled && material->material.emissiveMap != 0) {
+	
+	if (material->enabled && material->material.emissiveMap != 0)
+	{
 		glBindTexture(GL_TEXTURE_2D, material->material.emissiveMap);
 	}
-	else {
+	else 
+	{
 		glBindTexture(GL_TEXTURE_2D, App->renderer->fallback);
 	}
+	
 	glUniform1i(glGetUniformLocation(shaderProgram, "emissiveMap"), 1);
 
 	glActiveTexture(GL_TEXTURE2);
-	if (material->enabled && material->material.occlusionMap != 0) {
+	
+	if (material->enabled && material->material.occlusionMap != 0)
+	{
 		glBindTexture(GL_TEXTURE_2D, material->material.occlusionMap);
 	}
-	else {
+	else 
+	{
 		glBindTexture(GL_TEXTURE_2D, App->renderer->fallback);
 	}
+	
 	glUniform1i(glGetUniformLocation(shaderProgram, "occlusionMap"), 2);
 
 	glActiveTexture(GL_TEXTURE3);
-	if (material->enabled && material->material.specularMap != 0) {
+	
+	if (material->enabled && material->material.specularMap != 0) 
+	{
 		glBindTexture(GL_TEXTURE_2D, material->material.specularMap);
 	}
-	else {
+	else 
+	{
 		glBindTexture(GL_TEXTURE_2D, App->renderer->fallback);
 	}
+	
 	glUniform1i(glGetUniformLocation(shaderProgram, "specularMap"), 3);
 
 	glBindVertexArray(mesh.vao);
@@ -105,38 +131,48 @@ void ComponentMesh::Draw(unsigned shaderProgram, const ComponentMaterial* materi
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void ComponentMesh::DrawProperties(bool staticGo) {
-
+void ComponentMesh::DrawProperties(bool staticGo) 
+{
 	ImGui::PushID(this);
-	if (ImGui::CollapsingHeader("Mesh")) {
 
-		if (staticGo) {
+	if (ImGui::CollapsingHeader("Mesh")) 
+	{
+		if (staticGo) 
+		{
 			ImGui::PushItemFlag({ ImGuiButtonFlags_Disabled | ImGuiItemFlags_Disabled | ImGuiSelectableFlags_Disabled }, true);
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
 		}
 
 		bool removed = Component::DrawComponentState();
-		if (removed) {
+	
+		if (removed) 
+		{
 			ImGui::PopID();
+		
 			return;
 		}
+
 		ImGui::Separator();
 
-
-
-		if (ImGui::BeginCombo("##meshCombo", currentMesh.c_str())) {
-
-			for (std::vector<std::string>::iterator it = App->library->fileMeshesList->begin(); it != App->library->fileMeshesList->end(); ++it) {
+		if (ImGui::BeginCombo("##meshCombo", currentMesh.c_str())) 
+		{
+			for (std::vector<std::string>::iterator it = App->library->fileMeshesList->begin(); it != App->library->fileMeshesList->end(); ++it) 
+			{
 				bool isSelected = (currentMesh == (*it));
-				if (ImGui::Selectable((*it).c_str(), isSelected)) {
+			
+				if (ImGui::Selectable((*it).c_str(), isSelected)) 
+				{
 					currentMesh = (*it);
 
 					LoadMesh(currentMesh.c_str());
-					if (isSelected) {
+				
+					if (isSelected) 
+					{
 						ImGui::SetItemDefaultFocus();
 					}
 				}
 			}
+
 			ImGui::EndCombo();
 		}
 
@@ -145,22 +181,25 @@ void ComponentMesh::DrawProperties(bool staticGo) {
 		ImGui::Text("Triangles count: %d", mesh.verticesNumber / 3);
 		ImGui::Text("Vertices count: %d", mesh.verticesNumber);
 
-		if (staticGo) {
+		if (staticGo) 
+		{
 			ImGui::PopItemFlag();
 			ImGui::PopStyleVar();
 		}
-
 	}
 
 	ImGui::PopID();
 }
 
-void ComponentMesh::LoadMesh(const char* name) {
-	if (mesh.vbo != 0) {
+void ComponentMesh::LoadMesh(const char* name) 
+{
+	if (mesh.vbo != 0) 
+	{
 		glDeleteBuffers(1, &mesh.vbo);
 	}
 
-	if (mesh.ibo != 0) {
+	if (mesh.ibo != 0) 
+	{
 		glDeleteBuffers(1, &mesh.ibo);
 	}
 
@@ -169,18 +208,21 @@ void ComponentMesh::LoadMesh(const char* name) {
 	goContainer->ComputeBBox();
 }
 
-void ComponentMesh::ComputeMesh() {
+void ComponentMesh::ComputeMesh() 
+{
 	glGenBuffers(1, &mesh.vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, mesh.vbo);
 
 	unsigned offset = sizeof(math::float3);
 
-	if (mesh.normals != nullptr) {
+	if (mesh.normals != nullptr) 
+	{
 		mesh.normalsOffset = offset;
 		offset += sizeof(math::float3);
 	}
 
-	if (mesh.uvs != nullptr) {
+	if (mesh.uvs != nullptr) 
+	{
 		mesh.texturesOffset = offset;
 		offset += sizeof(math::float2);
 	}
@@ -190,11 +232,13 @@ void ComponentMesh::ComputeMesh() {
 	glBufferData(GL_ARRAY_BUFFER, mesh.vertexSize * mesh.verticesNumber, nullptr, GL_STATIC_DRAW);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * 3 * mesh.verticesNumber, mesh.vertices);
 
-	if (mesh.normals != nullptr) {
+	if (mesh.normals != nullptr) 
+	{
 		glBufferSubData(GL_ARRAY_BUFFER, mesh.normalsOffset * mesh.verticesNumber, sizeof(float) * 3 * mesh.verticesNumber, mesh.normals);
 	}
 
-	if (mesh.uvs != nullptr) {
+	if (mesh.uvs != nullptr) 
+	{
 		glBufferSubData(GL_ARRAY_BUFFER, mesh.texturesOffset * mesh.verticesNumber, sizeof(float2)*mesh.verticesNumber, mesh.uvs);
 	}
 
@@ -217,12 +261,14 @@ void ComponentMesh::ComputeMesh() {
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
-	if (mesh.normalsOffset != 0) {
+	if (mesh.normalsOffset != 0) 
+	{
 		glEnableVertexAttribArray(1);
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)(mesh.normalsOffset * mesh.verticesNumber));
 	}
 
-	if (mesh.texturesOffset != 0) {
+	if (mesh.texturesOffset != 0) 
+	{
 		glEnableVertexAttribArray(2);
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*)(mesh.texturesOffset * mesh.verticesNumber));
 	}
@@ -239,7 +285,8 @@ void ComponentMesh::ComputeMesh() {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void ComponentMesh::ComputeMesh(par_shapes_mesh_s* parMesh) {
+void ComponentMesh::ComputeMesh(par_shapes_mesh_s* parMesh) 
+{
 	assert(parMesh != nullptr);
 
 	glGenBuffers(1, &mesh.vbo);
@@ -247,7 +294,8 @@ void ComponentMesh::ComputeMesh(par_shapes_mesh_s* parMesh) {
 
 	unsigned offset = sizeof(math::float3);
 
-	if (parMesh->normals) {
+	if (parMesh->normals) 
+	{
 		mesh.normalsOffset = offset;
 		offset += sizeof(math::float3);
 	}
@@ -257,7 +305,8 @@ void ComponentMesh::ComputeMesh(par_shapes_mesh_s* parMesh) {
 	glBufferData(GL_ARRAY_BUFFER, mesh.vertexSize * parMesh->npoints, nullptr, GL_STATIC_DRAW);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(math::float3) * parMesh->npoints, parMesh->points);
 
-	if (parMesh->normals) {
+	if (parMesh->normals) 
+	{
 		glBufferSubData(GL_ARRAY_BUFFER, mesh.normalsOffset * parMesh->npoints, sizeof(math::float3) * parMesh->npoints, parMesh->normals);
 	}
 
@@ -270,7 +319,8 @@ void ComponentMesh::ComputeMesh(par_shapes_mesh_s* parMesh) {
 
 	unsigned* indices = (unsigned*)glMapBufferRange(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(unsigned) * parMesh->ntriangles * 3, GL_MAP_WRITE_BIT);
 
-	for (unsigned i = 0; i< unsigned(parMesh->ntriangles * 3); ++i) {
+	for (unsigned i = 0; i< unsigned(parMesh->ntriangles * 3); ++i) 
+	{
 		*(indices++) = parMesh->triangles[i];
 	}
 
@@ -289,7 +339,8 @@ void ComponentMesh::ComputeMesh(par_shapes_mesh_s* parMesh) {
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
-	if (mesh.normalsOffset != 0) {
+	if (mesh.normalsOffset != 0) 
+	{
 		glEnableVertexAttribArray(1);
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)(mesh.normalsOffset * mesh.verticesNumber));
 	}
