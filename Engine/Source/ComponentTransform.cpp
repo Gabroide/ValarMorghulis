@@ -1,6 +1,7 @@
 #include "Config.h"
 #include "GameObject.h"
 #include "Application.h"
+#include "ModuleRender.h"
 #include "ModuleScene.h"
 #include "IMGUI\imgui_internal.h"
 #include "ComponentTransform.h"
@@ -93,6 +94,20 @@ math::float4x4 ComponentTransform::GetGlobalTransform() const
 	return GetLocalTransform();
 }
 
+void ComponentTransform::SetGlobalTransform(const math::float4x4& global) 
+{
+	SetLocalToWorld(global);
+	math::float4x4 parentglobal = math::float4x4::identity;
+
+	if (goContainer->parent != nullptr && goContainer->parent->transform != nullptr) 
+	{
+		parentglobal = goContainer->parent->transform->GetGlobalTransform();
+	}
+	
+	SetWorldToLocal(parentglobal);
+	goContainer->ComputeBBox();
+}
+
 void ComponentTransform::DrawProperties(bool staticGo) 
 {
 	if (ImGui::CollapsingHeader("Local Transform")) 
@@ -119,6 +134,34 @@ void ComponentTransform::DrawProperties(bool staticGo)
 		}
 
 		rotation = rotation.FromEulerXYZ(math::DegToRad(eulerRotation.x), math::DegToRad(eulerRotation.y), math::DegToRad(eulerRotation.z));
+
+		ImGui::Text("Edit a GameObject");
+		if (ImGui::Button("Translate") //TODO
+		{
+			App->renderer->imGuizmoActivity = ImGuizmo::TRANSLATE;
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::Text("Rotate"))
+		{
+			App->renderer->imGuizmoActivity = ImGuizmo::ROTATE;
+		}
+
+		ImGui::SmaeLine();
+
+		if (ImGui::Text("Scale"))
+		{
+			App->renderer->imGuizmoActivity = ImGuizmo::SCALE;
+			App->renderer->imGuizmoMode = ImGuizmo::LOCAL;
+		}
+
+		if (App->renderer->imGuizmoActivity != ImGuizmo::SCALE)
+		{
+			ImGui::RadioButton("Local", &App->renderer->imGuizmoActivity, ImGuizmo::LOCAL);
+			ImGui::SameLine();
+			ImGui::RadioButton("Global", &App->renderer->imGuizmoMode, ImGuizmo::WORLD);
+		}
 
 		if (edited) 
 		{

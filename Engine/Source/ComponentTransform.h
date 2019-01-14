@@ -29,6 +29,7 @@ class ComponentTransform : public Component
 		void			DrawProperties(bool staticGo) override;
 		void			Save(Config* config);
 		void			Load(Config* config, rapidjson::Value& value);
+		void			GlobalTransform(const math::float4x4& global);
 
 		math::float4x4	GetLocalTransform() const;
 		math::float4x4	GetGlobalTransform() const;
