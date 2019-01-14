@@ -44,23 +44,24 @@ class ModuleRender : public Module
 		void			PrintRayCast() const;
 
 	public:
-		bool			frustCulling		= true;
-		bool			vsyncEnabled		= false;
-		bool			showQuad			= false;
-		bool			showRayCast			 = false;
+		bool			frustCulling			= true;
+		bool			vsyncEnabled			= false;
+		bool			showQuad				= false;
+		bool			showRayCast				= false;
+		bool			selectAncestorOnClick	= true;
 
-		unsigned		fallback			= 0u;
-		unsigned		ubo					= 0u;
+		unsigned		fallback				= 0u;
+		unsigned		ubo						= 0u;
 
-		int				frustumCullingType	= 0;
-		int				imGuizmoActivity			= 0;
-		int				imGuizmoMode		= 0;
+		int				frustumCullingType		= 0;
+		int				imGuizmoActivity		= 0;
+		int				imGuizmoMode			= 0;
 
-		float			sceneViewportX		= 0.0f;
-		float			sceneViewportY		= 0.0f;
+		float			sceneViewportX			= 0.0f;
+		float			sceneViewportY			= 0.0f;
 
 	public:
-		void*			context				= nullptr;
+		void*			context					= nullptr;
 
 		std::list<ComponentMesh*> meshes;
 	

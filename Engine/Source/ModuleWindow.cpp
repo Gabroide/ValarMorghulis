@@ -4,12 +4,20 @@
 #include "ModuleRender.h"
 #include "ModuleWindow.h"
 
-ModuleWindow::ModuleWindow() { }
+// Constructor
+ModuleWindow::ModuleWindow() 
+{
 
-ModuleWindow::~ModuleWindow() { }
+}
 
-bool ModuleWindow::Init() {
+// Destructor
+ModuleWindow::~ModuleWindow() 
+{
 
+}
+
+bool ModuleWindow::Init() 
+{
 	LOG("Init SDL window & surface");
 	bool ret = true;
 
@@ -19,7 +27,7 @@ bool ModuleWindow::Init() {
 	} else {
 		int width = SCREEN_WIDTH;
 		int height = SCREEN_HEIGHT;
-		Uint32 flags = SDL_WINDOW_SHOWN |  SDL_WINDOW_OPENGL;
+		Uint32 flags = SDL_WINDOW_SHOWN |  SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_MAXIMIZED;
 
 		if(FULLSCREEN == true) {
 			flags |= SDL_WINDOW_FULLSCREEN;

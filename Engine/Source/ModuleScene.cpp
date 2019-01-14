@@ -8,7 +8,7 @@
 #include "ModuleCamera.h"
 #include "ComponentMesh.h"
 #include "ComponentLight.h"
-#include "QuadTreeChimera.h"
+#include "QuadTreeValar.h"
 #include "ComponentCamera.h"
 #include "ComponentMaterial.h"
 #include "ComponentTransform.h"
@@ -40,7 +40,7 @@ bool ModuleScene::CleanUp()
 bool ModuleScene::Init() 
 {
 	root = new GameObject("root", nullptr);
-	quadTree = new QuadTreeChimera();
+	quadTree = new QuadTreeValar();
 
 	return true;
 }
