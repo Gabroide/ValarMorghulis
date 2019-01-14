@@ -31,14 +31,17 @@ void DockAbout::Draw()
 		return;
 	}
 
-	ImGui::Text("Name:"); ImGui::SameLine();
+	ImGui::Text("Name:"); 
+	ImGui::SameLine();
 	ImGui::TextColored(ImVec4(1, 1, 0, 1), TITLE);
 
-	ImGui::Text("Description:"); ImGui::SameLine();
+	ImGui::Text("Description:");
+	ImGui::SameLine();
 	ImGui::TextColored(ImVec4(1, 1, 0, 1), DESCRIPTION);
 	ImGui::Separator();
 
-	ImGui::Text("Author:"); ImGui::SameLine();
+	ImGui::Text("Author:");
+	ImGui::SameLine();
 	ImGui::TextColored(ImVec4(1, 1, 0, 1), AUTHOR);
 
 	if (ImGui::SmallButton("Github")) 
@@ -63,11 +66,12 @@ void DockAbout::Draw()
 		ImGui::BulletText("DebugDraw (version 2017)");
 		ImGui::BulletText("PhysicsFS (version 3.0.1");
 		ImGui::BulletText("RapidJason (version 1.1.0)");
+		ImGui::BulletText("ImGuizmo (version 1.1.0)");
 		ImGui::TreePop();
 	}
 
 	ImGui::Separator();
-	ImGui::Text("This engine is licensed under the Public Domain, see LICENSE for more information");
+	ImGui::Text("MIT LICENSE");
 	
 	if (ImGui::SmallButton("License")) 
 	{

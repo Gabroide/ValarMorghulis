@@ -11,6 +11,8 @@
 
 #include "glew-2.1.0\include\GL\glew.h"
 
+#include "ImGuizmo\ImGuizmo.h"
+
 // Constructor
 ModuleEditor::ModuleEditor()
 {
@@ -54,6 +56,7 @@ update_status ModuleEditor::PreUpdate()
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplSDL2_NewFrame(App->window->window);
 	ImGui::NewFrame();
+	ImGuizmo::BeginFrame();
 
 	CreateDockSpace();
 	return UPDATE_CONTINUE;

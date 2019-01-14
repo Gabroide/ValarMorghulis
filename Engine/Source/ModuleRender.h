@@ -2,8 +2,11 @@
 #define __ModuleRender_h__
 
 #include "Module.h"
+
 #include <list>
 #include <vector>
+
+#include "ImGuizmo\ImGuizmo.h"
 
 class GameObject;
 class QuadTreeNode;
@@ -23,6 +26,8 @@ class ModuleRender : public Module
 		update_status	Update()		override;
 		update_status	PostUpdate()	override;
 	
+		void			DrawImGuizmo(float width, float height, float winPosX, float winPosY);
+
 	private:
 		void			InitSDL();
 		void			InitOpenGL() const;
@@ -48,6 +53,8 @@ class ModuleRender : public Module
 		unsigned		ubo					= 0u;
 
 		int				frustumCullingType	= 0;
+		int				imGuizmoActivity			= 0;
+		int				imGuizmoMode		= 0;
 
 		float			sceneViewportX		= 0.0f;
 		float			sceneViewportY		= 0.0f;
