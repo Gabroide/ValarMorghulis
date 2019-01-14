@@ -1,26 +1,37 @@
 #include "assert.h"
+
 #include "Config.h"
 #include "GameObject.h"
 #include "Application.h"
 #include "ModuleProgram.h"
 #include "ModuleLibrary.h"
-#include "imgui_internal.h"
+
+#include "IMGUI\imgui_internal.h"
+
 #include "ModuleTextures.h"
 #include "ComponentMaterial.h"
 
-ComponentMaterial::ComponentMaterial(GameObject* goContainer) : Component(goContainer, ComponentType::MATERIAL) {
+ComponentMaterial::ComponentMaterial(GameObject* goContainer) : Component(goContainer, ComponentType::MATERIAL) 
+{
 
 }
 
-ComponentMaterial::ComponentMaterial(GameObject* goContainer, const aiMaterial* material) : Component(goContainer, ComponentType::MATERIAL) {
+ComponentMaterial::ComponentMaterial(GameObject* goContainer, const aiMaterial* material) : Component(goContainer, ComponentType::MATERIAL) 
+{
 
 }
 
-ComponentMaterial::ComponentMaterial(const ComponentMaterial& duplicatedComponent) : Component(duplicatedComponent) {
+ComponentMaterial::ComponentMaterial(const ComponentMaterial& duplicatedComponent) : Component(duplicatedComponent) 
+{
+	difusseSelected = duplicatedComponent.diffuseSelected;
+	occlusionSelected = duplicatedComponent.occlusionSelected;
+	specularSelected = duplicatedComponent.specularSelected;
+	emissiveSelected = duplicatedComponent.emissiveSelected;
 	material = duplicatedComponent.material;
 }
 
-ComponentMaterial::~ComponentMaterial() {
+ComponentMaterial::~ComponentMaterial() 
+{
 	UnloadMaterial();
 }
 
