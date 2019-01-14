@@ -7,7 +7,7 @@
 #include "ComponentMesh.h"
 #include "ComponentLight.h"
 #include "ComponentCamera.h"
-#include "QuadTreeChimera.h"
+#include "QuadTreeValar.h"
 #include "ComponentMaterial.h"
 #include "ComponentTransform.h"
 #include "ModuleFileSystem.h"

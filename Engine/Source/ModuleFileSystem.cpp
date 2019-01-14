@@ -18,7 +18,7 @@ ModuleFileSystem::~ModuleFileSystem()
 
 bool ModuleFileSystem::Init() 
 {
-	basePath = SDL_GetPrefPath("Chimera", "");
+	basePath = SDL_GetPrefPath("Valar", "");
 	PHYSFS_init(basePath);
 	SDL_free(basePath);
 

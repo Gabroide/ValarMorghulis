@@ -20,7 +20,7 @@ enum class GeometryType {
 
 class Config;
 class GameObject;
-class QuadTreeChimera;
+class QuadTreeValar;
 
 class ModuleScene : public Module
 {
@@ -55,7 +55,7 @@ class ModuleScene : public Module
 		GameObject*			root			= nullptr;
 		GameObject*			goSelected		= nullptr;
 		
-		QuadTreeChimera*	quadTree		= nullptr;
+		QuadTreeValar*	quadTree		= nullptr;
 
 };
 

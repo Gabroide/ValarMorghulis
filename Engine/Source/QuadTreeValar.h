@@ -67,7 +67,7 @@ class QuadTreeValar
 };
 
 template<typename TYPE>
-inline void QuadTreeChimera::CollectIntersections(std::vector<GameObject*>& gameObject, const TYPE& primitive) const {
+inline void QuadTreeValar::CollectIntersections(std::vector<GameObject*>& gameObject, const TYPE& primitive) const {
 	if (root != nullptr)	{
 		root->CollectIntersections(gameObject, primitive);
 	}
