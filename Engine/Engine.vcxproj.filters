@@ -13,9 +13,6 @@
     <ClCompile Include="Source\ModuleResourceManager.cpp">
       <Filter>Modules</Filter>
     </ClCompile>
-    <ClCompile Include="Source\ModuleTime.cpp">
-      <Filter>Modules</Filter>
-    </ClCompile>
     <ClCompile Include="Source\ModuleWindow.cpp">
       <Filter>Modules</Filter>
     </ClCompile>
@@ -238,6 +235,9 @@
     <ClCompile Include="Source\DockQuadTree.cpp">
       <Filter>Docks\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\ModuleTime.cpp">
+      <Filter>Modules\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\GameObject.h">
@@ -247,9 +247,6 @@
       <Filter>Main</Filter>
     </ClInclude>
     <ClInclude Include="Source\ModuleResourceManager.h">
-      <Filter>Modules</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\ModuleTime.h">
       <Filter>Modules</Filter>
     </ClInclude>
     <ClInclude Include="Source\ModuleWindow.h">
@@ -548,6 +545,9 @@
     </ClInclude>
     <ClInclude Include="Source\DockQuadTree.h">
       <Filter>Docks\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ModuleTime.h">
+      <Filter>Modules\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

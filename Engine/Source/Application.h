@@ -2,8 +2,11 @@
 #define __Aplication_h__
 
 #include <list>
+
 #include "Globals.h"
 #include "Module.h"
+
+#include "Brofiler\include\Brofiler.h"
 
 class ModuleRender;
 class ModuleWindow;

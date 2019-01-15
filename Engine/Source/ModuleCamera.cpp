@@ -34,6 +34,8 @@ bool ModuleCamera::Init()
 
 update_status ModuleCamera::PreUpdate() 
 {
+	BROFILER_CATEGORY("CameraPreupdate()", Profiler::Color::Aqua); //TODO
+
 	if (App->editor->SceneFocused()) 
 	{
 		MovementSpeed();
@@ -70,7 +72,7 @@ update_status ModuleCamera::PreUpdate()
 
 		Zoom();
 
-		if (App->input->GetMouseButtonDown(SDL_BUTTON_LEFT) == KEY_DOWN) 
+		if (App->input->GetMouseButtonDown(SDL_BUTTON_LEFT) == KEY_DOWN && sceneFocused && !ImGuizmo::IsOver()) 
 		{
 			SelectGameObject();
 		}
@@ -82,6 +84,8 @@ update_status ModuleCamera::PreUpdate()
 
 update_status ModuleCamera::Update() 
 {
+	BROFILER_CATEGORY("CameraUpdate()", Profiler::Color::Aqua); //TODO
+
 	if (selectedCamera != nullptr && selectedCamera->enabled) 
 	{
 		selectedCamera->Update();
@@ -145,8 +149,8 @@ void ModuleCamera::MovementSpeed()
 {
 	if (App->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_DOWN) 
 	{
-		sceneCamera->cameraSpeed = sceneCamera->cameraSpeed * 2;
-		sceneCamera->rotationSpeed = sceneCamera->rotationSpeed * 2;
+		sceneCamera->cameraSpeed = sceneCamera->cameraSpeed * 2.0f;
+		sceneCamera->rotationSpeed = sceneCamera->rotationSpeed * 2.0f;
 	}
 	else if (App->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_UP) 
 	{
@@ -202,11 +206,9 @@ void ModuleCamera::SelectGameObject()
 {
 	const fPoint mousePos = App->input->GetMousePosition();
 
-	float normalizedX = mousePos.x * App->window->width - App->editor->scene->viewport.x;
-	float normalizedY = mousePos.y * App->window->height - App->editor->scene->viewport.y;
-	normalizedX = (normalizedX / (App->window->width / 2)) - 1.0f;
-	normalizedY = 1.0f - (normalizedY / (App->window->height / 2));
-
+	float normalizedX = -(1.0f - (float(mousePos.x - App->editor->scene->viewport.x) * 2.0f) / App->editor->scene->winSize.x);
+	float normalizedY = 1.0f - (float(mousePos.y - App->editor->scene->viewport.y) * 2.0f) / App->editor->scene->winSize.y;
+	
 	rayCast = sceneCamera->frustum.UnProjectLineSegment(normalizedX, normalizedY);
 
 	objectsPossiblePick.clear();
@@ -277,6 +279,10 @@ void ModuleCamera::SelectGameObject()
 		{
 			App->scene->goSelected = gameObjectHit;
 		}
+	}
+	else
+	{
+		App->scene->goSelected = nullptr;
 	}
 }
 

@@ -1,5 +1,5 @@
-#ifndef __MODULETIME_H_
-#define __MODULETIME_H_
+#ifndef __ModuleIime_h__
+#define __ModuleIime_h__
 
 #include "Timer.h"
 #include "Module.h"
@@ -13,38 +13,40 @@ class ModuleTime : public Module
 		ModuleTime();
 		~ModuleTime();
 
-		bool Init() override;
-		update_status Update() override;
-		bool CleanUp() override;
+		bool			Init()		override;
+		bool			CleanUp()	override;
 
-		void StartGameClock();
-		void PauseGameClock(bool pause);
-		void StopGameClock();
-		void Step();
+		update_status	Update()	override;
+		
+		void			StartGameClock();
+		void			PauseGameClock(bool pause);
+		void			StopGameClock();
+		void			Step();
 
 	public:
-		int FPS = 0;					
-		bool nextFrame = false;		
-		unsigned maxFps = 144u;
-		unsigned totalFrames = 0u;
-		GameState gameState = GameState::STOP;
+		bool			nextFrame = false;
 
-		Timer frameTimer;
-		Timer fpsTimer;
+		unsigned		maxFps = 144u;
+		unsigned		totalFrames = 0u;
+		unsigned		realFrameCount = 0u;
 
-		// Game Clock
-		float gameTimeScale = 1.0f;
-		float gameTime = 0.0f;		
-		float gameDeltaTime = 0.0f;
+		int				FPS = 0;					
+		
+		float			gameTimeScale	= 1.0f;
+		float			gameTime		= 0.0f;
+		float			gameDeltaTime	= 0.0f;
 
-		// RealTime Clock
-		float realTime = 0.0f;					
-		float realDeltaTime = 0.0f;
-		unsigned realFrameCount = 0u;	
+		float			realTime		= 0.0f;
+		float			realDeltaTime	= 0.0f;
 
+		GameState		gameState		= GameState::STOP;
+
+		Timer			frameTimer;
+		Timer			fpsTimer;
+	
 	private:
-		unsigned frameCount = 0u;
+		unsigned		frameCount		= 0u;
 
 };
 
-#endif
+#endif // __ModuleIime_h__

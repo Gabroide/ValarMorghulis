@@ -58,6 +58,8 @@ bool ModuleRender::Init()
 
 update_status ModuleRender::PreUpdate() 
 {
+	BROFILER_CATEGORY("RenderPreUpdate()", Profiler::Color::DodgerBlue);
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	return UPDATE_CONTINUE;
@@ -66,6 +68,8 @@ update_status ModuleRender::PreUpdate()
 // Called every draw update
 update_status ModuleRender::Update() 
 {
+	BROFILER_CATEGORY("RenderUpdate()", Profiler::Color::DodgerBlue);
+
 	glBindFramebuffer(GL_FRAMEBUFFER, App->camera->sceneCamera->fbo);
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -96,7 +100,7 @@ update_status ModuleRender::Update()
 		DrawDebugData(App->camera->selectedCamera);
 	}
 
-	if (App->camera->quadCamera != nullptr) 
+	if (showQuad && App->camera->quadCamera != nullptr) 
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, App->camera->quadCamera->fbo);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -116,6 +120,8 @@ update_status ModuleRender::Update()
 
 update_status ModuleRender::PostUpdate() 
 {
+	BROFILER_CATEGORY("RenderPostUpdate()", Profiler::Color::DodgerBlue);
+
 	App->editor->RenderGUI();
 	SDL_GL_SwapWindow(App->window->window);
 
@@ -124,6 +130,8 @@ update_status ModuleRender::PostUpdate()
 
 void ModuleRender::DrawDebugData(ComponentCamera* camera) const 
 {
+	BROFILER_CATEGORY("LibraryUpdate()", Profiler::Color::Orchid);
+
 	if (camera->debugDraw == false)
 	{
 		return;

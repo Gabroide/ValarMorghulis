@@ -13,7 +13,7 @@ bool stopWatcher = false;
 // Constructior
 ModuleLibrary::ModuleLibrary() 
 {
-	
+	CleanUp();
 }
 
 // Destructor
@@ -24,19 +24,17 @@ ModuleLibrary::~ModuleLibrary()
 
 void LibraryWatcher() 
 {	
-	return;
-	
 	std::map<std::string, std::string> oldFilesAssets;
 	std::map<std::string, std::string> currentFilesAssets;
 	std::map<std::string, std::string> currentFilesLibrary;
 	
 	while (!stopWatcher) 
 	{
-		currentFilesAssets = App->fileSystem->GetFilesFromDirectoryRecursive("/Assets/", true);
+		App->fileSystem->GetFilesFromDirectoryRecursive("/Assets/", true, currentFilesAssets);
 		
 		if ((oldFilesAssets.size() == 0 && oldFilesAssets.size() != currentFilesAssets.size()) || oldFilesAssets.size() < currentFilesAssets.size()) 
 		{
-			currentFilesLibrary = App->fileSystem->GetFilesFromDirectoryRecursive("/Library/", false);
+			App->fileSystem->GetFilesFromDirectoryRecursive("/Library/", false, currentFilesLibrary);
 			
 			for (std::map<std::string, std::string>::iterator iterator = currentFilesAssets.begin(); iterator != currentFilesAssets.end(); ++iterator) 
 			{
@@ -95,6 +93,8 @@ bool ModuleLibrary::Init()
 
 update_status ModuleLibrary::Update() 
 {
+	BROFILER_CATEGORY("LibraryUpdate()", Profiler::Color::Chocolate);
+
 	if (toBeDeleted) 
 	{
 		toBeDeleted = false;
@@ -115,6 +115,7 @@ update_status ModuleLibrary::Update()
 bool ModuleLibrary::CleanUp() 
 {
 	stopWatcher = true;
+	Sleep(1200);
 
 	return true;
 }

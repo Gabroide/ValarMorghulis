@@ -47,10 +47,8 @@ class ModuleCamera : public Module
 
 	public:
 		bool						firstMouse			= true;
+		bool						sceneFocused		= false;
 
-		float						mouseSensitivity	= 0.5f;
-		float						rotationSpeed		= 0.5f;
-		float						cameraSpeed			= 1700.0f;
 		float						lastX				= 0.0f;
 		float						lastY				= 0.0f;
 
