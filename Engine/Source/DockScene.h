@@ -17,6 +17,8 @@ class DockScene : public Dock
 	public:
 		bool			focus		= false;
 
+		ImVec2			winSize;
+
 		math::float2	viewport	= math::float2::zero;
 
 };

@@ -30,8 +30,7 @@ public:
 	void		GetFilesFromDirectory(const char* directory, std::vector<std::string>& fileList) const;
 	void		ChangePathSlashes(std::string& fullPath) const;
 	void		SplitFilePath(const char* fullPath, std::string* path, std::string* file = nullptr, std::string* extension = nullptr) const;
-
-	std::map<std::string, std::string> GetFilesFromDirectoryRecursive(const char* directory, const bool includeExtension);
+	void		GetFilesFromDirectoryRecursive(const char* directory, const bool includeExtension, std::map<std::string,std::string>& result);
 	
 public:
 	const char* NewGuuid();
